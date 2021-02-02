@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/ng-alain/schema.json",
+  "theme": {
+    "additionalThemeVars": [
+      "./src/app/layout/pro/styles/theme-#NAME#.less",
+      "./src/styles/fix/theme-#NAME#.less"
+    ],
+    "list": [
+      {
+        "theme": "dark"
+      },
+      {
+        "theme": "compact"
+      }
+    ]
+  }
+}

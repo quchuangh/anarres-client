@@ -1,0 +1,54 @@
+<ng-template #sideTpl>
+  <nz-sider
+    [nzTrigger]="null"
+    [nzCollapsible]="true"
+    [nzCollapsed]="isMobile ? false : pro.collapsed"
+    [nzWidth]="pro.width"
+    [nzCollapsedWidth]="pro.widthInCollapsed"
+    class="alain-pro__sider"
+    [ngClass]="{ 'alain-pro__sider-fixed': pro.fixSiderbar }"
+  >
+    <layout-pro-logo class="alain-pro__sider-logo"></layout-pro-logo>
+    <div class="alain-pro__side-nav" style="width: 100%; padding: 16px 0">
+      <div class="alain-pro__side-nav-wrap" layout-pro-menu></div>
+    </div>
+  </nz-sider>
+</ng-template>
+<div class="ant-layout ant-layout-has-sider">
+  <ng-container *ngIf="pro.menu === 'side' || isMobile">
+    <nz-drawer
+      *ngIf="isMobile"
+      [nzWidth]="pro.width"
+      nzWrapClassName="alain-pro__drawer"
+      [nzVisible]="!pro.collapsed"
+      [nzClosable]="false"
+      nzPlacement="left"
+      (nzOnClose)="pro.setCollapsed(true)"
+    >
+      <ng-template nzDrawerContent>
+        <ng-template [ngTemplateOutlet]="sideTpl"></ng-template>
+      </ng-template>
+    </nz-drawer>
+    <ng-container *ngIf="!isMobile">
+      <ng-template [ngTemplateOutlet]="sideTpl"></ng-template>
+    </ng-container>
+  </ng-container>
+  <div class="ant-layout alain-pro__main" [ngStyle]="getLayoutStyle">
+    <layout-pro-header></layout-pro-header>
+    <!--
+      NOTICE: Route reuse strategy tag placeholder, please refer to: https://ng-alain.com/components/reuse-tab
+      - Not supported top header fixed mode
+      ```html
+      <reuse-tab></reuse-tab>
+      ```
+    -->
+    <div class="ant-layout-content alain-pro__body" [class.alain-pro__fetching]="isFetching" [ngStyle]="getContentStyle">
+      <nz-spin class="alain-pro__fetching-icon" nzSpinning></nz-spin>
+      <router-outlet></router-outlet>
+    </div>
+    <layout-pro-footer class="ant-layout-footer alain-pro__footer"></layout-pro-footer>
+  </div>
+</div>
+<ng-template #settingHost></ng-template>
+<quick-chat></quick-chat>
+<theme-btn></theme-btn>

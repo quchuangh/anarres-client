@@ -1,0 +1,146 @@
+// Note that the following is the beautification fullcalendar v5 version
+
+@import '~@delon/theme/index';
+
+@fc-event-colors:
+  primary     @blue-6,
+  success     @green-6,
+  danger      @red-6,
+  warning     @yellow-6,
+  purple    @purple-6,
+  magenta   @magenta-6,
+;
+
+.fc-antd {
+  a {
+    color: inherit;
+    &,
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  th,
+  td,
+  .fc-scrollgrid
+   {
+    border: 1px solid @border-color-split;
+  }
+
+  .fc-col-header-cell {
+    padding: 8px;
+    color: @table-header-color;
+  }
+
+  .fc-day {
+    &:not(.fc-axis) {
+      padding: 4px;
+    }
+    &.fc-day-today {
+      background: rgba(232, 232, 232, 0.2);
+    }
+  }
+
+  .fc-event {
+    background: @calendar_fc-event_background;
+    border: 1px solid @border-color-split;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.055);
+    &-title-container {
+      padding: 4px 4px 4px 20px;
+      &::before {
+        position: absolute;
+        top: 50%;
+        left: 4px;
+        display: block;
+        width: 10px;
+        height: 10px;
+        margin-top: -5px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 50%;
+        content: ' ';
+      }
+    }
+    &-title {
+      display: block;
+      overflow: hidden;
+      color: @text-color;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    &.fc-not-start.fc-end .fc-event-main {
+      padding-left: 4px;
+      &::before {
+        display: none;
+      }
+    }
+
+    // colors
+    .for-each(@fc-event-colors, {
+      // fc-event-title-container
+      &-@{adKey} {
+        .fc-event-title-container {
+          &::before {
+            background-color: @adValue;
+          }
+        }
+      }
+      &-fill-@{adKey} {
+        background-color: @adValue;
+      }
+    });
+  }
+
+  // popover
+  .fc-popover {
+    &-header {
+      padding: 8px 16px;
+      background: #eee;
+    }
+    &-body {
+      background: @popover-background;
+    }
+  }
+
+    // colors
+    // fc-daygrid-event fc-daygrid-block-event fc-h-event fc-event fc-event-draggable fc-event-start fc-event-end fc-event-past
+    // .for-each(@fc-event-colors, {
+    //   &-@{adKey} .fc-list-event-dot {
+    //     border-color: @adValue;
+    //   }
+    //   &-fill-@{adKey} {
+    //     .fc-list-event-dot {
+    //       border-color: @adValue;
+    //     }
+    //   }
+    // });
+
+
+
+  // // events
+  // .fc-event {
+  //   &.fc-not-start.fc-end .fc-content {
+  //     padding-left: 4px;
+  //     &::before {
+  //       display: none;
+  //     }
+  //   }
+  //   &.fc-start {
+  //     .fc-content::before {
+  //       background: rgba(0, 0, 0, 0.2);
+  //     }
+  //   }
+
+  //   // colors
+  //   .for-each(@fc-event-colors, {
+  //     &-@{adKey} .fc-list-event-dot {
+  //       border-color: @adValue;
+  //     }
+  //     &-fill-@{adKey} {
+  //       .fc-list-event-dot {
+  //         border-color: @adValue;
+  //       }
+  //     }
+  //   });
+  // }
+}
