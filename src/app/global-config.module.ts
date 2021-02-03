@@ -12,7 +12,10 @@ import { DelonACLModule } from '@delon/acl';
 const alainConfig: AlainConfig = {
   st: { modal: { size: 'lg' } },
   pageHeader: { homeI18n: 'home', recursiveBreadcrumb: true },
-  auth: { login_url: '/passport/login' },
+  auth: {
+    login_url: '/passport/login',
+    token_send_key: 'Authorization',
+  },
 };
 
 const alainModules = [AlainThemeModule.forRoot(), DelonACLModule.forRoot(), DelonMockModule.forRoot()];
@@ -59,7 +62,7 @@ export class GlobalConfigModule {
     // NOTICE: Only valid for menus with reuse property
     // Pls refer to the E-Mail demo effect
     reuseTabService.mode = ReuseTabMatchMode.MenuForce;
-    // Shouled be trigger init, you can ingore when used `reuse-tab` component in layout component
+    // Shoued be trigger init, you can ignore when used `reuse-tab` component in layout component
     reuseTabService.init();
   }
 

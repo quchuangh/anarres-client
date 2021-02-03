@@ -11,7 +11,7 @@
   "scripts": {
     "ng-high-memory": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng",
     "ng": "ng",
-    "start": "ng s -o",
+    "start": "ng s -o --proxy-config proxy.conf.json",
     "hmr": "ng s -o --hmr",
     "build": "npm run ng-high-memory build -- --prod",
     "analyze": "npm run ng-high-memory build -- --prod --source-map",
@@ -29,6 +29,8 @@
     "icon": "ng g ng-alain:plugin icon"
   },
   "dependencies": {
+    "@ag-grid-community/angular": "^24.1.0",
+    "@ag-grid-enterprise/all-modules": "^24.1.0",
     "@angular/animations": "~11.0.5",
     "@angular/common": "~11.0.5",
     "@angular/compiler": "~11.0.5",

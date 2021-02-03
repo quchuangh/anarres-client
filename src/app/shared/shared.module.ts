@@ -19,6 +19,7 @@ const THIRDMODULES = [DragDropModule];
 // #region your componets & directives
 import { PRO_SHARED_MODULES } from '../layout/pro';
 import { AddressModule } from './components/address';
+import { AgGridExtModule } from './components/ag-grid-ext';
 import { DelayModule } from './components/delay';
 import { EditorModule } from './components/editor';
 import { FileManagerModule } from './components/file-manager';
@@ -36,6 +37,7 @@ const MODULES = [
   MouseFocusModule,
   ScrollbarModule,
   StatusLabelModule,
+  AgGridExtModule,
   ...PRO_SHARED_MODULES,
 ];
 // #endregion

@@ -5,6 +5,7 @@ import { ResultModule } from '@delon/abc/result';
 import { SEModule } from '@delon/abc/se';
 import { TranslateModule } from '@ngx-translate/core';
 import { LangsModule } from '@shared';
+import {NzAlertModule} from 'ng-zorro-antd/alert';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
@@ -61,6 +62,7 @@ const COMPONENTS = [
     SEModule,
     ResultModule,
     LangsModule,
+    NzAlertModule,
   ],
   declarations: [...COMPONENTS],
 })

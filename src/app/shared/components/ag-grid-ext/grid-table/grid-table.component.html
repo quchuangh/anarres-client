@@ -1,0 +1,140 @@
+<full-content [(fullscreen)]="fullscreen" class="flex flex-column flex-grow-1">
+
+  <ng-container *ngIf="searchPermission&&searchSchema">
+    <sf #sf [acl-ability]="searchPermission" [firstVisual]="true" [formData]="searchFormData"
+        [schema]="searchSchema"
+        acl
+        button="none"
+        class="agent-grid-header-search"
+        mode="search">
+    </sf>
+
+    <div class="agent-grid-search-action">
+      <button (click)="searchRowsData()" [acl-ability]="searchPermission" [nzLoading]="dataLoading"
+              acl nz-button nzSize="small" nzType="primary">
+        <i nz-icon nzType="search" theme="outline"></i>搜索
+      </button>
+      <button (click)="resetSearch()" [acl-ability]="searchPermission" acl nz-button nzSize="small" type="button">
+        <i nz-icon nzTheme="outline" nzType="rest"></i>重置
+      </button>
+
+    </div>
+  </ng-container>
+  <ng-container *ngIf="!searchPermission&&searchSchema">
+    <sf #sf [firstVisual]="true"
+        [formData]="searchFormData"
+        [schema]="searchSchema"
+        button="none"
+        class="header-search"
+        mode="search">
+    </sf>
+    <div class="search-action">
+      <button (click)="searchRowsData()"
+              [nzLoading]="dataLoading" nz-button nzSize="small" nzType="primary">
+        <i nz-icon nzType="search" theme="outline"></i>搜索
+      </button>
+      <button (click)="resetSearch()" nz-button nzSize="small" type="button">
+        <i nz-icon nzTheme="outline" nzType="rest"></i>重置
+      </button>
+
+    </div>
+  </ng-container>
+  <ng-container *ngIf="headerAction" [ngTemplateOutlet]="headerAction"></ng-container>
+
+  <ag-grid-angular
+    [class]="gridTheme"
+    [modules]="allModules"
+    [gridOptions]="_gridOptions"
+    [ngClass]="gridTableClass"
+    [ngStyle]="gridTableStyle"
+    class="grid-table grid"
+  ></ag-grid-angular>
+
+  <ng-container *ngIf="gridAlignedGrids" [ngTemplateOutlet]="gridAlignedGrids"></ng-container>
+
+  <div *ngIf="hasGridStatistics&&columnApi&&statistics&&statistics.length"
+       class="statistics-bar flex flex-grow-0 flex-shrink-1 justify-end  flex-wrap">
+    <app-grid-statistics-bar [api]="api" [columnApi]="columnApi" [statistics]="statistics"></app-grid-statistics-bar>
+  </div>
+  <div *ngIf="showFooter" class="footer flex flex-grow-0 flex-shrink-1 space-between  flex-wrap">
+    <div *ngIf="showFooterAction" class="action">
+      <button (click)="fullscreenToggle()"
+              *ngIf="showFooterAction.fullscreen"
+              [title]="'menu.fullscreen'|translate"
+              nz-button nzSize="small" nzType="primary">
+        <i [ngClass]="{'mdi':true,'mdi-fullscreen':!this.fullscreen,'mdi-fullscreen-exit':this.fullscreen}"
+           style="margin-right: 5px;"
+        ></i><span>{{'menu.fullscreen'|translate}}</span></button>
+
+      <button (nzOnConfirm)="exportAllPageData()" *ngIf="showFooterAction.export" [disabled]="total&&dataLoading"
+              [nzLoading]="progressPercent>0&&progressPercent<100"
+              [nzPopconfirmTitle]="'export.excel.confirm.tip' | translate"
+              nz-button nz-popconfirm nzSize="small" nzType="primary">
+        <i nz-icon nzTheme="outline" nzType="file-excel"></i> {{'export.excel.tip'|translate}}</button>
+
+      <ng-container *ngIf="footerAction" [ngTemplateOutlet]="footerAction"></ng-container>
+
+    </div>
+    <nz-pagination (nzPageIndexChange)="onPageIndexChange($event)"
+                   (nzPageSizeChange)="onPageSizeChange($event)"
+                   *ngIf="gridTablePagination&&this.gridOptions.rowModelType!=='serverSide'"
+                   [(nzPageIndex)]="currentPage"
+                   [nzPageSizeOptions]="this.pageSizeOptions"
+                   [nzPageSize]="this.currentPageSize"
+                   [nzShowQuickJumper]="gridTablePagination.showQuickJumper"
+                   [nzShowSizeChanger]="gridTablePagination.showSizeChanger"
+                   [nzShowTotal]="gridTablePagination.rangeTemplate!==undefined?gridTablePagination.rangeTemplate:rangeTemplate"
+                   [nzSize]="gridTablePagination.size"
+                   [nzTotal]="total"
+                   class="pagination"
+    >
+      <ng-template #rangeTemplate let-range="range" let-total>
+        <ng-container *ngIf="total">
+          第 {{range[0]}} 条至 {{range[1]}} 条 - 共 {{total}} 条数据
+        </ng-container>
+      </ng-template>
+
+
+    </nz-pagination>
+  </div>
+</full-content>
+<nz-modal [(nzVisible)]="showProgress" [nzClosable]="false" [nzFooter]="null"
+          [nzMaskClosable]="false" [nzTitle]="'export.excel.progress.tip'| translate">
+  <nz-progress [nzPercent]="progressPercent"></nz-progress>
+</nz-modal>
+<ng-template #actionCell let-node>
+  <ng-template #actionIcon let-action>
+
+    <i *ngIf="action.iconType;else fontIcon" [ngClass]="action.iconClass" [type]="action.iconType" nz-icon></i>
+    <ng-template #fontIcon>
+      <i *ngIf="action.iconClass" [ngClass]="action.iconClass" style="line-height: 16px;"></i>
+    </ng-template>
+  </ng-template>
+  <ng-container *ngIf="cellAction&&cellAction.action">
+    <ng-container>
+      <a (click)="action.click?action.click(node):null"
+         *ngFor="let action of cellAction.action"
+         [acl]="action.acl"
+         [class]="'cell-action-item '+(action.type?'ant-btn-'+action.type:'ant-btn-default')"
+         [ngClass]="action.className"
+         [ngStyle]="action.style"
+         [title]="action.name"
+      >
+        <ng-container *ngIf="action.iconType||action.iconClass" [ngTemplateOutletContext]="{$implicit:action}"
+                      [ngTemplateOutlet]="actionIcon"></ng-container>
+        {{action.name}}
+      </a>
+    </ng-container>
+
+  </ng-container>
+  <ng-container *ngIf="cellAction.content" [ngTemplateOutletContext]="{$implicit:node}"
+                [ngTemplateOutlet]="cellAction.content"></ng-container>
+</ng-template>
+
+
+<ng-template #deleteContent>
+  <div class="batch-delete-text">
+  是否删除当前选中行(共{{selectedNodes.length}}行)?
+  </div>
+  <nz-progress *ngIf="progressPercent>0" [nzPercent]="progressPercent" [nzStatus]="progressStatus"></nz-progress>
+</ng-template>

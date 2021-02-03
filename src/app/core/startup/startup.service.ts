@@ -1,15 +1,17 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import {Inject, Injectable, Injector} from '@angular/core';
+import {Router} from '@angular/router';
 import { ACLService } from '@delon/acl';
-import { ALAIN_I18N_TOKEN, MenuService, SettingsService, TitleService } from '@delon/theme';
+import {ALAIN_I18N_TOKEN, App, MenuService, SettingsService, TitleService} from '@delon/theme';
+import {AlainConfig, ALAIN_CONFIG} from '@delon/util';
 import { TranslateService } from '@ngx-translate/core';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzIconService } from 'ng-zorro-antd/icon';
-import { zip } from 'rxjs';
+import {of, zip} from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { I18NService } from '..';
 import { ICONS } from '../../../style-icons';
 import { ICONS_AUTO } from '../../../style-icons-auto';
-import { I18NService } from '../i18n/i18n.service';
 
 /**
  * 用于应用启动时
@@ -26,6 +28,8 @@ export class StartupService {
     private aclService: ACLService,
     private titleService: TitleService,
     private httpClient: HttpClient,
+    private injector: Injector,
+    @Inject(ALAIN_CONFIG) private alainCfg: AlainConfig
   ) {
     iconSrv.addIcon(...ICONS_AUTO, ...ICONS);
   }
@@ -34,7 +38,15 @@ export class StartupService {
     // only works with promises
     // https://github.com/angular/angular/issues/15088
     return new Promise((resolve) => {
-      zip(this.httpClient.get(`assets/tmp/i18n/${this.i18n.defaultLang}.json`), this.httpClient.get('assets/tmp/app-data.json'))
+      const users = this.httpClient.get(`/api/auth/users`).pipe(
+        catchError((res) => {
+          return of(null);
+        }),
+      );
+
+      zip(this.httpClient.get(`/api/i18n/client/json/${this.i18n.defaultLang}?_allow_anonymous=true`),
+        this.httpClient.get('/api/app/info?_allow_anonymous=true'),
+        users)
         .pipe(
           // 接收其他拦截器后产生的异常消息
           catchError((res) => {
@@ -44,24 +56,39 @@ export class StartupService {
           }),
         )
         .subscribe(
-          ([langData, appData]) => {
-            // setting language data
-            this.translate.setTranslation(this.i18n.defaultLang, langData);
-            this.translate.setDefaultLang(this.i18n.defaultLang);
+          ([langData, appResult, usersResult]) => {
+            const res = appResult as NzSafeAny;
+            const user_res = usersResult as NzSafeAny;
 
-            // application data
-            const res = appData as NzSafeAny;
-            // 应用信息：包括站点名、描述、年份
-            this.settingService.setApp(res.app);
-            // 用户信息：包括姓名、头像、邮箱地址
-            this.settingService.setUser(res.user);
-            // ACL：设置权限为全量
-            this.aclService.setFull(true);
-            // 初始化菜单
-            this.menuService.add(res.menu);
-            // 设置页面标题的后缀
-            this.titleService.default = '';
-            this.titleService.suffix = res.app.name;
+            // Setting language data
+            const app: App = res.data as App;
+
+            // Application information: including site name, description, year
+            this.settingService.setApp(app);
+            // Can be set page suffix title, https://ng-alain.com/theme/title
+            if (app.name != null) {
+              this.titleService.suffix = app.name;
+            }
+            if (usersResult) {
+              const user = user_res.data.user;
+              const  menu = user_res.data.menu;
+              this.translate.setDefaultLang(user.language);
+              this.translate.setTranslation(user.language, langData);
+
+              // Application data
+              // User information: including name, avatar, email address
+              this.settingService.setUser(user);
+              // ACL: Set the permissions to full, https://ng-alain.com/acl/getting-started
+              this.aclService.setFull(true);
+              // Menu data, https://ng-alain.com/theme/menu
+              this.menuService.add(menu);
+            } else {
+              setTimeout(() => {
+
+                this.translate.setDefaultLang(this.i18n.defaultLang);
+                this.injector.get(Router).navigateByUrl(this.alainCfg.auth?.login_url as string);
+              });
+            }
           },
           () => {},
           () => {

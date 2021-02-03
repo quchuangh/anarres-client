@@ -1,12 +1,22 @@
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponseBase } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
+  HttpResponse,
+  HttpResponseBase
+} from '@angular/common/http';
 import { Injectable, Injector } from '@angular/core';
 import { Router } from '@angular/router';
 import { DA_SERVICE_TOKEN, ITokenService } from '@delon/auth';
 import { _HttpClient } from '@delon/theme';
 import { environment } from '@env/environment';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, filter, mergeMap, switchMap, take, tap } from 'rxjs/operators';
+import { catchError, filter, mergeMap, switchMap, take } from 'rxjs/operators';
+import {AuthService} from './auth.service';
 
 const CODEMESSAGE: { [key: number]: string } = {
   200: '服务器成功返回请求的数据。',
@@ -31,11 +41,11 @@ const CODEMESSAGE: { [key: number]: string } = {
  */
 @Injectable()
 export class DefaultInterceptor implements HttpInterceptor {
-  private refreshTokenType: 're-request' | 'auth-refresh' = 'auth-refresh';
+  private refreshTokenType: 're-request' | 'auth-refresh' = 're-request';
   private refreshToking = false;
   private refreshToken$: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  constructor(private injector: Injector) {
+  constructor(private injector: Injector, private auth: AuthService) {
     if (this.refreshTokenType === 'auth-refresh') {
       this.buildAuthRefresh();
     }
@@ -159,7 +169,11 @@ export class DefaultInterceptor implements HttpInterceptor {
   }
 
   private handleData(ev: HttpResponseBase, req: HttpRequest<any>, next: HttpHandler): Observable<any> {
-    this.checkStatus(ev);
+    // 可能会因为 `throw` 导出无法执行 `_HttpClient` 的 `end()` 操作
+    if (ev.status > 0) {
+      this.http.end();
+      this.checkStatus(ev);
+    }
     // 业务处理：一些通用操作
     switch (ev.status) {
       case 200:
@@ -168,25 +182,36 @@ export class DefaultInterceptor implements HttpInterceptor {
         //  错误内容：{ status: 1, msg: '非法参数' }
         //  正确内容：{ status: 0, response: {  } }
         // 则以下代码片断可直接适用
-        // if (ev instanceof HttpResponse) {
-        //   const body = ev.body;
-        //   if (body && body.status !== 0) {
-        //     this.injector.get(NzMessageService).error(body.msg);
-        //     // 继续抛出错误中断后续所有 Pipe、subscribe 操作，因此：
-        //     // this.http.get('/').subscribe() 并不会触发
-        //     return throwError({});
-        //   } else {
-        //     // 重新修改 `body` 内容为 `response` 内容，对于绝大多数场景已经无须再关心业务状态码
-        //     return of(new HttpResponse(Object.assign(ev, { body: body.response })));
-        //     // 或者依然保持完整的格式
-        //     return of(ev);
-        //   }
-        // }
+        if (ev instanceof HttpResponse) {
+          // 如果头信息中有新的token
+          if (ev.headers.has('Authorization')) {
+            const newToken = ev.headers.get('Authorization') as string;
+            this.auth.setToken(newToken);
+          }
+
+          const body = ev.body;
+          if (!body) {
+            throwError(ev);
+          }
+          if (!body.code) {
+            return of(ev);
+          }
+          if (body && body.code !== 0) {
+            this.injector.get(NzMessageService).error(body.message);
+            // 继续抛出错误中断后续所有 Pipe、subscribe 操作，因此：
+            // this.http.get('/').subscribe() 并不会触发
+            return throwError(ev);
+          } else {
+            // 重新修改 `body` 内容为 `response` 内容，对于绝大多数场景已经无须再关心业务状态码
+            const v = Object.assign(ev, { body: body.response }) as any;
+            return of(new HttpResponse(v));
+          }
+        }
         break;
       case 401:
-        if (this.refreshTokenType === 're-request') {
-          return this.tryRefreshToken(ev, req, next);
-        }
+        // if (this.refreshTokenType === 're-request') {
+        //     return this.tryRefreshToken(ev, req, next);
+        // }
         this.toLogin();
         break;
       case 403:
