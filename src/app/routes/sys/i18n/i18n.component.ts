@@ -1,23 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { SFSchema } from '@delon/form';
-import { Menu, _HttpClient } from '@delon/theme';
-import { ArrayService } from '@delon/util';
-import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzFormatBeforeDropEvent, NzFormatEmitEvent, NzTreeNode } from 'ng-zorro-antd/tree';
-import { of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import {Component, OnInit} from '@angular/core';
+import {SysI18n} from '@core';
+import {SFSchema} from '@delon/form';
+import {_HttpClient} from '@delon/theme';
+import {NzContextMenuService, NzDropdownMenuComponent} from 'ng-zorro-antd/dropdown';
+import {NzFormatEmitEvent} from 'ng-zorro-antd/tree';
 
 @Component({
-  selector: 'app-sys-menu',
-  templateUrl: './menu.component.html',
+  selector: 'app-sys-i18n',
+  templateUrl: './i18n.component.html',
 })
-export class SysMenuComponent implements OnInit {
+export class SysI18nComponent implements OnInit {
   private menuEvent!: NzFormatEmitEvent;
 
-  data: NzTreeNode[] = [];
+  data: SysI18n[] = [];
   op!: string;
-  item!: Menu;
+  item!: SysI18n;
   delDisabled = false;
 
   schema: SFSchema = {
@@ -29,18 +26,12 @@ export class SysMenuComponent implements OnInit {
       acl: { type: 'string', title: 'ACL', default: ''},
       reuse: { type: 'boolean', title: '复用', default: false },
       link: { type: 'string', title: '路由', minLength: 1, default: '#' },
-      target: { type: 'string', title: '跳转方式', default: '_self', enum: [
-          { label: '_self', title: '_self', value: '_self', checked: true },
-          { label: '_blank', title: '_blank', value: '_blank' },
-          { label: '_parent', title: '_parent', value: '_parent' },
-          { label: '_top', title: '_top', value: '_top' },
-      ]},
       hide: { type: 'boolean', title: '隐藏', default: false},
       enabled: { type: 'boolean', title: '启用', default: true },
       hideInBreadcrumb: { type: 'boolean', title: '隐藏导航', default: false },
       canShortcut: { type: 'boolean', title: '允许快捷' , default: false },
       icon: { type: 'string', title: '图标', default: ''},
-      sortRank: { type: 'number', title: '排序值', default: 1 },
+      sortRank: { type: 'number', title: '排序值' },
     },
     required: ['text'],
     ui: { grid: { md: 24, lg: 12 }, spanLabelFixed: 100 },
@@ -48,9 +39,7 @@ export class SysMenuComponent implements OnInit {
 
   constructor(
     private http: _HttpClient,
-    private ccSrv: NzContextMenuService,
-    private arrSrv: ArrayService,
-    private msg: NzMessageService,
+    private ccSrv: NzContextMenuService
   ) {}
 
   ngOnInit(): void {
@@ -58,14 +47,8 @@ export class SysMenuComponent implements OnInit {
   }
 
   private getData(): void {
-    this.http.get('/api/sys/menu/all').subscribe((res: Menu[]) => {
-      this.data = this.arrSrv.arrToTreeNode(res, {
-        titleMapName: 'text',
-        parentIdMapName: 'parentId',
-        cb: (item, _parent, deep) => {
-          item.expanded = deep <= 1;
-        },
-      });
+    this.http.get('/api/sys/i18n/all').subscribe((res: SysI18n[]) => {
+      this.data = res;
     });
   }
 
@@ -73,9 +56,10 @@ export class SysMenuComponent implements OnInit {
     this.closeContextMenu();
     this.op = 'edit';
     this.item = {
-      id: 0,
-      text: '',
-      parentId: item ? item.id : 0,
+      key: '',
+      typeGroup: 'SERVER',
+      i18n: '',
+      lang: []
     };
   }
 
@@ -100,7 +84,7 @@ export class SysMenuComponent implements OnInit {
 
   del(): void {
     this.closeContextMenu();
-    this.http.delete(`/api/sys/menu/delete/${this.item.id}`).subscribe(() => {
+    this.http.delete(`/api/sys/menu/delete/${this.item.key}`).subscribe(() => {
       this.getData();
       this.op = '';
     });
@@ -117,27 +101,6 @@ export class SysMenuComponent implements OnInit {
     return `确认删除【${this.menuEvent.node!.title}】以及所有子菜单吗？`;
   }
 
-  move = (e: NzFormatBeforeDropEvent) => {
-    // if (e.pos !== 0) {
-    //   this.msg.warning(`只支持菜单不同类目的移动，且无法移动至顶层`);
-    //   return of(false);
-    // }
-    if (e.dragNode.origin.parent_id === e.node.origin.id) {
-      return of(false);
-    }
-    const from = e.dragNode.origin.id;
-    const to = e.node.origin.id;
-    return this.http
-      .post('/menus/move', {
-        from,
-        to,
-      })
-      .pipe(
-        tap(() => (this.op = '')),
-        map(() => true),
-      );
-    // tslint:disable-next-line: semicolon
-  };
 
   show(e: NzFormatEmitEvent): void {
     this.op = e.node!.isSelected ? 'view' : '';

@@ -38,15 +38,14 @@ export class StartupService {
     // only works with promises
     // https://github.com/angular/angular/issues/15088
     return new Promise((resolve) => {
-      const users = this.httpClient.get(`/api/auth/users`).pipe(
+      const users$ = this.httpClient.get(`/api/sys/auth/users`).pipe(
         catchError((res) => {
           return of(null);
         }),
       );
 
-      zip(this.httpClient.get(`/api/i18n/client/json/${this.i18n.defaultLang}?_allow_anonymous=true`),
-        this.httpClient.get('/api/app/info?_allow_anonymous=true'),
-        users)
+      zip(this.httpClient.get('/api/sys/app-info?_allow_anonymous=true'),
+        users$)
         .pipe(
           // 接收其他拦截器后产生的异常消息
           catchError((res) => {
@@ -56,12 +55,11 @@ export class StartupService {
           }),
         )
         .subscribe(
-          ([langData, appResult, usersResult]) => {
-            const res = appResult as NzSafeAny;
-            const user_res = usersResult as NzSafeAny;
+          ([appResult, usersResult]) => {
+            const users = usersResult as NzSafeAny;
 
             // Setting language data
-            const app: App = res.data as App;
+            const app: App = appResult as App;
 
             // Application information: including site name, description, year
             this.settingService.setApp(app);
@@ -70,10 +68,9 @@ export class StartupService {
               this.titleService.suffix = app.name;
             }
             if (usersResult) {
-              const user = user_res.data.user;
-              const  menu = user_res.data.menu;
-              this.translate.setDefaultLang(user.language);
-              this.translate.setTranslation(user.language, langData);
+              const user = users.user;
+              const  menu = users.menu;
+              this.translate.use(user.language);
 
               // Application data
               // User information: including name, avatar, email address

@@ -193,9 +193,11 @@ export class DefaultInterceptor implements HttpInterceptor {
           if (!body) {
             throwError(ev);
           }
-          if (!body.code) {
+
+          if (typeof body.code === 'undefined') {// 如果不是标准的 result 对象
             return of(ev);
           }
+
           if (body && body.code !== 0) {
             this.injector.get(NzMessageService).error(body.message);
             // 继续抛出错误中断后续所有 Pipe、subscribe 操作，因此：
@@ -203,7 +205,7 @@ export class DefaultInterceptor implements HttpInterceptor {
             return throwError(ev);
           } else {
             // 重新修改 `body` 内容为 `response` 内容，对于绝大多数场景已经无须再关心业务状态码
-            const v = Object.assign(ev, { body: body.response }) as any;
+            const v = Object.assign(ev, { body: body.data }) as any;
             return of(new HttpResponse(v));
           }
         }

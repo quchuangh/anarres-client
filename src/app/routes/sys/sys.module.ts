@@ -1,6 +1,7 @@
 import { NgModule, Type } from '@angular/core';
 
 import { SharedModule } from '@shared';
+import {SysI18nComponent} from './i18n/i18n.component';
 import { SysRoutingModule } from './sys-routing.module';
 
 import { SysFileManagerComponent } from './file-manager/file-manager.component';
@@ -17,6 +18,7 @@ const COMPONENTS: Type<void>[] = [
   SysUserViewComponent,
   SysUserEditComponent,
   SysMenuComponent,
+  SysI18nComponent,
   SysPermissionComponent,
   SysLogComponent,
   SysRoleComponent,

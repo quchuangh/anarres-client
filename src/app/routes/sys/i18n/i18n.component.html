@@ -1,20 +1,15 @@
 <page-header-wrapper>
   <div nz-row [nzGutter]="32">
     <div nz-col nzMd="24" nzLg="8">
-      <nz-card [nzTitle]="'app.sys.menu.list' | translate" [nzExtra]="extraTpl">
+      <nz-card [nzTitle]="'app.sys.i18n.list' | translate" [nzExtra]="extraTpl">
         <ng-template #extraTpl>
-          <button (click)="add(null)" nz-button nzSize="small">{{ 'app.sys.menu.root' | translate }}</button>
+          <button (click)="add(null)" nz-button nzSize="small">{{ 'app.sys.i18n.root' | translate }}</button>
         </ng-template>
         <div *ngIf="data.length === 0">{{ 'common.no-data' | translate }}</div>
         <div *ngIf="data.length > 0" scrollbar class="position-relative" style="height: 300px;">
-          <nz-tree
-            [nzData]="data"
-            [nzDraggable]="true"
-            (nzClick)="show($event)"
-            (nzContextMenu)="showContextMenu($event, ccMenu)"
-            [nzBeforeDrop]="move"
-          >
-          </nz-tree>
+          <div>
+            1
+          </div>
         </div>
       </nz-card>
     </div>

@@ -31,7 +31,7 @@ export class  AuthService {
             {headers: {'content-type': 'application/x-www-form-urlencoded'}}
         )
             .pipe(tap((res: any) => {
-                this.setToken(res.data);
+                this.setToken(res);
             }));
     }
 
