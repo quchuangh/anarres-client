@@ -19,10 +19,10 @@ export class GridStatisticsBarComponent implements OnInit {
   subtotal: false | Array<string> = false;
 
   @Input()
-  api: GridApi | undefined;
+  api!: GridApi;
 
   @Input()
-  columnApi: ColumnApi | undefined;
+  columnApi!: ColumnApi;
 
 
   constructor() {

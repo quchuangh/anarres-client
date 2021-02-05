@@ -52,9 +52,9 @@ export enum PermissionType {
   styleUrls: ['./grid-table.component.scss'],
 })
 export class GridTableComponent implements OnInit, OnDestroy {
-  private rowModelType: string | 'serverSide' | undefined;
-  private treeData: boolean | undefined;
-  _gridOptions: GridOptions | undefined;
+  private rowModelType!: string | 'serverSide';
+  private treeData!: boolean;
+  _gridOptions!: GridOptions;
 
 
   allModules = AllModules;
@@ -77,7 +77,7 @@ export class GridTableComponent implements OnInit, OnDestroy {
    */
   @Input() initLoadData = true;
 
-  @Input() gridOptions: GridOptions | undefined;
+  @Input() gridOptions!: GridOptions;
 
   @Input() gridTheme = 'ag-theme-balham';
 
@@ -86,7 +86,7 @@ export class GridTableComponent implements OnInit, OnDestroy {
   /**
    * 搜索条件组件
    */
-  @Input() searchSchema: SFSchema | undefined;
+  @Input() searchSchema!: SFSchema;
 
 
   /**
@@ -111,16 +111,16 @@ export class GridTableComponent implements OnInit, OnDestroy {
   @Input() showFooterAction: false | { [key: string]: boolean } = {export: true, fullscreen: true};
 
 
-  @Input() footerAction: TemplateRef<{}> | undefined;
+  @Input() footerAction!: TemplateRef<{}>;
 
 
-  @Input() headerAction: TemplateRef<{}> | undefined;
+  @Input() headerAction!: TemplateRef<{}>;
 
 
   /**
    * 单元格操作区
    */
-  @Input() cellAction: CellOption | null = null;
+  @Input() cellAction!: CellOption;
   /**
    * 是否存在统计数据
    */
@@ -132,7 +132,7 @@ export class GridTableComponent implements OnInit, OnDestroy {
   @Input() showDefaultStatusBar = false;
 
 
-  @Input() gridAlignedGrids: TemplateRef<{}> | undefined;
+  @Input() gridAlignedGrids!: TemplateRef<{}>;
 
 
   /**
@@ -144,7 +144,7 @@ export class GridTableComponent implements OnInit, OnDestroy {
     showQuickJumper: true
   };
 
-  @Input() searchPermission: string | undefined;
+  @Input() searchPermission!: string;
 
 
   /**
@@ -168,13 +168,13 @@ export class GridTableComponent implements OnInit, OnDestroy {
    * items=当前页数据
    * footerItems=页脚数据
    */
-  @Input() getData: ((params: { [key: string]: any; }) => Observable<{ total: number; items: any[]; statistics?: Array<GridStatistics>; }>) | undefined ;
+  @Input() getData!: ((params: { [key: string]: any; }) => Observable<{ total: number; items: any[]; statistics?: Array<GridStatistics>; }>) ;
 
 
   /**
    * 删除方法
    */
-  @Input() deleteFunc: ((node: RowNode) => Observable<void>) | undefined;
+  @Input() deleteFunc!: ((node: RowNode) => Observable<void>);
 
   /**
    * 右键菜单上显示批量删除
@@ -264,29 +264,29 @@ export class GridTableComponent implements OnInit, OnDestroy {
   };
 
 
-  api: GridApi | undefined;
+  api!: GridApi;
 
-  columnApi: ColumnApi | undefined;
+  columnApi!: ColumnApi;
 
-  statistics: Array<GridStatistics> | undefined;
+  statistics!: Array<GridStatistics>;
 
   contextMenuItemsLabel = {
     'grid.table.columns.autosize': 'grid.table.columns.autosize',
     'grid.table.columns.fit': 'grid.table.columns.fit'
   };
 
-  currentUrl: string | undefined;
+  currentUrl!: string;
 
-  firstDataRenderedTime: number | undefined;
-  firstLeavePageTime: number | undefined;
+  firstDataRenderedTime!: number;
+  firstLeavePageTime!: number;
   dispatchFirstDataRendered = false;
-  @ViewChild('sf', {static: false}) sf: SFComponent | undefined;
+  @ViewChild('sf', {static: false}) sf!: SFComponent;
 
 
-  @ViewChild('actionCell', {static: true}) actionCell: TemplateRef<any> | undefined;
+  @ViewChild('actionCell', {static: true}) actionCell!: TemplateRef<any>;
 
 
-  @ViewChild('deleteContent', {static: true}) deleteContent: TemplateRef<any> | undefined;
+  @ViewChild('deleteContent', {static: true}) deleteContent!: TemplateRef<any>;
 
   constructor(private translateService: TranslateService,
               private msg: NzMessageService,

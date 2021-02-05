@@ -6,9 +6,9 @@ import {GridTableComponent} from './grid-table.component';
 
 export abstract class ServerTreeGrid {
 
-  gridTable: GridTableComponent | undefined;
+  gridTable!: GridTableComponent;
 
-  potentialParent: RowNode | undefined;
+  potentialParent!: RowNode | undefined;
 
   static refreshRows(api: GridApi, rowsToRefresh: RowNode[]): void {
     api.refreshCells({

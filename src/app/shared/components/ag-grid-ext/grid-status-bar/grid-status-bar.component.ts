@@ -8,7 +8,7 @@ import {IStatusPanelAngularComp} from '@ag-grid-community/angular';
   styles: []
 })
 export class GridStatusBarComponent implements OnInit, IStatusPanelAngularComp {
-  private params: IStatusPanelParams | undefined;
+  private params!: IStatusPanelParams;
 
   constructor() {
   }

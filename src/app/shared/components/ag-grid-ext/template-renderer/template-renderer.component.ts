@@ -9,8 +9,8 @@ import {IAfterGuiAttachedParams, ICellRendererParams} from '@ag-grid-community/c
 })
 export class TemplateRendererComponent implements OnInit, ICellRendererAngularComp {
 
-  template: TemplateRef<any> | undefined;
-  templateContext: { $implicit: any, params: any } | undefined;
+  template!: TemplateRef<any> ;
+  templateContext!: { $implicit: any, params: any };
 
   constructor() {
   }
