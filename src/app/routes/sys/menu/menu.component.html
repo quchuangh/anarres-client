@@ -6,7 +6,7 @@
           <button (click)="add(null)" nz-button nzSize="small">{{ 'app.sys.menu.root' | translate }}</button>
         </ng-template>
         <div *ngIf="data.length === 0">{{ 'common.no-data' | translate }}</div>
-        <div *ngIf="data.length > 0" scrollbar class="position-relative" style="height: 300px;">
+        <div *ngIf="data.length > 0" scrollbar class="position-relative" style="height: 500px;">
           <nz-tree
             [nzData]="data"
             [nzDraggable]="true"

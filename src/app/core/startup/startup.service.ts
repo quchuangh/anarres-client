@@ -9,7 +9,8 @@ import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzIconService } from 'ng-zorro-antd/icon';
 import {of, zip} from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { I18NService } from '..';
+import {I18NService} from '../i18n/i18n.service';
+
 import { ICONS } from '../../../style-icons';
 import { ICONS_AUTO } from '../../../style-icons-auto';
 

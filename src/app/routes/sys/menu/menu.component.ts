@@ -58,6 +58,7 @@ export class SysMenuComponent implements OnInit {
   }
 
   private getData(): void {
+    // https://ng-alain.com/util/array/zh?#arrToTree
     this.http.get('/api/sys/menu/all').subscribe((res: Menu[]) => {
       this.data = this.arrSrv.arrToTreeNode(res, {
         titleMapName: 'text',
@@ -122,19 +123,24 @@ export class SysMenuComponent implements OnInit {
     //   this.msg.warning(`只支持菜单不同类目的移动，且无法移动至顶层`);
     //   return of(false);
     // }
+
     if (e.dragNode.origin.parent_id === e.node.origin.id) {
       return of(false);
     }
     const from = e.dragNode.origin.id;
     const to = e.node.origin.id;
     return this.http
-      .post('/menus/move', {
+      .post('/api/sys/menu/move', {
         from,
         to,
+        pos: e.pos
       })
       .pipe(
-        tap(() => (this.op = '')),
-        map(() => true),
+        tap(() => {
+          this.op = '';
+          this.getData();
+        }),
+        map(data => false),
       );
     // tslint:disable-next-line: semicolon
   };
