@@ -1,0 +1,13 @@
+<full-content [(fullscreen)]="fullscreen" class="flex flex-column flex-grow-1">
+  <!-- 表格 -->
+  <ag-grid-angular
+    [class]="gridTheme"
+    [modules]="allModules"
+    [gridOptions]="_gridOptions"
+    [ngClass]="gridTableClass"
+    [ngStyle]="gridTableStyle"
+    class="grid-table grid"
+  ></ag-grid-angular>
+
+  <ng-content></ng-content>
+</full-content>

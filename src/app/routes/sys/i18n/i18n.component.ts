@@ -1,119 +1,103 @@
-import {Component, OnInit} from '@angular/core';
-import {SysI18n} from '@core';
-import {SFSchema} from '@delon/form';
-import {_HttpClient} from '@delon/theme';
-import {NzContextMenuService, NzDropdownMenuComponent} from 'ng-zorro-antd/dropdown';
-import {NzFormatEmitEvent} from 'ng-zorro-antd/tree';
+import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
+import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { SFSchema } from '@delon/form';
+import { _HttpClient } from '@delon/theme';
+import { GridTableComponent } from '@shared';
 
 @Component({
   selector: 'app-sys-i18n',
   templateUrl: './i18n.component.html',
 })
 export class SysI18nComponent implements OnInit {
-  private menuEvent!: NzFormatEmitEvent;
-
-  data: SysI18n[] = [];
-  op!: string;
-  item!: SysI18n;
-  delDisabled = false;
-
   schema: SFSchema = {
     properties: {
-      text: { type: 'string', title: '名称', minLength: 1 },
-      code: { type: 'string', title: '编号', minLength: 4 },
-      i18n: { type: 'string', title: '国际化', minLength: 1 },
-      group: { type: 'boolean', title: '菜单组', default: false },
-      acl: { type: 'string', title: 'ACL', default: ''},
-      reuse: { type: 'boolean', title: '复用', default: false },
-      link: { type: 'string', title: '路由', minLength: 1, default: '#' },
-      hide: { type: 'boolean', title: '隐藏', default: false},
-      enabled: { type: 'boolean', title: '启用', default: true },
-      hideInBreadcrumb: { type: 'boolean', title: '隐藏导航', default: false },
-      canShortcut: { type: 'boolean', title: '允许快捷' , default: false },
-      icon: { type: 'string', title: '图标', default: ''},
-      sortRank: { type: 'number', title: '排序值' },
+      i18n: { type: 'string', title: 'i18n', minLength: 1 },
+      message: { type: 'string', title: 'message', minLength: 1 },
+      language: { type: 'string', title: '语言', minLength: 1 },
+      typeGroup: {
+        type: 'string',
+        title: '类型',
+        enum: [
+          { label: '服务端', value: 'SERVER' },
+          { label: '客户端', value: 'CLIENT' },
+        ],
+      },
+      md5: { type: 'string', title: 'md5', default: '' },
+      creator: { type: 'string', title: '创建人' },
+      createdTime: { type: 'string', title: '创建时间', format: 'date-time' },
+      updater: { type: 'string', title: '更新人' },
+      updatedTime: { type: 'string', title: '更新时间' },
     },
     required: ['text'],
     ui: { grid: { md: 24, lg: 12 }, spanLabelFixed: 100 },
   };
 
-  constructor(
-    private http: _HttpClient,
-    private ccSrv: NzContextMenuService
-  ) {}
+  columnDefs: ColDef[] = [
+    { headerName: 'id', field: 'id', sort: 'desc', sortable: true },
+    { headerName: 'i18n', field: 'i18n' },
+    { headerName: 'message', field: 'message' },
+    { headerName: '语言', field: 'language', enableRowGroup: true },
+    { headerName: '类型', field: 'typeGroup', enableRowGroup: true },
+    { headerName: 'md5', field: 'md5' },
+    { headerName: '创建人', field: 'creator' },
+    { headerName: '创建时间', field: 'createdTime', sortable: true },
+    { headerName: '更新人', field: 'updater' },
+    { headerName: '更新时间', field: 'updatedTime', sortable: true },
+  ];
 
-  ngOnInit(): void {
-    this.getData();
-  }
+  gridOptions: GridOptions;
 
-  private getData(): void {
-    this.http.get('/api/sys/i18n/all').subscribe((res: SysI18n[]) => {
-      this.data = res;
-    });
-  }
+  @ViewChild(GridTableComponent)
+  table!: GridTableComponent;
 
-  add(item: any): void {
-    this.closeContextMenu();
-    this.op = 'edit';
-    this.item = {
-      key: '',
-      typeGroup: 'SERVER',
-      i18n: '',
-      lang: []
+  constructor(private http: _HttpClient) {
+    this.gridOptions = {
+      enableCharts: false,
+      columnDefs: this.columnDefs,
+      // getRowNodeId: (data) => {
+      //   return data.id;
+      // },
+      onFirstDataRendered(event: FirstDataRenderedEvent): void {
+        event.columnApi.autoSizeAllColumns();
+      },
     };
   }
 
-  edit(): void {
-    this.closeContextMenu();
-    this.op = 'edit';
+  ngOnInit(): void {}
+
+  getData(params: any): void {
+    const current = params.current;
+    const size = params.size;
+    delete params.current;
+    delete params.size;
+    params = { queries: params, current, size };
+    return params;
   }
 
-  save(item: any): void {
-    this.http.post('/api/sys/menu/save', item).subscribe(() => {
-      if (item.id <= 0) {
-        this.getData();
-        this.op = '';
-      } else {
-        this.item = item;
-        this.menuEvent.node!.title = item.text;
-        this.menuEvent.node!.origin = item;
-        this.op = 'view';
-      }
-    });
-  }
-
-  del(): void {
-    this.closeContextMenu();
-    this.http.delete(`/api/sys/menu/delete/${this.item.key}`).subscribe(() => {
-      this.getData();
-      this.op = '';
-    });
-  }
-
-  get delMsg(): string {
-    if (!this.menuEvent) {
-      return '';
+  onGridReady(e: { event: GridReadyEvent; gridTable: GridTableComponent }): void {
+    // Console.collapse($event);
+    const records = [];
+    for (let i = 0; i < 20; i++) {
+      records.push({
+        id: 1 + i,
+        i18n: 'i18n_' + i,
+        message: 'message' + i,
+        language: 'language_' + i,
+        typeGroup: 'typeGroup_' + i,
+        md5: 'md5_' + i,
+        creator: 'creator_' + i,
+        createdTime: 'createdTime_' + i,
+        updater: 'updater_' + i,
+        updatedTime: 'updatedTime_' + i,
+      });
     }
-    const childrenLen = this.menuEvent.node!.children.length;
-    if (childrenLen === 0) {
-      return `确认删除【${this.menuEvent.node!.title}】吗？`;
-    }
-    return `确认删除【${this.menuEvent.node!.title}】以及所有子菜单吗？`;
-  }
 
-
-  show(e: NzFormatEmitEvent): void {
-    this.op = e.node!.isSelected ? 'view' : '';
-    this.item = e.node!.origin as any;
-  }
-
-  showContextMenu(e: NzFormatEmitEvent, menu: NzDropdownMenuComponent): void {
-    this.menuEvent = e;
-    this.delDisabled = e.node!.children.length !== 0;
-    this.ccSrv.create(e.event!, menu);
-  }
-
-  closeContextMenu(): void {
-    this.ccSrv.close();
+    e.gridTable.setData({
+      records,
+      total: 100,
+      size: 20,
+      current: 1,
+    });
   }
 }

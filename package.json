@@ -28,6 +28,7 @@
     "theme": "ng-alain-plugin-theme -t=themeCss",
     "icon": "ng g ng-alain:plugin icon"
   },
+  "bundleDependencies": false,
   "dependencies": {
     "@ag-grid-community/angular": "^24.1.0",
     "@ag-grid-enterprise/all-modules": "^24.1.0",

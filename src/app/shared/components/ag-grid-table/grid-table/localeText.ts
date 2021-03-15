@@ -180,5 +180,5 @@ export const GRID_LOCALE_TEXT = {
   doughnutChart: '圆环图',
   areaRangeChart: '区间面积图',
   stackedAreaChart: '面积堆叠图',
-  normalizedAreaChart: '100%面积堆叠图'
+  normalizedAreaChart: '100%面积堆叠图',
 };

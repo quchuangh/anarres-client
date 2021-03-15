@@ -7,10 +7,8 @@
     flex-grow: 1;
   }
 
-
-
   .agent-grid-header-search {
-    border: 1px solid #BDC3C7;
+    border: 1px solid #bdc3c7;
     border-bottom: 0;
     background: white;
     padding: 5px 10px;
@@ -23,12 +21,11 @@
     }
   }
 
-  .footer, .statistics-bar {
-
+  .footer,
+  .statistics-bar {
     padding: 5px 10px;
-    border: 1px solid #BDC3C7;
+    border: 1px solid #bdc3c7;
     border-top: none;
-
   }
 
   .footer {
@@ -39,7 +36,6 @@
   .statistics-bar {
     background: white;
     padding: 5px 16px;
-
   }
 
   .grid-footer {
@@ -47,15 +43,12 @@
     min-height: 28px;
     flex-grow: 0;
     flex-shrink: 1;
-
   }
-
-
 
   ::ng-deep .grid-table.grid.ag-theme-balham {
     .ag-status-bar {
       border-bottom: 0;
-      box-shadow: inset 0 -1px 0 0 #BDC3C7;
+      box-shadow: inset 0 -1px 0 0 #bdc3c7;
     }
 
     a.cell-action-item {
@@ -77,34 +70,34 @@
         border-width: 1px;
       }
     }
-
-
   }
 
-
-  ::ng-deep .agent-grid-header-search .ant-form .ant-row, ::ng-deep .agent-grid-header-search .ant-form sf-object {
+  ::ng-deep .agent-grid-header-search .ant-form .ant-row,
+  ::ng-deep .agent-grid-header-search .ant-form sf-object {
     display: flex;
     flex-wrap: wrap;
     @media (max-width: 767px) {
-      & > [nz-col], & > sf-item {
+      & > [nz-col],
+      & > sf-item {
         width: 50%;
-
       }
-      & > [nz-col]:nth-child(even), & > sf-item:nth-child(even) {
+      & > [nz-col]:nth-child(even),
+      & > sf-item:nth-child(even) {
         padding-left: 5px;
       }
-      & > [nz-col]:nth-child(odd), & > sf-item:nth-child(odd) {
+      & > [nz-col]:nth-child(odd),
+      & > sf-item:nth-child(odd) {
         padding-right: 5px;
       }
     }
     @media (max-width: 576px) {
-      & > [nz-col], & > sf-item {
+      & > [nz-col],
+      & > sf-item {
         width: 100%;
         padding: 0 !important;
       }
     }
   }
-
 
   ::ng-deep .grid-table.grid-footer {
     .ag-status-bar {
@@ -117,7 +110,6 @@
       .ag-header {
         display: none;
       }
-
 
       .ag-body-viewport {
         overflow-y: hidden !important;
@@ -132,10 +124,8 @@
       }
     }
   }
-
 }
 
 ::ng-deep .grid-batch-delete .batch-delete-text {
   margin-top: -8px;
 }
-

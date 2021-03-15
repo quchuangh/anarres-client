@@ -1,8 +1,8 @@
-:host{
+:host {
   display: flex;
   align-items: center;
 }
 
-:host-context(.grid-footer){
+:host-context(.grid-footer) {
   display: none;
 }

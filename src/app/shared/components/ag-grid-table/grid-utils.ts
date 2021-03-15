@@ -1,4 +1,4 @@
-import {GridApi} from '@ag-grid-community/core';
+import { GridApi } from '@ag-grid-community/core';
 
 /**
  * 得到grid中被选择的节点,如果没有返回被范围选中的行,或null
@@ -19,7 +19,6 @@ export function getSelectOrRangeSelectNode(gridApi: GridApi): Array<any> {
   return nodes;
 }
 
-
 /**
  * 根据grid的范围选择对象得到表格中被区域选择的行
  * @param rangeNodes 被选择的范围
@@ -27,16 +26,18 @@ export function getSelectOrRangeSelectNode(gridApi: GridApi): Array<any> {
  * @return node 数组
  */
 export function getRangeSelectNodes(rangeNodes: any[], gridApi: GridApi): Array<any> {
-  return rangeNodes.map(range => {
-    let start = range.startRow.rowIndex;
-    let end = range.endRow.rowIndex;
-    const _rows = [];
-    [start, end] = start > end ? [end, start] : [start, end];
-    for (start; start <= end; start++) {
-      _rows.push(gridApi.getDisplayedRowAtIndex(start));
-    }
-    return _rows;
-  }).reduce((c1, c2) => c1.concat(c2.filter(row2 => !c1.some(row1 => row1.rowIndex === row2.rowIndex))), []);
+  return rangeNodes
+    .map((range) => {
+      let start = range.startRow.rowIndex;
+      let end = range.endRow.rowIndex;
+      const _rows = [];
+      [start, end] = start > end ? [end, start] : [start, end];
+      for (start; start <= end; start++) {
+        _rows.push(gridApi.getDisplayedRowAtIndex(start));
+      }
+      return _rows;
+    })
+    .reduce((c1, c2) => c1.concat(c2.filter((row2) => !c1.some((row1) => row1.rowIndex === row2.rowIndex))), []);
 }
 
 /**
@@ -47,13 +48,13 @@ export function getRangeSelectNodes(rangeNodes: any[], gridApi: GridApi): Array<
  * @param columnId 当前列名
  */
 function isContain(rangeSelections: any[], rowIndex: number, columnId: any): boolean {
-  return rangeSelections.some(node => {
+  return rangeSelections.some((node) => {
     let start = node.start.rowIndex;
     let end = node.end.rowIndex;
     [start, end] = start > end ? [end, start] : [start, end];
 
     // @ts-ignore
-    return node.columns.some(column => column.colId === columnId) && rowIndex >= start && rowIndex <= end;
+    return node.columns.some((column) => column.colId === columnId) && rowIndex >= start && rowIndex <= end;
   });
 }
 
@@ -85,12 +86,10 @@ export function checkAndChangeGridContextMenuRange(params: any): void {
       rowEnd: curRowIndex, // the end row index
       floatingEnd: null, // the end floating ('top', 'bottom' or null/undefined)
       columnStart: curColumnId, // colId of the starting column
-      columnEnd: curColumnId // colId of the ending column
+      columnEnd: curColumnId, // colId of the ending column
     });
   }
 }
-
-
 
 /**
  * 把数据变更为支持在grid里面使用的tree结构
@@ -98,7 +97,7 @@ export function checkAndChangeGridContextMenuRange(params: any): void {
  */
 export function changeDataToGridTree(data: Array<any>): Array<any> {
   function getPid(pid: string, parents: string[]): any[] {
-    const parent = data.filter(item => item.id === pid);
+    const parent = data.filter((item) => item.id === pid);
     if (parent.length) {
       const p = parent[0];
       parents = [p.id].concat(parents);
@@ -109,16 +108,15 @@ export function changeDataToGridTree(data: Array<any>): Array<any> {
     return parents;
   }
 
-  const newData = data.map(item => ({...item}));
+  const newData = data.map((item) => ({ ...item }));
 
-  newData.forEach(item => {
+  newData.forEach((item) => {
     const path = [item.id];
     if (item.parentId && item.id !== item.parentId) {
       item.path = getPid(item.parentId, path);
     } else {
       item.path = path;
     }
-
   });
   return newData;
 }

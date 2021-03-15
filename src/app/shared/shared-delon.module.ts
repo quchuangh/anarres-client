@@ -31,7 +31,6 @@ export const SHARED_DELON_MODULES = [
   ErrorCollectModule,
   FooterToolbarModule,
   GlobalFooterModule,
-  GlobalFooterModule,
   PageHeaderModule,
   ResultModule,
   TagSelectModule,

@@ -6,6 +6,7 @@ import { DelonACLModule } from '@delon/acl';
 import { DelonFormModule } from '@delon/form';
 import { AlainThemeModule } from '@delon/theme';
 import { TranslateModule } from '@ngx-translate/core';
+import { SHARED_ANR_MODULES } from './shared-anr.module';
 
 import { SHARED_DELON_MODULES } from './shared-delon.module';
 import { SHARED_ZORRO_MODULES } from './shared-zorro.module';
@@ -19,7 +20,6 @@ const THIRDMODULES = [DragDropModule];
 // #region your componets & directives
 import { PRO_SHARED_MODULES } from '../layout/pro';
 import { AddressModule } from './components/address';
-import { AgGridExtModule } from './components/ag-grid-ext';
 import { DelayModule } from './components/delay';
 import { EditorModule } from './components/editor';
 import { FileManagerModule } from './components/file-manager';
@@ -37,8 +37,8 @@ const MODULES = [
   MouseFocusModule,
   ScrollbarModule,
   StatusLabelModule,
-  AgGridExtModule,
   ...PRO_SHARED_MODULES,
+  ...SHARED_ANR_MODULES,
 ];
 // #endregion
 
@@ -53,6 +53,7 @@ const MODULES = [
     DelonFormModule,
     ...SHARED_DELON_MODULES,
     ...SHARED_ZORRO_MODULES,
+    ...SHARED_ANR_MODULES,
     ...MODULES,
     // third libs
     ...THIRDMODULES,
@@ -69,6 +70,7 @@ const MODULES = [
     TranslateModule,
     ...SHARED_DELON_MODULES,
     ...SHARED_ZORRO_MODULES,
+    ...SHARED_ANR_MODULES,
     ...MODULES,
     // third libs
     ...THIRDMODULES,

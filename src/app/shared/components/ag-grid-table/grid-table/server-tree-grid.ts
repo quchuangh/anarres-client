@@ -1,11 +1,9 @@
-import {RowDragEvent, RowNode} from '@ag-grid-community/core';
-import {GridApi} from '@ag-grid-community/core/dist/cjs/gridApi';
-import {Observable} from 'rxjs';
-import {GridTableComponent} from './grid-table.component';
-
+import { RowDragEvent, RowNode } from '@ag-grid-community/core';
+import { GridApi } from '@ag-grid-community/core/dist/cjs/gridApi';
+import { Observable } from 'rxjs';
+import { GridTableComponent } from './grid-table.component';
 
 export abstract class ServerTreeGrid {
-
   gridTable!: GridTableComponent;
 
   potentialParent!: RowNode | undefined;
@@ -13,20 +11,19 @@ export abstract class ServerTreeGrid {
   static refreshRows(api: GridApi, rowsToRefresh: RowNode[]): void {
     api.refreshCells({
       rowNodes: rowsToRefresh,
-      force: true
+      force: true,
     });
   }
 
-
   onDelete(nodes: RowNode[] | boolean): void {
     if (nodes && Array.isArray(nodes)) {
-      const paths = nodes.map(node => {
-        return this.getPath(node).filter(id => node.data.id !== id);
+      const paths = nodes.map((node) => {
+        return this.getPath(node).filter((id) => node.data.id !== id);
       });
       const cachePath = this.getParentPath(paths);
       this.gridTable?.api.clearFocusedCell();
       this.gridTable?.api.clearRangeSelection();
-      cachePath.forEach(path => {
+      cachePath.forEach((path) => {
         this.gridTable?.api.purgeServerSideCache(path);
       });
     }
@@ -45,15 +42,14 @@ export abstract class ServerTreeGrid {
         return [[]];
       }
       const pathStr = path.join('/');
-      const children = cachePath.some(cache => pathStr.startsWith(cache.join('/')));
+      const children = cachePath.some((cache) => pathStr.startsWith(cache.join('/')));
       if (!children) {
-        cachePath = cachePath.filter(cache => !cache.join('/').startsWith(pathStr));
+        cachePath = cachePath.filter((cache) => !cache.join('/').startsWith(pathStr));
         cachePath.push(path);
       }
     }
     return cachePath;
   }
-
 
   setPotentialParentForNode(api: GridApi, overNode?: RowNode): void {
     let newPotentialParent: RowNode | undefined;
@@ -75,7 +71,6 @@ export abstract class ServerTreeGrid {
     ServerTreeGrid.refreshRows(api, rowsToRefresh);
   }
 
-
   onRowDragEnd = (event: RowDragEvent) => {
     const moveInfo = this.moveInfo(event.overNode, event.node, event);
     if (moveInfo === null) {
@@ -87,22 +82,24 @@ export abstract class ServerTreeGrid {
       ancestor,
       changeMode: 1,
       descendant: movingNode.data.id,
-      originalAncestor
-    }).subscribe(() => {}, e => {
+      originalAncestor,
+    }).subscribe(
+      () => {},
+      (e) => {
         this.gridTable?.refreshRowsData();
-      });
+      },
+    );
     event.api.clearFocusedCell();
     if (!originalAncestor || !ancestor) {
       event.api.purgeServerSideCache();
     } else {
       const cachePath = this.getParentPath([movePath, overPath]);
-      cachePath.forEach(path => {
+      cachePath.forEach((path) => {
         event.api.purgeServerSideCache(path);
       });
     }
     this.setPotentialParentForNode(event.api);
-  }
-
+  };
 
   /***
    * 移动节点到顶部
@@ -112,11 +109,14 @@ export abstract class ServerTreeGrid {
       ancestor: 0,
       changeMode: 1,
       descendant: node.data.id,
-      originalAncestor: node.parent && node.parent.data ? node.parent.data.id : 0
-    }).subscribe(() => {}, (e) => {},
+      originalAncestor: node.parent && node.parent.data ? node.parent.data.id : 0,
+    }).subscribe(
+      () => {},
+      (e) => {},
       () => {
-      this.gridTable?.refreshRowsData();
-    });
+        this.gridTable?.refreshRowsData();
+      },
+    );
   }
 
   /**
@@ -125,23 +125,24 @@ export abstract class ServerTreeGrid {
    * @param movingNode 当前移动的节点
    * @param event 事件
    */
-  abstract moveInfo(overNode: RowNode, movingNode: RowNode, event: RowDragEvent): null |
-    {
-      overNode: RowNode,
-      movingNode: RowNode,
-      movePath: any[],
-      overPath: any[],
-      ancestor: any,
-      originalAncestor: any,
-    };
+  abstract moveInfo(
+    overNode: RowNode,
+    movingNode: RowNode,
+    event: RowDragEvent,
+  ): null | {
+    overNode: RowNode;
+    movingNode: RowNode;
+    movePath: any[];
+    overPath: any[];
+    ancestor: any;
+    originalAncestor: any;
+  };
 
   onGridReady(event: any, gridTable: GridTableComponent): void {
     this.gridTable = gridTable;
   }
 
-
   abstract move(value: any): Observable<any>;
-
 
   getPath(movingNode: RowNode, ids: string[] = []): string[] {
     if (movingNode.parent && movingNode.parent.data) {
@@ -149,7 +150,5 @@ export abstract class ServerTreeGrid {
     }
     ids.push(movingNode.data.id);
     return ids;
-
   }
-
 }

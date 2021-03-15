@@ -1,7 +1,7 @@
-$color: #5C8DF6;
-$colorRight: darken(#5C8DF6, 15%);
-$colorLeft: darken(#5C8DF6, 5%);
-$shadow: #DBE3F4;
+$color: #5c8df6;
+$colorRight: darken(#5c8df6, 15%);
+$colorLeft: darken(#5c8df6, 5%);
+$shadow: #dbe3f4;
 
 .boxes {
   --size: 32px;
@@ -88,7 +88,7 @@ $shadow: #DBE3F4;
 }
 
 @keyframes box2 {
-  0%{
+  0% {
     transform: translate(0, 100%);
   }
   50% {
@@ -110,7 +110,7 @@ $shadow: #DBE3F4;
 }
 
 @keyframes box4 {
-  0%{
+  0% {
     transform: translate(200%, 0);
   }
   50% {
@@ -128,5 +128,3 @@ $shadow: #DBE3F4;
     box-sizing: border-box;
   }
 }
-
-
