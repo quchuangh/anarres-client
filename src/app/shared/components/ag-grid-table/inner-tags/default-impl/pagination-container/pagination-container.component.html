@@ -1,0 +1,42 @@
+<div class="header flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
+  <ng-content select="[page-top-bar]"></ng-content>
+  <nz-pagination
+    *ngIf="cfg && cfg.show !== 'bottom'"
+    (nzPageIndexChange)="onPageIndexChange($event)"
+    (nzPageSizeChange)="onPageSizeChange($event)"
+    [nzPageIndex]="pageIndex"
+    [nzPageSizeOptions]="cfg.pageSizeOptions"
+    [nzPageSize]="pageSize"
+    [nzShowQuickJumper]="cfg.showQuickJumper"
+    [nzShowSizeChanger]="cfg.showSizeChanger"
+    [nzShowTotal]="rangeTemplate"
+    [nzSize]="cfg.size"
+    [nzTotal]="total"
+    class="pagination"
+  >
+  </nz-pagination>
+</div>
+
+<ng-content select="[page-table]"></ng-content>
+
+<div class="footer flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
+  <ng-content select="[page-bottom-bar]"></ng-content>
+  <nz-pagination
+    *ngIf="cfg && cfg.show !== 'top'"
+    (nzPageIndexChange)="onPageIndexChange($event)"
+    (nzPageSizeChange)="onPageSizeChange($event)"
+    [nzPageIndex]="pageIndex"
+    [nzPageSizeOptions]="cfg.pageSizeOptions"
+    [nzPageSize]="pageSize"
+    [nzShowQuickJumper]="cfg.showQuickJumper"
+    [nzShowSizeChanger]="cfg.showSizeChanger"
+    [nzShowTotal]="rangeTemplate"
+    [nzSize]="cfg.size"
+    [nzTotal]="total"
+    class="pagination"
+  >
+  </nz-pagination>
+</div>
+<ng-template #rangeTemplate let-range="range" let-total>
+  <ng-container *ngIf="total"> 第 {{ range[0] }} 条至 {{ range[1] }} 条 - 共 {{ total }} 条数据 </ng-container>
+</ng-template>

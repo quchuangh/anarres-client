@@ -1,4 +1,22 @@
 <page-header-wrapper>
-  <grid-table [gridOptions]="gridOptions" (onGridReady)="onGridReady($event)"></grid-table>
+  <button class="button btn" (click)="test()">test</button>
+  <!-- [deleteMenu]="true" 将自动添加一个删除菜单，批量删除只会删除checkbox选中的值 -->
+  <ag-grid-table
+    [gridOptions]="gridOptions"
+    [showPagination]="{ show: 'both' }"
+    [gridTableStyle]="{ height: '90%' }"
+    [defaultStatusBar]="true"
+    [resizable]="true"
+    [groupSelectsChildren]="true"
+    (pageIndexChange)="onPageIndexChange($event)"
+    (gridReady)="onGridReady($event)"
+  >
+    <ag-grid-header-bar>
+      <span>this is header</span>
+    </ag-grid-header-bar>
+    <ag-grid-footer-bar>
+      <span>this is footer</span>
+    </ag-grid-footer-bar>
+  </ag-grid-table>
 </page-header-wrapper>
 <!--    [headerAction]="headerAction"-->

@@ -1,4 +1,20 @@
 import { GridApi } from '@ag-grid-community/core';
+import { ColDef, ColGroupDef } from '@ag-grid-community/core/dist/cjs/entities/colDef';
+
+export function deepEach(columnDefs: (ColDef | ColGroupDef)[], each: (col: ColDef) => void): void {
+  columnDefs.forEach((value) => {
+    if (isGroup(value)) {
+      deepEach((value as ColGroupDef).children, each);
+    } else {
+      each(value as ColDef);
+    }
+  });
+}
+
+export function isGroup(col: ColDef | ColGroupDef): boolean {
+  const tmp: any = col;
+  return !(typeof tmp.children === 'undefined');
+}
 
 /**
  * 得到grid中被选择的节点,如果没有返回被范围选中的行,或null

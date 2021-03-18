@@ -1,10 +1,10 @@
 import { RowDragEvent, RowNode } from '@ag-grid-community/core';
 import { GridApi } from '@ag-grid-community/core/dist/cjs/gridApi';
 import { Observable } from 'rxjs';
-import { GridTableComponent } from './grid-table.component';
+import { AgGridTableComponent } from './ag-grid-table.component';
 
 export abstract class ServerTreeGrid {
-  gridTable!: GridTableComponent;
+  gridTable!: AgGridTableComponent;
 
   potentialParent!: RowNode | undefined;
 
@@ -86,7 +86,7 @@ export abstract class ServerTreeGrid {
     }).subscribe(
       () => {},
       (e) => {
-        this.gridTable?.refreshRowsData();
+        this.gridTable?.refresh();
       },
     );
     event.api.clearFocusedCell();
@@ -114,7 +114,7 @@ export abstract class ServerTreeGrid {
       () => {},
       (e) => {},
       () => {
-        this.gridTable?.refreshRowsData();
+        this.gridTable?.refresh();
       },
     );
   }
@@ -138,7 +138,7 @@ export abstract class ServerTreeGrid {
     originalAncestor: any;
   };
 
-  onGridReady(event: any, gridTable: GridTableComponent): void {
+  onGridReady(event: any, gridTable: AgGridTableComponent): void {
     this.gridTable = gridTable;
   }
 

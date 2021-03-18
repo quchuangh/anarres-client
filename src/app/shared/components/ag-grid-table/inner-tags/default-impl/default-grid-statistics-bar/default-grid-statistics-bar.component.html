@@ -1,0 +1,6 @@
+<div *ngFor="let items of statistics" [attr.key]="items.func" [ngClass]="items.className" class="row flex flex-wrap">
+  <label>{{ items.label }} &nbsp;&nbsp;-</label>
+  <div *ngFor="let item of items.fields" [attr.key]="item.field" [ngClass]="item.className" class="row-value shadow-divider-right">
+    <label>{{ item.label }}:</label><span class="value">{{ item.value }}</span>
+  </div>
+</div>

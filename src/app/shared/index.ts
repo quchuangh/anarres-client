@@ -8,7 +8,7 @@ export * from './components/status-label/index';
 export * from './components/scrollbar/index';
 export * from './components/address/index';
 export * from './components/langs/index';
-export * from './components/ag-grid-ext/index';
+export * from './components/ag-grid-table/index';
 
 // Utils
 export * from './utils/yuan';

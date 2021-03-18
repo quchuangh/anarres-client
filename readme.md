@@ -20,7 +20,20 @@ infinite: 无限模型
 server-side: 服务端模型, 服务端模型建立在 无限模型之上, 用户向下滚动时除了能延迟加载外，还能使用服务端对数据进行聚合（但这个考验服务端的能力） 
 viewport: 视窗模型, 表格将通知服务器要显示的数据（第一行和最后一行），借此来实现分页。 （之前的脚手架用的就是这个模型），不建议使用这个，太特么复杂，而且客户端模式就能模拟。
 
+### 行模型的选择
+原本打算用 infinite 和 server-side 分别实现无限和分页。 但是 infinite 和 server-side 都不支持 checkbox. 且存在无数不确定因素。
+server-side 相比于 client-side 的优势在于查询时 ag-grid 会提供了更多的信息，但这部分信息实际上是可以手动实现的。
+因此，决定将分页选用client-side 模式。
 
 ### 任务
 1. 菜单开发 -> 完成
 2. 表格开发 -> 进行中..  暂时使用归档1的表格，回头参考front进行修改。
+
+### ng-template ng-container ng-content 
+* 参考  https://blog.csdn.net/wuyuxing24/article/details/82825608
+* ng-template 不会展示，<ng-template #标识>.....</ng-template>
+    对应对象: TemplateRef<any>
+* ng-container 为容器，不会展示自身，可以通过 <ng-container *ngTemplateOutlet='标识'></ng-container> 来展示一个模板
+    还能通过 let-xx 来定义变量
+    对应的对象为: ViewContainerRef
+    createEmbeddedView(TemplateRef) 可以给其添加一个模板

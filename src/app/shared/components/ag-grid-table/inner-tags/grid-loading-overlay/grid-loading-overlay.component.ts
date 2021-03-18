@@ -3,11 +3,11 @@ import { IAfterGuiAttachedParams, ILoadingOverlayParams } from '@ag-grid-communi
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-loading-overlay',
-  templateUrl: './loading-overlay.component.html',
-  styleUrls: ['./loading-overlay.component.scss'],
+  selector: 'grid-loading-overlay',
+  templateUrl: './grid-loading-overlay.component.html',
+  styleUrls: ['./grid-loading-overlay.component.scss'],
 })
-export class LoadingOverlayComponent implements ILoadingOverlayAngularComp, OnInit {
+export class GridLoadingOverlayComponent implements OnInit, ILoadingOverlayAngularComp {
   constructor() {}
 
   ngOnInit(): void {}

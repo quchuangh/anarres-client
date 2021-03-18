@@ -1,0 +1,68 @@
+<full-content [(fullscreen)]="fullscreen" class="flex flex-column flex-grow-1">
+  <ng-content select="ag-grid-header-bar"></ng-content>
+
+  <!-- 分页容器 -->
+  <pagination-container
+    [cfg]="showPagination"
+    [pageIndex]="pageIdx"
+    [pageSize]="pageSize"
+    [total]="cur_page?.total ? cur_page.total : 0"
+    (pageIndexChange)="this.onPageIndexChange($event)"
+    (pageSizeChange)="this.onPageSizeChange($event)"
+  >
+    <!-- 表格 -->
+    <ag-grid-angular
+      page-table
+      [class]="gridTheme"
+      [modules]="allModules"
+      [gridOptions]="gridOptions"
+      [groupSelectsChildren]="groupSelectsChildren"
+      [ngClass]="gridTableClass"
+      [ngStyle]="gridTableStyle"
+      class="grid-table grid"
+    ></ag-grid-angular>
+
+    <!--  统计栏  -->
+    <div
+      *ngIf="showStatistics && columnApi && statistics && statistics.length"
+      class="statistics-bar flex flex-grow-0 flex-shrink-1 justify-end flex-wrap"
+    >
+      <default-grid-statistics-bar [api]="api" [columnApi]="columnApi" [statistics]="statistics"></default-grid-statistics-bar>
+    </div>
+
+    <ng-container page-bottom-bar>
+      <div class="action">
+        <button
+          *ngIf="fullscreenAction"
+          (click)="fullscreenToggle()"
+          [title]="'menu.fullscreen' | translate"
+          nz-button
+          nzSize="small"
+          nzType="primary"
+        >
+          <i
+            [ngClass]="{ mdi: true, 'mdi-fullscreen': !this.fullscreen, 'mdi-fullscreen-exit': this.fullscreen }"
+            style="margin-right: 5px"
+          ></i
+          ><span>{{ 'menu.fullscreen' | translate }}</span>
+        </button>
+
+        <button
+          *ngIf="enableExport"
+          (nzOnConfirm)="exportAllPageData()"
+          [disabled]="cur_page?.total && dataLoading"
+          [nzLoading]="loadProgressPercent > 0 && loadProgressPercent < 100"
+          [nzPopconfirmTitle]="'export.excel.confirm.tip' | translate"
+          nz-button
+          nz-popconfirm
+          nzSize="small"
+          nzType="primary"
+        >
+          <i nz-icon nzTheme="outline" nzType="file-excel"></i> {{ 'export.excel.tip' | translate }}
+        </button>
+        <ng-content select="ag-grid-tool-bar"></ng-content>
+      </div>
+    </ng-container>
+  </pagination-container>
+  <ng-content select="ag-grid-footer-bar"></ng-content>
+</full-content>

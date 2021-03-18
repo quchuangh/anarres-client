@@ -3,7 +3,7 @@ import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events'
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SFSchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
-import { GridTableComponent } from '@shared';
+import { AgGridTableComponent } from '@shared';
 
 @Component({
   selector: 'app-sys-i18n',
@@ -34,10 +34,10 @@ export class SysI18nComponent implements OnInit {
   };
 
   columnDefs: ColDef[] = [
-    { headerName: 'id', field: 'id', sort: 'desc', sortable: true },
+    { headerName: 'id', field: 'id', sort: 'desc', sortable: true, checkboxSelection: true, headerCheckboxSelection: true },
     { headerName: 'i18n', field: 'i18n' },
-    { headerName: 'message', field: 'message' },
-    { headerName: '语言', field: 'language', enableRowGroup: true },
+    { headerName: 'message', field: 'message', resizable: false },
+    { headerName: '语言', field: 'language', enableRowGroup: true, checkboxSelection: true },
     { headerName: '类型', field: 'typeGroup', enableRowGroup: true },
     { headerName: 'md5', field: 'md5' },
     { headerName: '创建人', field: 'creator' },
@@ -48,8 +48,8 @@ export class SysI18nComponent implements OnInit {
 
   gridOptions: GridOptions;
 
-  @ViewChild(GridTableComponent)
-  table!: GridTableComponent;
+  @ViewChild(AgGridTableComponent)
+  table!: AgGridTableComponent;
 
   constructor(private http: _HttpClient) {
     this.gridOptions = {
@@ -66,16 +66,16 @@ export class SysI18nComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  getData(params: any): void {
-    const current = params.current;
-    const size = params.size;
-    delete params.current;
-    delete params.size;
-    params = { queries: params, current, size };
-    return params;
-  }
+  // getData(params: any): void {
+  //   const current = params.current;
+  //   const size = params.size;
+  //   delete params.current;
+  //   delete params.size;
+  //   params = { queries: params, current, size };
+  //   return params;
+  // }
 
-  onGridReady(e: { event: GridReadyEvent; gridTable: GridTableComponent }): void {
+  onGridReady(e: { event: GridReadyEvent; gridTable: AgGridTableComponent }): void {
     // Console.collapse($event);
     const records = [];
     for (let i = 0; i < 20; i++) {
@@ -83,7 +83,7 @@ export class SysI18nComponent implements OnInit {
         id: 1 + i,
         i18n: 'i18n_' + i,
         message: 'message' + i,
-        language: 'language_' + i,
+        language: 'language_' + (i % 2),
         typeGroup: 'typeGroup_' + i,
         md5: 'md5_' + i,
         creator: 'creator_' + i,
@@ -93,11 +93,27 @@ export class SysI18nComponent implements OnInit {
       });
     }
 
-    e.gridTable.setData({
+    this.table.setData({
       records,
       total: 100,
       size: 20,
       current: 1,
     });
+
+    this.table.addMenu({
+      name: 'test',
+      show: 'selected',
+      callback: (selected) => {
+        console.log(selected);
+      },
+    });
+  }
+
+  onPageIndexChange(index: number): void {
+    console.log(index);
+  }
+
+  test(): void {
+    console.log(this.table.api.getPinnedBottomRowCount());
   }
 }
