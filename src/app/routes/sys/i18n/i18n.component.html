@@ -1,22 +1,29 @@
 <page-header-wrapper>
   <button class="button btn" (click)="test()">test</button>
   <!-- [deleteMenu]="true" 将自动添加一个删除菜单，批量删除只会删除checkbox选中的值 -->
-  <ag-grid-table
+  <ngx-grid-table
     [gridOptions]="gridOptions"
-    [showPagination]="{ show: 'both' }"
+    [showPagination]="false"
     [gridTableStyle]="{ height: '90%' }"
     [defaultStatusBar]="true"
     [resizable]="true"
     [groupSelectsChildren]="true"
+    [optionCell]="option"
+    [dataSource]="dataSource"
+    [searchSchema]="schema"
     (pageIndexChange)="onPageIndexChange($event)"
     (gridReady)="onGridReady($event)"
   >
-    <ag-grid-header-bar>
+    <ngx-grid-table-header>
       <span>this is header</span>
-    </ag-grid-header-bar>
-    <ag-grid-footer-bar>
+    </ngx-grid-table-header>
+    <ngx-grid-table-footer>
       <span>this is footer</span>
-    </ag-grid-footer-bar>
-  </ag-grid-table>
+    </ngx-grid-table-footer>
+  </ngx-grid-table>
 </page-header-wrapper>
-<!--    [headerAction]="headerAction"-->
+
+<!-- cell 和 row对应的是 TemplateRendererComponent 中的 $implicit(默认值ICellRendererParams对象) 和 row（RowNode对象） -->
+<ng-template #option let-cell let-row="row">
+  <button (click)="print(cell, row)">test</button>
+</ng-template>

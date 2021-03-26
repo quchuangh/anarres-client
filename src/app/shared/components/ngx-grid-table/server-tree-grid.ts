@@ -1,10 +1,10 @@
 import { RowDragEvent, RowNode } from '@ag-grid-community/core';
 import { GridApi } from '@ag-grid-community/core/dist/cjs/gridApi';
 import { Observable } from 'rxjs';
-import { AgGridTableComponent } from './ag-grid-table.component';
+import { NgxGridTableComponent } from './table/ngx-grid-table.component';
 
 export abstract class ServerTreeGrid {
-  gridTable!: AgGridTableComponent;
+  gridTable!: NgxGridTableComponent;
 
   potentialParent!: RowNode | undefined;
 
@@ -138,7 +138,7 @@ export abstract class ServerTreeGrid {
     originalAncestor: any;
   };
 
-  onGridReady(event: any, gridTable: AgGridTableComponent): void {
+  onGridReady(event: any, gridTable: NgxGridTableComponent): void {
     this.gridTable = gridTable;
   }
 

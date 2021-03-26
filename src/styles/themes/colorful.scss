@@ -1,0 +1,145 @@
+$app-primary-color: #7266ba;
+$app-primary-text-color: #fff;
+$app-header-background-color: #ac4ab9;
+$layout-sidebar-background-color: #323259;
+$app-grid-bar: linear-gradient(218deg, rgba(255, 249, 104, 0.32) 0%, rgba(255, 109, 45, 0.15) 60%);
+.colorful-theme {
+  transition: all 1s;
+
+  .alain-default__header {
+    background-color: #7266ba;
+    background-image: linear-gradient(
+      218deg,
+      rgba(255, 249, 104, 0.32) 0%,
+      rgba(255, 109, 45, 0.92) 30%,
+      rgba(255, 34, 185, 0.41) 61%
+    ) !important;
+    box-shadow: none;
+  }
+
+  .alain-default__aside {
+    box-shadow: none;
+    background-color: $layout-sidebar-background-color;
+
+    .alain-default__header-logo-expanded {
+      background: $app-header-background-color;
+    }
+  }
+
+  .sidebar-nav__selected {
+    background-color: $layout-sidebar-background-color;
+  }
+
+  .sidebar-nav__open {
+    .sidebar-nav__sub li.sidebar-nav__selected {
+      background-color: $app-primary-color !important; //当前激活的节点
+    }
+
+    .sidebar-nav__item-link {
+      //color: #a16eff;    //当前展开的子节点
+    }
+  }
+
+  /**
+   * ant
+   */
+  .ant-btn:hover {
+    border-color: $app-primary-color;
+    color: $app-primary-color;
+  }
+
+  .ant-btn-background-ghost.ant-btn-primary,
+  .ant-btn-background-ghost.ant-btn-primary:hover,
+  .ant-btn-background-ghost.ant-btn-primary:focus {
+    border-color: $app-primary-color;
+
+    color: $app-primary-color;
+  }
+
+  .ant-btn-primary {
+    color: $app-primary-text-color;
+    background-color: $app-primary-color;
+    border-color: $app-primary-color;
+  }
+
+  .ant-btn-primary:hover,
+  .ant-btn-primary:focus {
+    color: $app-primary-text-color;
+
+    background-color: #7266bab8;
+    border-color: $app-primary-color;
+  }
+
+  .ant-btn-primary-disabled,
+  .ant-btn-primary.disabled,
+  .ant-btn-primary[disabled],
+  .ant-btn-primary-disabled:hover,
+  .ant-btn-primary.disabled:hover,
+  .ant-btn-primary[disabled]:hover,
+  .ant-btn-primary-disabled:focus,
+  .ant-btn-primary.disabled:focus,
+  .ant-btn-primary[disabled]:focus,
+  .ant-btn-primary-disabled:active,
+  .ant-btn-primary.disabled:active,
+  .ant-btn-primary[disabled]:active,
+  .ant-btn-primary-disabled.active,
+  .ant-btn-primary.disabled.active,
+  .ant-btn-primary[disabled].active {
+    color: rgba(0, 0, 0, 0.25);
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+  }
+
+  /**
+   * 网格,表格
+   */
+  app-grid-table {
+    //box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+    .footer {
+      background-image: $app-grid-bar !important;
+    }
+  }
+
+  /*ag-grid*/
+  .ag-theme-balham {
+    .ag-icon {
+      color: $app-primary-color;
+    }
+
+    .ag-header {
+    }
+
+    .ag-ltr,
+    .ag-rtl {
+    }
+    .ag-cell-highlight {
+      background-color: $app-primary-color !important;
+    }
+
+    .ag-ltr,
+    .ag-rtl {
+      .ag-has-focus .ag-cell-focus:not(.ag-cell-range-selected),
+      .ag-has-focus .ag-cell-focus.ag-cell-range-single-cell,
+      .ag-cell-focus.ag-cell-range-single-cell.ag-cell-range-handle {
+        border: 1px solid $app-primary-color;
+        outline: initial;
+      }
+
+      .ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell) {
+        border: 1px solid transparent;
+        &.ag-cell-range-top {
+          border-top-color: $app-primary-color;
+        }
+        &.ag-cell-range-right {
+          border-right-color: $app-primary-color;
+        }
+        &.ag-cell-range-bottom {
+          border-bottom-color: $app-primary-color;
+        }
+        &.ag-cell-range-left {
+          border-left-color: $app-primary-color;
+        }
+      }
+    }
+  }
+}

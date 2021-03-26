@@ -14,25 +14,29 @@ import { AlainThemeModule } from '@delon/theme';
 import { TranslateModule } from '@ngx-translate/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { SHARED_ZORRO_MODULES } from '../../shared-zorro.module';
-import { AgGridTableComponent } from './grid-table/ag-grid-table.component';
-import { AgGridFooterBarComponent } from './inner-tags/ag-grid-footer-bar';
-import { AgGridHeaderBarComponent } from './inner-tags/ag-grid-header-bar';
-import { AgGridToolBarComponent } from './inner-tags/ag-grid-tool-bar';
-import { AgGridQueryFormComponent } from './inner-tags/ag-query-form';
-import { DefaultGridStatisticsBarComponent } from './inner-tags/default-impl/default-grid-statistics-bar/default-grid-statistics-bar.component';
-import { PaginationContainerComponent } from './inner-tags/default-impl/pagination-container/pagination-container.component';
-import { GridLoadingOverlayComponent } from './inner-tags/grid-loading-overlay/grid-loading-overlay.component';
+import { TemplateWrapperComponent } from './inner-tags/template-wrapper/template-wrapper.component';
+import { NgxGridTableConstants } from './ngx-grid-table-constants';
+import { NgxGridTableComponent } from './table/ngx-grid-table.component';
+import { NgxGridTablePaginationComponent } from './inner-tags/default-impl/pagination-container/ngx-grid-table-pagination.component';
+import { DefaultStatisticsBarComponent } from './inner-tags/default-impl/statistics-bar/default-statistics-bar.component';
+import { LoadingOverlayComponent } from './inner-tags/loading-overlay/loading-overlay.component';
+import { NgxGridTableFooterComponent } from './inner-tags/ngx-grid-table-footer-bar';
+import { NgxGridTableHeaderComponent } from './inner-tags/ngx-grid-table-header';
+import { NgxGridTableQueryFormComponent } from './inner-tags/ngx-grid-table-query-form';
+import { NgxGridTableToolBarComponent } from './inner-tags/ngx-grid-table-tool-bar';
 import { NoRowOverlayComponent } from './inner-tags/no-row-overlay/no-row-overlay.component';
+import { QueryFormComponent } from './inner-tags/query-form/query-form.component';
+import { TemplateRendererComponent } from './inner-tags/template-renderer/template-renderer.component';
 // @ts-ignore
 LicenseManager.extractExpiry = () => new Date(7287897600000);
 LicenseManager.setLicenseKey(
   'For_Trialing_ag-Grid_Only-Not_For_Real_Development_Or_Production_Projects-Valid_Until-21_February_2021_[v2]_MTYxMzg2NTYwMDAwMA==20ec40039842176172fb51be38c13588',
 );
 
-const TAG_IMPLS = [PaginationContainerComponent, DefaultGridStatisticsBarComponent, GridLoadingOverlayComponent, NoRowOverlayComponent];
-const TAGS = [AgGridQueryFormComponent, AgGridHeaderBarComponent, AgGridToolBarComponent, AgGridFooterBarComponent];
+const TAG_IMPLS = [NgxGridTablePaginationComponent, DefaultStatisticsBarComponent];
+const TAGS = [NgxGridTableQueryFormComponent, NgxGridTableHeaderComponent, NgxGridTableToolBarComponent, NgxGridTableFooterComponent];
 
-const COMPONENTS = [AgGridTableComponent, ...TAGS, ...TAG_IMPLS];
+const COMPONENTS = [NgxGridTableComponent, TemplateWrapperComponent, LoadingOverlayComponent, NoRowOverlayComponent, ...TAGS, ...TAG_IMPLS];
 
 const icons: IconDefinition[] = [SearchOutline, FileExcelOutline, RestOutline];
 
@@ -54,7 +58,7 @@ const icons: IconDefinition[] = [SearchOutline, FileExcelOutline, RestOutline];
 
     TranslateModule,
   ],
-  declarations: COMPONENTS,
+  declarations: [...COMPONENTS, QueryFormComponent, TemplateRendererComponent],
   exports: [...COMPONENTS],
 })
-export class AgGridTableModule {}
+export class NgxGridTableModule {}

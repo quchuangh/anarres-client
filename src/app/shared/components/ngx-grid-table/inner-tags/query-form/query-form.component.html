@@ -1,0 +1,21 @@
+<sf
+  layout="horizontal"
+  [firstVisual]="true"
+  [formData]="searchFormData"
+  [schema]="searchSchema"
+  button="none"
+  class="grid-header-search"
+  [mode]="'search'"
+>
+  <ng-template sf-template="ngx-number" let-me let-ui="ui" let-schema="schema">
+    <input
+      nz-input
+      [attr.id]="me.id"
+      [disabled]="me.disabled"
+      [attr.disabled]="me.disabled"
+      [nzSize]="ui.size"
+      [ngModel]="me.formProperty.value"
+      (ngModelChange)="test($event)"
+    />
+  </ng-template>
+</sf>

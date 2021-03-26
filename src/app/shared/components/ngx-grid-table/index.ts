@@ -1,0 +1,6 @@
+export * from './ngx-grid-table.module';
+
+export * from './table/ngx-grid-table.component';
+export * from './ngx-grid-table-utils';
+export * from './ngx-grid-table-model';
+export * from './ngx-grid-table-constants';

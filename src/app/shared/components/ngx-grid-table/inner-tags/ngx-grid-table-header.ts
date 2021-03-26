@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'ag-grid-query-form',
+  selector: 'ngx-grid-table-header',
   template: `<ng-content></ng-content>`,
 })
-export class AgGridQueryFormComponent implements OnInit {
+export class NgxGridTableHeaderComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {}

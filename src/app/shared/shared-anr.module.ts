@@ -1,3 +1,3 @@
-import { AgGridTableModule } from './components/ag-grid-table';
+import { NgxGridTableModule } from './components/ngx-grid-table';
 
-export const SHARED_ANR_MODULES = [AgGridTableModule];
+export const SHARED_ANR_MODULES = [NgxGridTableModule];

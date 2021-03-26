@@ -1,5 +1,6 @@
 import { GridApi } from '@ag-grid-community/core';
 import { ColDef, ColGroupDef } from '@ag-grid-community/core/dist/cjs/entities/colDef';
+import { DateOption, IFilter, NumberOption, SetOption, TextOption } from './ngx-grid-table-model';
 
 export function deepEach(columnDefs: (ColDef | ColGroupDef)[], each: (col: ColDef) => void): void {
   columnDefs.forEach((value) => {

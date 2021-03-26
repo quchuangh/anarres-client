@@ -1,9 +1,10 @@
 import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { SFSchema } from '@delon/form';
+import { SFSchema, SFSelectWidgetSchema, SFTreeSelectWidgetSchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
-import { AgGridTableComponent } from '@shared';
+import { IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
+import { DataSourceUtils } from '../../DataSourceUtils';
 
 @Component({
   selector: 'app-sys-i18n',
@@ -22,15 +23,26 @@ export class SysI18nComponent implements OnInit {
           { label: '服务端', value: 'SERVER' },
           { label: '客户端', value: 'CLIENT' },
         ],
+        // ui: {
+        //   widget: 'select',
+        //   multiple: true
+        // } as SFSelectWidgetSchema,
+      },
+      id: {
+        type: 'integer',
+        title: 'id',
+        ui: {
+          widget: 'ngx-number',
+        },
       },
       md5: { type: 'string', title: 'md5', default: '' },
       creator: { type: 'string', title: '创建人' },
       createdTime: { type: 'string', title: '创建时间', format: 'date-time' },
       updater: { type: 'string', title: '更新人' },
-      updatedTime: { type: 'string', title: '更新时间' },
+      updatedTime: { type: 'string', title: '更新时间', format: 'date-time' },
     },
     required: ['text'],
-    ui: { grid: { md: 24, lg: 12 }, spanLabelFixed: 100 },
+    ui: { width: 275, spanLabelFixed: 80 },
   };
 
   columnDefs: ColDef[] = [
@@ -44,12 +56,15 @@ export class SysI18nComponent implements OnInit {
     { headerName: '创建时间', field: 'createdTime', sortable: true },
     { headerName: '更新人', field: 'updater' },
     { headerName: '更新时间', field: 'updatedTime', sortable: true },
+    { headerName: '操作', field: NgxGridTableConstants.OPTION_FIELD },
   ];
 
   gridOptions: GridOptions;
 
-  @ViewChild(AgGridTableComponent)
-  table!: AgGridTableComponent;
+  dataSource: IGridDataSource;
+
+  @ViewChild(NgxGridTableComponent)
+  table!: NgxGridTableComponent;
 
   constructor(private http: _HttpClient) {
     this.gridOptions = {
@@ -62,6 +77,8 @@ export class SysI18nComponent implements OnInit {
         event.columnApi.autoSizeAllColumns();
       },
     };
+
+    this.dataSource = DataSourceUtils.create(http, '/api/sys/i18n', (r) => r);
   }
 
   ngOnInit(): void {}
@@ -75,7 +92,7 @@ export class SysI18nComponent implements OnInit {
   //   return params;
   // }
 
-  onGridReady(e: { event: GridReadyEvent; gridTable: AgGridTableComponent }): void {
+  onGridReady(e: { event: GridReadyEvent; gridTable: NgxGridTableComponent }): void {
     // Console.collapse($event);
     const records = [];
     for (let i = 0; i < 20; i++) {
@@ -115,5 +132,9 @@ export class SysI18nComponent implements OnInit {
 
   test(): void {
     console.log(this.table.api.getPinnedBottomRowCount());
+  }
+
+  print(...data: any): void {
+    console.log(data);
   }
 }

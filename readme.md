@@ -21,9 +21,10 @@ server-side: 服务端模型, 服务端模型建立在 无限模型之上, 用�
 viewport: 视窗模型, 表格将通知服务器要显示的数据（第一行和最后一行），借此来实现分页。 （之前的脚手架用的就是这个模型），不建议使用这个，太特么复杂，而且客户端模式就能模拟。
 
 ### 行模型的选择
-原本打算用 infinite 和 server-side 分别实现无限和分页。 但是 infinite 和 server-side 都不支持 checkbox. 且存在无数不确定因素。
-server-side 相比于 client-side 的优势在于查询时 ag-grid 会提供了更多的信息，但这部分信息实际上是可以手动实现的。
-因此，决定将分页选用client-side 模式。
+踩了一些坑之后，发现 infinite 和 viewport 没有使用的必要。官方也明确推荐在能够使用 server-side的情况下，不要使用infinite。同时也强调对viewport没有特别理解和特别需要，也不推荐使用。
+然而如此跟infinite和viewport相比如此优秀的server-side也有很多坑。比如不支持checkbox。
+最终无奈的发现最符合一般人使用习惯的反而是使用client-side来获取服务端数据后进行处理。
+最后的结论是：分页使用client-side最合适。无限使用server-side最合适。
 
 ### 任务
 1. 菜单开发 -> 完成

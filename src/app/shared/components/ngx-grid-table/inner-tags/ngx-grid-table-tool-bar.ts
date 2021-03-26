@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'ag-grid-header-bar',
+  selector: 'ngx-grid-table-tool-bar',
   template: `<ng-content></ng-content>`,
 })
-export class AgGridHeaderBarComponent implements OnInit {
+export class NgxGridTableToolBarComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {}

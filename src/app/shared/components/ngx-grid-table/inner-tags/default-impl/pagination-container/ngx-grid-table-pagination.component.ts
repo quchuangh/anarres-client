@@ -2,11 +2,11 @@ import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@an
 import { PaginationCfg } from '@shared';
 
 @Component({
-  selector: 'pagination-container',
-  templateUrl: './pagination-container.component.html',
-  styleUrls: ['./pagination-container.component.less'],
+  selector: 'ngx-grid-table-pagination',
+  templateUrl: './ngx-grid-table-pagination.component.html',
+  styleUrls: ['./ngx-grid-table-pagination.component.less'],
 })
-export class PaginationContainerComponent implements OnInit {
+export class NgxGridTablePaginationComponent implements OnInit {
   @Input() pageIndex = 1;
   @Input() pageSize = 50;
   @Input() total = 0;

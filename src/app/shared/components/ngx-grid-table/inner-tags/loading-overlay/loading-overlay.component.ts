@@ -4,10 +4,10 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'grid-loading-overlay',
-  templateUrl: './grid-loading-overlay.component.html',
-  styleUrls: ['./grid-loading-overlay.component.scss'],
+  templateUrl: './loading-overlay.component.html',
+  styleUrls: ['./loading-overlay.component.scss'],
 })
-export class GridLoadingOverlayComponent implements OnInit, ILoadingOverlayAngularComp {
+export class LoadingOverlayComponent implements OnInit, ILoadingOverlayAngularComp {
   constructor() {}
 
   ngOnInit(): void {}
