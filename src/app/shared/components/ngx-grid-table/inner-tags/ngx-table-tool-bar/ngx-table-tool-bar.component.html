@@ -1,0 +1,38 @@
+<div class="grid-search-action">
+  <div class="search-panel-left">
+    <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: this.left }"></ng-container>
+    <ng-content select="left-panel"></ng-content>
+  </div>
+  <div class="search-panel-center">
+    <ng-content select="center-panel"></ng-content>
+    <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: this.center }"></ng-container>
+  </div>
+  <div class="search-panel-right">
+    <ng-content select="right-panel"></ng-content>
+    <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: this.right }"></ng-container>
+  </div>
+</div>
+
+<ng-template #actions let-actions>
+  <ng-container *ngFor="let item of actions" [ngSwitch]="item">
+    <button *ngSwitchCase="'search'" (click)="onSearch()" [nzLoading]="loading | async" acl nz-button nzSize="small" nzType="primary">
+      <i nz-icon nzType="search" nzTheme="outline"></i>搜索
+    </button>
+    <button *ngSwitchCase="'reset'" (click)="onReset()" acl nz-button nzSize="small" nzType="primary">
+      <i nz-icon nzType="rest" nzTheme="outline"></i>重置
+    </button>
+    <button *ngSwitchCase="'data-mode'" (click)="onDataMode()" acl nz-button nzSize="small" nzType="primary">
+      <i nz-icon nzType="swap" nzTheme="outline"></i>切换模式
+    </button>
+
+    <button *ngSwitchCase="'full'" (click)="onFull()" acl nz-button nzSize="small" nzType="primary">
+      <i nz-icon [nzType]="full ? 'fullscreen-exit' : 'fullscreen'" nzTheme="outline"></i>全屏
+    </button>
+
+    <button *ngSwitchCase="'export'" (click)="onExport()" acl nz-button nzSize="small" nzType="primary">
+      <i nz-icon nzType="file-excel" nzTheme="outline"></i>导出
+    </button>
+
+    <ng-container *ngSwitchCase="'page'" [ngTemplateOutlet]="page"> </ng-container>
+  </ng-container>
+</ng-template>

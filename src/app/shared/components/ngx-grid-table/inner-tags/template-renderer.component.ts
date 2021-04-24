@@ -5,8 +5,8 @@ import { Component, OnInit, TemplateRef } from '@angular/core';
 
 @Component({
   selector: 'app-template-renderer',
-  templateUrl: './template-renderer.component.html',
-  styleUrls: ['./template-renderer.component.less'],
+  template: `<ng-container *ngTemplateOutlet="template; context: templateContext"></ng-container>`,
+  styles: [':host { display: flex; align-items: center }', ':host-context(.grid-footer) { display: none; }'],
 })
 export class TemplateRendererComponent implements OnInit, ICellRendererAngularComp {
   template!: TemplateRef<any>;

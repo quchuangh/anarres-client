@@ -1,13 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { SFComponent, SFSchema } from '@delon/form';
-import { IFilter } from '@shared';
+import { IFilter } from '../../filter-input/filter.types';
 
 @Component({
-  selector: 'query-form',
-  templateUrl: './query-form.component.html',
-  styleUrls: ['./query-form.component.less'],
+  selector: 'sf-query-form',
+  templateUrl: './sf-query-form.component.html',
+  styleUrls: ['./sf-query-form.component.less'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QueryFormComponent implements OnInit {
+export class SfQueryFormComponent implements OnInit {
   @Input() searchSchema!: SFSchema;
 
   /**

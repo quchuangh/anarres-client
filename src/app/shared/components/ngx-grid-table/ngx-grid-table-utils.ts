@@ -1,6 +1,45 @@
 import { GridApi } from '@ag-grid-community/core';
 import { ColDef, ColGroupDef } from '@ag-grid-community/core/dist/cjs/entities/colDef';
-import { DateOption, IFilter, NumberOption, SetOption, TextOption } from './ngx-grid-table-model';
+import { SFSchema } from '@delon/form';
+import { DATE_FILTERS, NUMBER_FILTERS, SET_FILTERS, TEXT_FILTERS } from '../filter-input';
+
+export function defaultPropertiesUI(schema: SFSchema, optionShowType: 'i18n' | 'shorthand' | 'symbol' = 'i18n'): SFSchema {
+  if (!schema.properties) {
+    return schema;
+  }
+  Object.values(schema.properties).forEach((value) => {
+    if (!value.ui) {
+      value.ui = {};
+    }
+    switch (value.type) {
+      case 'integer':
+      case 'number':
+        // @ts-ignore
+        value.ui = { widget: 'filter-input', options: NUMBER_FILTERS, optionShowType, ...value.ui };
+        break;
+      case 'array':
+      case 'boolean':
+        // @ts-ignore
+        value.ui = { widget: 'filter-input', options: SET_FILTERS, optionShowType, ...value.ui };
+        break;
+      case 'string':
+        if (value.format && value.format.startsWith('date')) {
+          // @ts-ignore
+          value.ui = { widget: 'filter-input', options: DATE_FILTERS, optionShowType, ...value.ui };
+          break;
+        } else {
+          // @ts-ignore
+          value.ui = { widget: 'filter-input', options: TEXT_FILTERS, optionShowType, ...value.ui };
+          break;
+        }
+      default:
+        // @ts-ignore
+        value.ui = { widget: 'filter-input', options: TEXT_FILTERS, optionShowType, ...value.ui };
+        break;
+    }
+  });
+  return schema;
+}
 
 export function deepEach(columnDefs: (ColDef | ColGroupDef)[], each: (col: ColDef) => void): void {
   columnDefs.forEach((value) => {

@@ -1,7 +1,6 @@
 import {
   AgEvent,
   ColDef,
-  ColGroupDef,
   Constants,
   GetContextMenuItemsParams,
   GridApi,
@@ -13,14 +12,15 @@ import {
 import { GetContextMenuItems } from '@ag-grid-community/core/dist/cjs/entities/gridOptions';
 import { TemplateRef } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { SFSchema } from '@delon/form';
 import { TranslateService } from '@ngx-translate/core';
-import { ApiGetter, GridQuery, IFilter, IRowQuery, MenuItem, TreeDataCfg } from '@shared';
 import { Subject } from 'rxjs';
 import { filter, takeUntil, takeWhile } from 'rxjs/operators';
-import { TemplateRendererComponent } from './inner-tags/template-renderer/template-renderer.component';
-import { TemplateWrapperComponent } from './inner-tags/template-wrapper/template-wrapper.component';
+import { DATE_FILTERS, IFilter, NUMBER_FILTERS, SET_FILTERS, TEXT_FILTERS } from '../filter-input/filter.types';
+import { TemplateRendererComponent } from './inner-tags/template-renderer.component';
 import { GRID_LOCALE_TEXT } from './localeText';
 import { NgxGridTableConstants } from './ngx-grid-table-constants';
+import { ApiGetter, IRowQuery, MenuItem, TreeDataCfg } from './ngx-grid-table-model';
 import { deepEach } from './ngx-grid-table-utils';
 
 export function buildFrameworkComponents(gridOptions: GridOptions): void {
@@ -297,6 +297,8 @@ export function initGridOptions(gridOptions: GridOptions, rowSelection: string, 
     enableRangeSelection: true,
     loadingOverlayComponent: 'loadingOverlay',
     noRowsOverlayComponent: 'noRowsOverlay',
+    pagination: false,
+    suppressPaginationPanel: true,
     onGridReady: (event: GridReadyEvent) => {
       onReady(event);
       if (tmpOnReady) {
@@ -307,20 +309,22 @@ export function initGridOptions(gridOptions: GridOptions, rowSelection: string, 
   };
 }
 
-export function clientSideAsRowQuery(api: GridApi, gridQuery: GridQuery): IRowQuery {
-  const rowQuery = {} as IRowQuery;
-
-  asRowQuery(rowQuery, api.getFilterModel(), api.getSortModel(), gridQuery, gridQuery.pageNum!, gridQuery.pageSize!);
-
-  return rowQuery;
+export function clientSideAsRowQuery(api: GridApi, pageNum: number, pageSize: number, extFilter: IFilter[]): IRowQuery {
+  return asRowQuery(api.getFilterModel(), api.getSortModel(), pageNum, pageSize, extFilter);
 }
+
 export function serverSideAsRowQuery(
   tableParams: IServerSideGetRowsParams,
-  gridQuery: GridQuery,
   treeData: false | TreeDataCfg,
+  extFilter: IFilter[],
 ): IRowQuery {
-  const rowQuery = {} as IRowQuery;
+  // 分页
+  const startRow = tableParams.request.startRow;
+  const endRow = tableParams.request.endRow;
+  const pageSize = endRow - startRow;
+  const page = startRow / pageSize + 1;
 
+  const rowQuery = asRowQuery(tableParams.request.filterModel, tableParams.request.sortModel, page, pageSize, extFilter);
   // treeData
   if (treeData) {
     const groupKeys = tableParams.request.groupKeys;
@@ -328,26 +332,17 @@ export function serverSideAsRowQuery(
       rowQuery.treePath = groupKeys;
     }
   }
-
-  // 分页
-  const startRow = tableParams.request.startRow;
-  const endRow = tableParams.request.endRow;
-  const pageSize = endRow - startRow;
-  const page = startRow / pageSize + 1;
-
-  asRowQuery(rowQuery, tableParams.request.filterModel, tableParams.request.sortModel, gridQuery, page, pageSize);
-
   return rowQuery;
 }
 
 function asRowQuery(
-  rowQuery: IRowQuery,
   filterModel: any,
   sorts: { colId: string; sort: string }[],
-  gridQuery: GridQuery,
   pageNum: number,
   pageSize: number,
-): void {
+  extFilter?: IFilter[],
+): IRowQuery {
+  const rowQuery = {} as IRowQuery;
   // 分页
   rowQuery.pageNum = pageNum;
   rowQuery.pageSize = pageSize;
@@ -378,14 +373,10 @@ function asRowQuery(
     return r;
   });
 
-  const _gridQuery = { ...gridQuery };
-  delete _gridQuery.pageSize;
-  delete _gridQuery.pageNum;
-
-  // rowQuery.filters.push(...Object.keys(gridQuery).map(field => {
-  //   return {
-  //     field,
-  //     // TODO 这里没有写
-  //   } as IFilter;
-  // }));
+  if (extFilter) {
+    extFilter.forEach((value) => {
+      rowQuery.filters.push(value);
+    });
+  }
+  return rowQuery;
 }

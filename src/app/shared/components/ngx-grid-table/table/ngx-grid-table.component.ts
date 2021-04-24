@@ -1,5 +1,6 @@
 import { ColumnApi, GridApi, GridOptions, GridReadyEvent, IServerSideGetRowsParams, RowNode } from '@ag-grid-community/core';
 import { CellRange } from '@ag-grid-community/core/dist/cjs/interfaces/iRangeController';
+import { IServerSideDatasource } from '@ag-grid-community/core/dist/cjs/interfaces/iServerSideDatasource';
 
 import { AllModules } from '@ag-grid-enterprise/all-modules';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
@@ -14,8 +15,8 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { of, Subject } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { buildTreeData, Console, GridQuery, IRowQuery, TreeDataCfg } from '../../..';
-import { QueryFormComponent } from '../inner-tags/query-form/query-form.component';
+import { Console } from '../../../utils/console';
+import { IFilter } from '../../filter-input/filter.types';
 // 不要使用import {Console} from '@shared'，防止循环引用
 import {
   buildFrameworkComponents,
@@ -32,7 +33,17 @@ import {
   serverSideAsRowQuery,
 } from '../ngx-grid-functions';
 import { NgxGridTableConstants } from '../ngx-grid-table-constants';
-import { ApiGetter, GridStatistics, IGridDataSource, IPage, MenuItem, PaginationCfg } from '../ngx-grid-table-model';
+import {
+  ApiGetter,
+  GridStatistics,
+  IGridDataSource,
+  IPage,
+  IRowQuery,
+  MenuItem,
+  PaginationCfg,
+  TreeDataCfg,
+} from '../ngx-grid-table-model';
+import { SfQueryFormComponent } from '../sf-query-form/sf-query-form.component';
 
 /**
  * 表格提供 分页 和 无限 两种模式。
@@ -47,6 +58,7 @@ import { ApiGetter, GridStatistics, IGridDataSource, IPage, MenuItem, Pagination
 })
 export class NgxGridTableComponent implements OnInit, OnDestroy {
   // =============================== 表格内部参数 =========================
+  __show__ = true;
   /** 添加菜单 */
   private additionMenu: Array<MenuItem> = [];
   /** 销毁 */
@@ -55,16 +67,12 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   private treeData: false | TreeDataCfg = false;
 
   allModules = AllModules;
-  /** 是否为全屏状态 */
-  fullscreen = false;
+
   /** 表格初始化后的 api 对象，同于控制表格行为 */
   api!: GridApi;
   /** 表格初始化后的 ColumnApi对象，用于控制表列行为 */
   columnApi!: ColumnApi;
-  /** 当前页码 */
-  pageIdx = 1;
-  /** 页大小 */
-  pageSize = 20;
+
   /** 是否正在加载数据中 */
   dataLoading = false;
   /** 加载进度条 */
@@ -75,10 +83,14 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   cur_page!: IPage<any>;
   /** 表格页面所在的url */
   currentUrl: string;
-  /** 异步查询对象 */
-  next$ = new Subject<GridQuery>();
 
   // ================================== 基本配置（外部） =============================
+  /** 是否为全屏状态 */
+  @Input() fullscreen = false;
+  /** 当前页码 */
+  @Input() pageIndex = 1;
+  /** 页大小 */
+  @Input() pageSize = 20;
   /** 表格基础配置 */
   @Input() gridOptions!: GridOptions;
   /** 表格主题 */
@@ -86,13 +98,11 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   /** 表格CSS */
   @Input() gridTableClass = [];
   /** 数据表格样式 */
-  @Input() gridTableStyle: { [key: string]: any } = { width: '100%', height: '100%' };
+  @Input() gridTableStyle: { [key: string]: any } = { width: '100%', height: '70%' };
   /** 是否在表格初始化后立即执行一次查询 */
   @Input() initLoadData = true;
   /** 分页还是无限 */
   @Input() dataLoadModel: 'pageable' | 'infinite' = 'pageable';
-  /** 页码和页大小变更时是否自动查询 */
-  @Input() autoQueryOnPageChange = true;
   /** 是否显示分页控件 */
   @Input() showPagination: false | PaginationCfg = {};
   /** 是否显示默认状态栏, 展示用户选中项状态数据 */
@@ -101,10 +111,6 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   @Input() rowSelection: 'single' | 'multiple' = 'multiple';
   /** 是否显示统计 */
   @Input() showStatistics = false;
-  /** 是否可以全屏 */
-  @Input() fullscreenAction = true;
-  /** 导出按钮 */
-  @Input() enableExport = true;
   /** 是否展示删除菜单 */
   @Input() deleteMenu = true;
   /** 默认是否可以改变列宽 */
@@ -117,21 +123,27 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   @Input() dataSource!: IGridDataSource;
   /** 表单schema */
   @Input() searchSchema!: SFSchema;
-  /** 默认表单数据 */
-  @Input() searchData!: any;
+  /** 初始表单数据 */
+  @Input() initFormData!: any;
+
+  @Input() customPageView!: TemplateRef<any>;
+
+  @Input() filterGetter!: () => IFilter[];
 
   // ============================== 事件 ============================
+  @Output() fullscreenChange = new EventEmitter<boolean>();
+  @Output() pageIndexChange = new EventEmitter<number>();
+  @Output() pageSizeChange = new EventEmitter<number>();
   /** 表格就绪事件 */
   @Output() gridReady = new EventEmitter<{ event: GridReadyEvent; gridTable: NgxGridTableComponent }>();
-  /** 页码变更事件 */
-  @Output() pageIndexChange = new EventEmitter<number>();
-  /** 页大小变更事件 */
-  @Output() pageSizeChange = new EventEmitter<number>();
   /** 删除事件 */
   @Output() deleted = new EventEmitter<any>();
+  @Output() dataLoadingChange = new EventEmitter<boolean>();
+  @Output() dataLoadModelChange = new EventEmitter<'pageable' | 'infinite'>();
 
   // ============================= 组件 =======================
-  @ViewChild(QueryFormComponent) form!: QueryFormComponent;
+  @ViewChild(SfQueryFormComponent) form!: SfQueryFormComponent;
+  @ViewChild('defaultPageTmpl') defaultPageTmpl!: TemplateRef<any>;
 
   constructor(
     private translateService: TranslateService,
@@ -149,7 +161,7 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // api 获取方法，用于给functions传递api对象
     const apiGetter: ApiGetter = { get: () => ({ api: this.api, columnApi: this.columnApi }) };
-    this.nextDataSubscribe();
+
     buildFrameworkComponents(this.gridOptions);
     // 构建菜单
     buildMenus(
@@ -171,10 +183,6 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
     repairRowModeType(this.gridOptions, this.dataLoadModel);
     // TODO 构建ACL
 
-    if (this.dataLoadModel !== 'pageable') {
-      this.showPagination = false;
-    }
-
     this.showPagination = {
       ...NgxGridTableConstants.DEFAULT_PAGINATION,
       ...this.showPagination,
@@ -186,6 +194,10 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   private onGridReady(event: GridReadyEvent): void {
     this.api = event.api;
     this.columnApi = event.columnApi;
+
+    if (this.dataLoadModel === 'infinite') {
+      this.api.setServerSideDatasource(this.infiniteDataSource());
+    }
 
     this.gridReady.emit({ event, gridTable: this });
 
@@ -201,90 +213,49 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  private nextDataSubscribe(): void {
-    this.next$.subscribe((query: GridQuery) => {
-      if (this.dataLoadModel === 'pageable') {
-        this.pageSource(query);
-      } else {
-        this.infiniteSource(query);
-      }
-    });
-  }
-
-  private pageSource(gridQuery: GridQuery): void {
-    if (!gridQuery.pageNum || !gridQuery.pageSize) {
-      console.error(`GridQuery进行分页查询时，居然没有传入 pageNum 和 pageSize 参数，请联系开发者对其进行修复`);
-      gridQuery.pageNum = this.cur_page.current;
-      gridQuery.pageSize = this.cur_page.size;
+  private filters(): IFilter[] {
+    let filters = [] as IFilter[];
+    if (this.form) {
+      filters = [...this.form.filter];
     }
-    const rowQuery: IRowQuery = clientSideAsRowQuery(this.api, gridQuery);
-
-    Console.collapse('grid-table.component getData', 'indigoBg', 'queryParams', 'indigoOutline');
-    console.log(rowQuery);
-    console.groupEnd();
-    this.api.showLoadingOverlay();
-    this.dataLoading = true;
-
-    this.dataSource
-      .query(rowQuery)
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError((err) => {
-          Console.collapse('grid-table.component RefreshRowsData', 'redBg', 'ERROR', 'redOutline');
-          console.log(err);
-          console.groupEnd();
-          return of({ total: 0, records: [], size: rowQuery.pageSize, current: rowQuery.pageNum, statistics: [] } as IPage<any>);
-        }),
-      )
-      .subscribe((resultPage) => {
-        this.cur_page = resultPage;
-        this.api.setRowData(resultPage.records);
-        this.statistics = resultPage.statistics || [];
-        if (!resultPage.records.length) {
-          this.api.showNoRowsOverlay();
-        } else {
-          this.api.hideOverlay();
-        }
-        this.dataLoading = false;
-      });
+    if (this.filterGetter) {
+      filters = [...filters, ...this.filterGetter()];
+    }
+    return filters;
   }
 
-  private infiniteSource(gridQuery: GridQuery): void {
-    this.api.showLoadingOverlay();
-
-    this.api.setServerSideDatasource({
-      getRows: (tableParams: IServerSideGetRowsParams) => {
-        const rowQuery = serverSideAsRowQuery(tableParams, gridQuery, this.treeData);
-
-        Console.collapse('grid-table.component getData', 'indigoBg', 'queryParams', 'indigoOutline');
-        console.log(rowQuery);
-        console.groupEnd();
-        this.dataLoading = true;
-        this.api.showLoadingOverlay();
-        this.dataSource
-          .query(rowQuery)
-          .pipe(
-            takeUntil(this.destroy$),
-            catchError((err) => {
-              Console.collapse('grid-table.component RefreshRowsData', 'redBg', 'ERROR', 'redOutline');
-              console.error(err);
-              console.groupEnd();
-              return of({ total: 0, records: [], size: rowQuery.pageSize, current: rowQuery.pageNum, statistics: [] } as IPage<any>);
-            }),
-          )
-          .subscribe((resultPage) => {
-            this.cur_page = resultPage;
-            tableParams.successCallback(resultPage.records, resultPage.total);
+  private infiniteDataSource(): IServerSideDatasource {
+    const getRows = (params: IServerSideGetRowsParams) => {
+      const rowQuery = serverSideAsRowQuery(params, this.treeData, this.filters());
+      Console.collapse('grid-table.component getData', 'indigoBg', 'queryParams', 'indigoOutline');
+      console.log(rowQuery);
+      console.groupEnd();
+      this.setDataLoading(true);
+      this.api.showLoadingOverlay();
+      this.dataSource
+        .query(rowQuery)
+        .pipe(
+          takeUntil(this.destroy$),
+          catchError((err) => {
+            Console.collapse('grid-table.component RefreshRowsData', 'redBg', 'ERROR', 'redOutline');
+            console.error(err);
+            console.groupEnd();
+            return of({} as IPage<any>);
+          }),
+        )
+        .subscribe((resultPage) => {
+          if (resultPage.records) {
+            params.successCallback(resultPage.records, resultPage.total);
             this.statistics = resultPage.statistics || [];
-            if (!resultPage.records.length && !this.treeData) {
-              this.api.showNoRowsOverlay();
-            } else {
-              this.api.hideOverlay();
-            }
-            this.dataLoading = false;
-          });
-      },
-    });
+            this.api.hideOverlay();
+          } else {
+            this.api.showNoRowsOverlay();
+            params.failCallback();
+          }
+          this.setDataLoading(false);
+        });
+    };
+    return { getRows };
   }
 
   private doDelete(): void {
@@ -317,25 +288,52 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
    * 查询
    */
   query(pageNum: number, pageSize: number): void {
-    this.next$.next({ pageNum, pageSize, ...this.form.filter });
+    this.api.clearRangeSelection();
+    this.api.deselectAll();
+    if (this.dataLoadModel !== 'pageable') {
+      console.warn('pageable 模式才能进行分页查询');
+      return;
+    }
+
+    const rowQuery: IRowQuery = clientSideAsRowQuery(this.api, pageNum, pageSize, this.filters());
+    Console.collapse('grid-table.component getData', 'indigoBg', 'queryParams', 'indigoOutline');
+    console.log(rowQuery);
+    console.groupEnd();
+    this.api.showLoadingOverlay();
+    this.setDataLoading(true);
+
+    this.dataSource
+      .query(rowQuery)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError((err) => {
+          Console.collapse('grid-table.component RefreshRowsData', 'redBg', 'ERROR', 'redOutline');
+          console.log(err);
+          console.groupEnd();
+          return of({ total: 0, records: [], size: rowQuery.pageSize, current: rowQuery.pageNum, statistics: [] } as IPage<any>);
+        }),
+      )
+      .subscribe((resultPage) => {
+        this.cur_page = resultPage;
+        this.api.setRowData(resultPage.records);
+        this.statistics = resultPage.statistics || [];
+        if (!resultPage.records.length) {
+          this.api.showNoRowsOverlay();
+        } else {
+          this.api.hideOverlay();
+        }
+        this.setDataLoading(false);
+      });
   }
 
   onPageSizeChange(size: number): void {
-    this.pageSizeChange.emit(size);
-    if (this.autoQueryOnPageChange) {
-      this.query(1, size);
-    }
+    this.setPageSize(size, true);
+    this.query(1, size);
   }
 
   onPageIndexChange(idx: number): void {
-    this.pageIndexChange.emit(idx);
-    if (this.autoQueryOnPageChange) {
-      this.query(idx, this.pageSize);
-    }
-  }
-
-  fullscreenToggle(): void {
-    this.fullscreen = !this.fullscreen;
+    this.setPageIndex(idx, true);
+    this.query(idx, this.pageSize);
   }
 
   exportAllPageData(): void {}
@@ -348,8 +346,8 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   public setData(data: IPage<any>): void {
     if (this.dataLoadModel === 'pageable') {
       this.cur_page = data;
-      this.pageIdx = this.cur_page.current;
-      this.pageSize = this.cur_page.size;
+      this.setPageIndex(this.cur_page.current, false);
+      this.setPageSize(this.cur_page.size, false);
       this.api.setRowData(this.cur_page.records);
     } else {
       console.warn('只有 tableModel === ‘pageable’ 才允许直接存值');
@@ -365,7 +363,11 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
    * 刷新表格
    */
   public refresh(): void {
-    this.query(this.pageIdx, this.pageSize);
+    if (this.dataLoadModel === 'pageable') {
+      this.query(this.pageIndex, this.pageSize);
+    } else {
+      this.api.purgeServerSideCache();
+    }
   }
 
   /**
@@ -405,5 +407,63 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   public getChecked<U>(hand: (value: RowNode) => U): U[] {
     const nodes: RowNode[] = this.api.getSelectedNodes();
     return nodes.map(hand);
+  }
+
+  /**
+   * 重置表单
+   */
+  resetForm(): void {}
+
+  get pageViewTmpl(): TemplateRef<any> {
+    return this.customPageView ? this.customPageView : this.defaultPageTmpl;
+  }
+
+  // ================================== 数据绑定 ====================================
+  toggleFullscreen(): void {
+    this.setFullscreen(!this.fullscreen);
+  }
+  setFullscreen(fullscreen: boolean): void {
+    this.fullscreen = fullscreen;
+    this.fullscreenChange.emit(this.fullscreen);
+  }
+
+  setPageIndex(pageIndex: number, emit: boolean): void {
+    this.pageIndex = pageIndex;
+    if (emit) {
+      this.pageIndexChange.emit(pageIndex);
+    }
+  }
+
+  setPageSize(pageSize: number, emit: boolean): void {
+    this.pageSize = pageSize;
+    if (emit) {
+      this.pageSizeChange.emit(pageSize);
+    }
+  }
+
+  private setDataLoading(loading: boolean): void {
+    this.dataLoading = loading;
+    this.dataLoadingChange.emit(this.dataLoading);
+  }
+
+  toggleDataModel(): void {
+    if ('pageable' === this.dataLoadModel) {
+      this.setDataMode('infinite');
+    } else {
+      this.setDataMode('pageable');
+    }
+  }
+
+  setDataMode(model: 'pageable' | 'infinite'): void {
+    this.dataLoadModel = model;
+    repairRowModeType(this.gridOptions, this.dataLoadModel);
+    // TODO 刷新表格
+    this.repaint();
+    this.dataLoadModelChange.emit(this.dataLoadModel);
+  }
+
+  repaint(): void {
+    this.__show__ = false;
+    setTimeout(() => (this.__show__ = true), 200);
   }
 }

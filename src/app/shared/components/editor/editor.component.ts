@@ -37,6 +37,7 @@ import { FileManagerImgComponent } from '../file-manager/file-manager-img.compon
 Quill.register('modules/imageResize', ImageResize);
 ['align', 'background', 'color', 'direction', 'font'].forEach((type) => Quill.register(Quill.import('attributors/style/' + type), true));
 const Size = Quill.import('attributors/style/size');
+
 const VALUES = {
   // NOTICE: Should be sync modify `@ql-sizes` in `styles/fix/_quill.less`
   size: ['10px', '12px', '14px', '16px', '18px', '20px', '24px'],

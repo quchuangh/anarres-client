@@ -1,10 +1,11 @@
 <page-header-wrapper>
-  <button class="button btn" (click)="test()">test</button>
   <!-- [deleteMenu]="true" 将自动添加一个删除菜单，批量删除只会删除checkbox选中的值 -->
   <ngx-grid-table
+    #table
     [gridOptions]="gridOptions"
+    [dataLoadModel]="'pageable'"
     [showPagination]="false"
-    [gridTableStyle]="{ height: '90%' }"
+    [gridTableStyle]="{ height: '70%' }"
     [defaultStatusBar]="true"
     [resizable]="true"
     [groupSelectsChildren]="true"
@@ -14,12 +15,18 @@
     (pageIndexChange)="onPageIndexChange($event)"
     (gridReady)="onGridReady($event)"
   >
-    <ngx-grid-table-header>
-      <span>this is header</span>
-    </ngx-grid-table-header>
-    <ngx-grid-table-footer>
-      <span>this is footer</span>
-    </ngx-grid-table-footer>
+    <!--    <ngx-table-header>-->
+    <!--      <span>this is header</span>-->
+    <!--    </ngx-table-header>-->
+
+    <ngx-table-tool-bar top [center]="['search', 'reset']" [left]="['data-mode']" [right]="['page']" [page]="table.pageViewTmpl">
+    </ngx-table-tool-bar>
+
+    <ngx-table-tool-bar bottom [left]="['full', 'export']" [right]="['page']" [page]="table.pageViewTmpl"> </ngx-table-tool-bar>
+
+    <!--    <ngx-table-footer>-->
+    <!--      <span>this is footer</span>-->
+    <!--    </ngx-table-footer>-->
   </ngx-grid-table>
 </page-header-wrapper>
 

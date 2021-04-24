@@ -1,81 +1,52 @@
-<full-content [(fullscreen)]="fullscreen" class="flex flex-column flex-grow-1">
-  <query-form *ngIf="searchSchema" [searchSchema]="searchSchema" [searchFormData]="searchData"></query-form>
+<full-content [(fullscreen)]="fullscreen" class="flex flex-column flex-grow-1" [ngStyle]="{ 'margin-top': fullscreen ? '-70px' : '0' }">
+  <sf-query-form *ngIf="searchSchema" [searchSchema]="searchSchema" [searchFormData]="initFormData"></sf-query-form>
 
-  <!-- 用户自定义头部 -->
+  <!-- 表格头 -->
   <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-    <ng-content select="ngx-grid-table-header"></ng-content>
+    <ng-content select="ngx-table-header"></ng-content>
   </div>
-
-  <!-- 查询按钮栏 -->
-
-  <template-wrapper [template]="status_bar" [wrap]="'both'">
-    <!-- 表格 -->
-    <ag-grid-angular
-      [class]="gridTheme"
-      [modules]="allModules"
-      [gridOptions]="gridOptions"
-      [groupSelectsChildren]="groupSelectsChildren"
-      [ngClass]="gridTableClass"
-      [ngStyle]="gridTableStyle"
-      class="grid-table grid"
-    >
-    </ag-grid-angular>
-    <!--  统计栏  -->
-    <div
-      *ngIf="showStatistics && columnApi && statistics && statistics.length"
-      class="statistics-bar flex flex-grow-0 flex-shrink-1 justify-end flex-wrap"
-    >
-      <statistics-bar [api]="api" [columnApi]="columnApi" [statistics]="statistics"></statistics-bar>
-    </div>
-    <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-      <ng-content select="ngx-grid-table-footer"></ng-content>
-    </div>
-  </template-wrapper>
+  <!-- 工具栏 -->
+  <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
+    <ng-content select="ngx-table-tool-bar[top]"></ng-content>
+  </div>
+  <!-- 表格 -->
+  <ag-grid-angular
+    *ngIf="__show__"
+    [class]="gridTheme"
+    [modules]="allModules"
+    [gridOptions]="gridOptions"
+    [groupSelectsChildren]="groupSelectsChildren"
+    [ngClass]="gridTableClass"
+    [ngStyle]="gridTableStyle"
+    class="grid-table grid"
+  >
+  </ag-grid-angular>
+  <!--  统计栏  -->
+  <div
+    *ngIf="showStatistics && columnApi && statistics && statistics.length"
+    class="statistics-bar flex flex-grow-0 flex-shrink-1 justify-end flex-wrap"
+  >
+    <ngx-table-statistics-bar [statistics]="statistics"></ngx-table-statistics-bar>
+  </div>
+  <!-- 下工具栏 -->
+  <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
+    <ng-content select="ngx-table-tool-bar[bottom]"></ng-content>
+  </div>
+  <!-- 页脚 -->
+  <div class="footer flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
+    <ng-content select="ngx-table-footer"></ng-content>
+  </div>
 </full-content>
 
-<!-- 工具模板，左边是按钮，右边是分页 -->
-<ng-template #status_bar>
-  <div class="footer flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-    <!-- 左边工具栏 -->
-    <div class="action">
-      <button
-        *ngIf="fullscreenAction"
-        (click)="fullscreenToggle()"
-        [title]="'menu.fullscreen' | translate"
-        nz-button
-        nzSize="small"
-        nzType="primary"
-      >
-        <i [ngClass]="{ mdi: true, 'mdi-fullscreen': !this.fullscreen, 'mdi-fullscreen-exit': this.fullscreen }" style="margin-right: 5px">
-        </i>
-        <span>{{ 'menu.fullscreen' | translate }}</span>
-      </button>
-
-      <button
-        *ngIf="enableExport"
-        (nzOnConfirm)="exportAllPageData()"
-        [disabled]="cur_page?.total && dataLoading"
-        [nzLoading]="loadProgressPercent > 0 && loadProgressPercent < 100"
-        [nzPopconfirmTitle]="'export.excel.confirm.tip' | translate"
-        nz-button
-        nz-popconfirm
-        nzSize="small"
-        nzType="primary"
-      >
-        <i nz-icon nzTheme="outline" nzType="file-excel"></i> {{ 'export.excel.tip' | translate }}
-      </button>
-      <ng-content select="ngx-grid-table-tool-bar[left-bottom]"></ng-content>
-    </div>
-    <!-- 右边分页 -->
-    <!-- 分页容器 -->
-    <ngx-grid-table-pagination
-      [cfg]="showPagination"
-      [pageIndex]="pageIdx"
-      [pageSize]="pageSize"
-      [total]="cur_page?.total ? cur_page.total : 0"
-      (pageIndexChange)="this.onPageIndexChange($event)"
-      (pageSizeChange)="this.onPageSizeChange($event)"
-    >
-    </ngx-grid-table-pagination>
-  </div>
+<ng-template #defaultPageTmpl>
+  <ngx-table-pagination
+    *ngIf="this.dataLoadModel === 'pageable' && showPagination"
+    [cfg]="showPagination"
+    [pageIndex]="pageIndex"
+    (pageIndexChange)="this.onPageIndexChange($event)"
+    [pageSize]="pageSize"
+    (pageSizeChange)="this.onPageSizeChange($event)"
+    [total]="cur_page?.total ? cur_page.total : 0"
+  >
+  </ngx-table-pagination>
 </ng-template>

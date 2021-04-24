@@ -1,9 +1,10 @@
 import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { SFSchema, SFSelectWidgetSchema, SFTreeSelectWidgetSchema } from '@delon/form';
+import { SFSchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
 import { IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
+import { defaultPropertiesUI } from '@shared';
 import { DataSourceUtils } from '../../DataSourceUtils';
 
 @Component({
@@ -11,39 +12,25 @@ import { DataSourceUtils } from '../../DataSourceUtils';
   templateUrl: './i18n.component.html',
 })
 export class SysI18nComponent implements OnInit {
-  schema: SFSchema = {
-    properties: {
-      i18n: { type: 'string', title: 'i18n', minLength: 1 },
-      message: { type: 'string', title: 'message', minLength: 1 },
-      language: { type: 'string', title: '语言', minLength: 1 },
-      typeGroup: {
-        type: 'string',
-        title: '类型',
-        enum: [
-          { label: '服务端', value: 'SERVER' },
-          { label: '客户端', value: 'CLIENT' },
-        ],
-        // ui: {
-        //   widget: 'select',
-        //   multiple: true
-        // } as SFSelectWidgetSchema,
+  schema: SFSchema = defaultPropertiesUI(
+    {
+      properties: {
+        id: { type: 'integer', title: 'id' },
+        i18n: { type: 'string', title: 'i18n' },
+        message: { type: 'string', title: 'message' },
+        language: { type: 'array', title: '语言', ui: { selectValues: ['zh_CN', 'en_US', 'zh_TW'] } },
+        typeGroup: { type: 'array', title: '类型', ui: { selectValues: ['服务端', '客户端'] } },
+        md5: { type: 'string', title: 'md5', default: 'test' },
+        creator: { type: 'string', title: '创建人' },
+        createdTime: { type: 'string', title: '创建时间', format: 'date-time' },
+        updater: { type: 'string', title: '更新人' },
+        updatedTime: { type: 'string', title: '更新时间', format: 'date-time' },
       },
-      id: {
-        type: 'integer',
-        title: 'id',
-        ui: {
-          widget: 'ngx-number',
-        },
-      },
-      md5: { type: 'string', title: 'md5', default: '' },
-      creator: { type: 'string', title: '创建人' },
-      createdTime: { type: 'string', title: '创建时间', format: 'date-time' },
-      updater: { type: 'string', title: '更新人' },
-      updatedTime: { type: 'string', title: '更新时间', format: 'date-time' },
+      required: ['text'],
+      ui: { width: 275, spanLabelFixed: 80 },
     },
-    required: ['text'],
-    ui: { width: 275, spanLabelFixed: 80 },
-  };
+    'symbol',
+  );
 
   columnDefs: ColDef[] = [
     { headerName: 'id', field: 'id', sort: 'desc', sortable: true, checkboxSelection: true, headerCheckboxSelection: true },
@@ -70,14 +57,13 @@ export class SysI18nComponent implements OnInit {
     this.gridOptions = {
       enableCharts: false,
       columnDefs: this.columnDefs,
-      // getRowNodeId: (data) => {
-      //   return data.id;
-      // },
+      getRowNodeId: (data) => {
+        return data.id;
+      },
       onFirstDataRendered(event: FirstDataRenderedEvent): void {
         event.columnApi.autoSizeAllColumns();
       },
     };
-
     this.dataSource = DataSourceUtils.create(http, '/api/sys/i18n', (r) => r);
   }
 

@@ -1,6 +1,6 @@
 import { PaginationCfg } from '@shared';
 import { LoadingOverlayComponent } from './inner-tags/loading-overlay/loading-overlay.component';
-import { NoRowOverlayComponent } from './inner-tags/no-row-overlay/no-row-overlay.component';
+import { NoRowOverlayComponent } from './inner-tags/no-row-overlay.component';
 
 export class NgxGridTableConstants {
   static DEFAULT_SIDE_BAR = {

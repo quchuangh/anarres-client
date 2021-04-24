@@ -1,6 +1,6 @@
-import { ColumnApi, GetContextMenuItemsParams, GridApi, RowNode } from '@ag-grid-community/core';
-import { TemplateRef } from '@angular/core';
+import { ColumnApi, GetContextMenuItemsParams, GridApi } from '@ag-grid-community/core';
 import { Observable } from 'rxjs';
+import { FilterType, IFilter } from '../filter-input/filter.types';
 
 export interface IPage<T> {
   /** 数据 */
@@ -15,12 +15,6 @@ export interface IPage<T> {
   statistics?: GridStatistics[];
 }
 
-export interface GridQuery {
-  pageNum?: number;
-  pageSize?: number;
-  [key: string]: any;
-}
-
 export interface PaginationCfg {
   size?: 'default' | 'small' | number;
   showSizeChanger?: boolean;
@@ -28,23 +22,6 @@ export interface PaginationCfg {
   pageSizeOptions?: number[];
 }
 //
-export declare type DateOption = 'equals' | 'greaterThan' | 'greaterThanOrEqual' | 'lessThan' | 'lessThanOrEqual' | 'notEqual' | 'inRange';
-export declare type NumberOption = DateOption;
-export declare type SetOption = 'in' | 'notIn';
-export declare type TextOption = 'equals' | 'notEqual' | 'startsWith' | 'endsWith' | 'contains' | 'notContains';
-export declare type FilterType = 'text' | 'set' | 'number' | 'date';
-
-export interface IFilter {
-  field: string;
-  type: FilterType;
-
-  option: TextOption | SetOption | NumberOption | DateOption;
-  value: any;
-}
-
-export interface IRangeFilter extends IFilter {
-  valueTo?: any;
-}
 
 export interface SortModel {
   field: string;

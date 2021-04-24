@@ -2,12 +2,13 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  min-height: 200px;
 
   .grid {
     flex-grow: 1;
   }
 
-  .agent-grid-header-search {
+  .grid-header-search {
     border: 1px solid #bdc3c7;
     border-bottom: 0;
     background: white;
@@ -15,7 +16,7 @@
   }
 
   @media (max-width: 576px) {
-    .agent-grid-header-search {
+    .grid-header-search {
       max-height: 220px;
       overflow-y: auto;
     }
@@ -29,7 +30,7 @@
   }
 
   .footer {
-    background: #e6f7ff;
+    background: #f6f7f7;
     user-select: none;
   }
 
@@ -45,10 +46,14 @@
     flex-shrink: 1;
   }
 
-  ::ng-deep .grid-table.grid.ag-theme-balham {
+  ::ng-deep .grid-table.grid {
     .ag-status-bar {
       border-bottom: 0;
       box-shadow: inset 0 -1px 0 0 #bdc3c7;
+    }
+    .cell-text-right {
+      display: flex;
+      justify-content: flex-end;
     }
 
     a.cell-action-item {
@@ -72,10 +77,23 @@
     }
   }
 
-  ::ng-deep .agent-grid-header-search .ant-form .ant-row,
-  ::ng-deep .agent-grid-header-search .ant-form sf-object {
+  ::ng-deep .grid-table.grid:not(.has-status-bar) {
+    .ag-status-bar {
+      border-top: none;
+    }
+  }
+
+  ::ng-deep .grid-header-search .ant-form .ant-row,
+  ::ng-deep .grid-header-search .ant-form sf-object {
     display: flex;
     flex-wrap: wrap;
+    > sf-item {
+      padding-bottom: 5px;
+      padding-top: 5px;
+    }
+    .ant-form-item {
+      margin-bottom: 8px;
+    }
     @media (max-width: 767px) {
       & > [nz-col],
       & > sf-item {

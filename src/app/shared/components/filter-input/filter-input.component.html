@@ -1,0 +1,73 @@
+<ng-container [ngSwitch]="filterType">
+  <!-- text -->
+  <nz-input-group *ngSwitchCase="'text'" nzCompact style="display: flex; flex-wrap: nowrap">
+    <nz-select
+      [nzPlaceHolder]="selectPlaceholder"
+      [ngStyle]="{ width: selectWidth + 'px', 'min-width': '50px' }"
+      (ngModelChange)="selectOnChange($event)"
+      [ngModel]="value.option"
+    >
+      <nz-option *ngFor="let option of options" [nzLabel]="showLabel(option)" [nzValue]="option"></nz-option>
+    </nz-select>
+    <input
+      style="flex-grow: 1; width: 10px"
+      type="text"
+      nz-input
+      [placeholder]="inputPlaceholder ? inputPlaceholder : ''"
+      (ngModelChange)="inputOnChange($event)"
+      [ngModel]="value.value"
+    />
+  </nz-input-group>
+
+  <!-- number -->
+  <nz-input-group *ngSwitchCase="'number'" nzCompact style="display: flex; flex-wrap: nowrap">
+    <nz-select
+      [nzPlaceHolder]="selectPlaceholder"
+      [ngStyle]="{ width: selectWidth + 'px', 'min-width': '50px' }"
+      (ngModelChange)="selectOnChange($event)"
+      [ngModel]="value.option"
+    >
+      <nz-option *ngFor="let option of options" [nzLabel]="showLabel(option)" [nzValue]="option"></nz-option>
+    </nz-select>
+    <nz-input-number style="flex-grow: 1; width: 10px" (ngModelChange)="inputOnChange($event)" [ngModel]="value.value"> </nz-input-number>
+  </nz-input-group>
+
+  <!-- date -->
+  <nz-input-group *ngSwitchCase="'date'" nzCompact style="display: flex; flex-wrap: nowrap">
+    <nz-range-picker
+      nzShowTime
+      nzShowNow
+      nzShowToday
+      nzFormat="yyyy-MM-dd HH:mm:ss"
+      (ngModelChange)="inputOnChange($event)"
+      [ngModel]="value.value"
+    >
+    </nz-range-picker>
+  </nz-input-group>
+
+  <!-- set -->
+  <nz-input-group *ngSwitchCase="'set'" nzCompact style="display: flex; flex-wrap: nowrap">
+    <nz-select
+      [nzPlaceHolder]="selectPlaceholder"
+      [ngStyle]="{ width: selectWidth + 'px', 'min-width': '50px' }"
+      (ngModelChange)="selectOnChange($event)"
+      [ngModel]="value.option"
+    >
+      <nz-option *ngFor="let option of options" [nzLabel]="showLabel(option)" [nzValue]="option"></nz-option>
+    </nz-select>
+    <nz-select
+      style="flex-grow: 1; width: 10px"
+      nzAllowClear
+      nzMode="multiple"
+      [nzPlaceHolder]="inputPlaceholder"
+      [ngModel]="value.value"
+      (ngModelChange)="inputOnChange($event)"
+    >
+      <nz-option
+        *ngFor="let option of selectValues"
+        [nzLabel]="option.label ? option.label : option"
+        [nzValue]="option.value ? option.value : option"
+      ></nz-option>
+    </nz-select>
+  </nz-input-group>
+</ng-container>
