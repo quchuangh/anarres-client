@@ -1,4 +1,5 @@
-import { ColumnApi, GetContextMenuItemsParams, GridApi } from '@ag-grid-community/core';
+import { ColDef, ColumnApi, GetContextMenuItemsParams, GridApi } from '@ag-grid-community/core';
+import { ACLCanType, ACLType } from '@delon/acl';
 import { Observable } from 'rxjs';
 import { FilterType, IFilter } from '../filter-input/filter.types';
 
@@ -42,6 +43,10 @@ export interface TreeDataCfg {
   groupKey: { field: string; type: FilterType };
 }
 
+export interface AclColDef extends ColDef {
+  acl?: ACLCanType;
+}
+
 export interface IGridDataSource {
   query: (rowQuery: IRowQuery) => Observable<IPage<any>>;
   modify?: (data: any) => Observable<any>;
@@ -52,10 +57,10 @@ export interface IGridDataSource {
 
 export interface MenuItem {
   name: string;
-  acl?: string;
+  acl?: ACLType;
   icon?: HTMLElement | string;
   callback: (selected: any, params: GetContextMenuItemsParams, api: GridApi) => void;
-  show: ((selected: any[], params: GetContextMenuItemsParams, api: GridApi) => boolean) | 'selected';
+  show?: ((selected: any[], params: GetContextMenuItemsParams, api: GridApi) => boolean) | 'selected';
 }
 
 export interface GridStatistics {

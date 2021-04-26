@@ -19,6 +19,7 @@ import { Console } from '../../../utils/console';
 import { IFilter } from '../../filter-input/filter.types';
 // 不要使用import {Console} from '@shared'，防止循环引用
 import {
+  buildColACL,
   buildFrameworkComponents,
   buildMenus,
   buildOptionField,
@@ -43,6 +44,7 @@ import {
   PaginationCfg,
   TreeDataCfg,
 } from '../ngx-grid-table-model';
+import { asRowQueryPropertiesUI } from '../ngx-grid-table-utils';
 import { SfQueryFormComponent } from '../sf-query-form/sf-query-form.component';
 
 /**
@@ -84,6 +86,8 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   /** 表格页面所在的url */
   currentUrl: string;
 
+  _searchSchema!: SFSchema;
+
   // ================================== 基本配置（外部） =============================
   /** 是否为全屏状态 */
   @Input() fullscreen = false;
@@ -93,6 +97,8 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   @Input() pageSize = 20;
   /** 表格基础配置 */
   @Input() gridOptions!: GridOptions;
+  /** 表格基础配置 */
+  @Input() colACLTmpl!: string;
   /** 表格主题 */
   @Input() gridTheme = 'ag-theme-balham';
   /** 表格CSS */
@@ -122,13 +128,15 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   /** 数据源 */
   @Input() dataSource!: IGridDataSource;
   /** 表单schema */
-  @Input() searchSchema!: SFSchema;
+  @Input() set searchSchema(schema: SFSchema) {
+    this._searchSchema = asRowQueryPropertiesUI(schema);
+  }
   /** 初始表单数据 */
   @Input() initFormData!: any;
 
   @Input() customPageView!: TemplateRef<any>;
 
-  @Input() filterGetter!: () => IFilter[];
+  @Input() filterHand!: (filters: IFilter[]) => IFilter[];
 
   // ============================== 事件 ============================
   @Output() fullscreenChange = new EventEmitter<boolean>();
@@ -167,6 +175,7 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
     buildMenus(
       this.gridOptions,
       this.translateService,
+      this.aclService,
       this.additionMenu,
       this.deleteMenu,
       this.destroy$,
@@ -181,7 +190,7 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
     buildOptionField(this.gridOptions, this.optionCell);
     reuseTabFix(this.router, this.currentUrl, this.destroy$, apiGetter);
     repairRowModeType(this.gridOptions, this.dataLoadModel);
-    // TODO 构建ACL
+    buildColACL(this.gridOptions, this.aclService, this.colACLTmpl);
 
     this.showPagination = {
       ...NgxGridTableConstants.DEFAULT_PAGINATION,
@@ -218,8 +227,8 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
     if (this.form) {
       filters = [...this.form.filter];
     }
-    if (this.filterGetter) {
-      filters = [...filters, ...this.filterGetter()];
+    if (this.filterHand) {
+      filters = [...this.filterHand(filters)];
     }
     return filters;
   }
@@ -412,7 +421,9 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   /**
    * 重置表单
    */
-  resetForm(): void {}
+  resetForm(): void {
+    this.form.reset();
+  }
 
   get pageViewTmpl(): TemplateRef<any> {
     return this.customPageView ? this.customPageView : this.defaultPageTmpl;

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { SFComponent, SFSchema } from '@delon/form';
-import { IFilter } from '../../filter-input/filter.types';
+import { DateOption, FilterType, IFilter, NumberOption, SetOption, TextOption } from '../../filter-input/filter.types';
 
 @Component({
   selector: 'sf-query-form',
@@ -29,10 +29,32 @@ export class SfQueryFormComponent implements OnInit {
   }
 
   get filter(): IFilter[] {
-    return [];
+    const v: any = { ...this.value };
+    const filters: IFilter[] = [];
+    Object.keys(v).forEach((key) => {
+      const obj = v[key];
+      if (!(obj.option && obj.filterType)) {
+        return;
+      }
+      const filter = {
+        filterType: obj.filterType,
+        value: obj.value,
+        field: key,
+        option: obj.option,
+      } as any;
+      if (obj.valueTo) {
+        filter.valueTo = obj.valueTo;
+      }
+      filters.push(filter);
+    });
+    return filters;
   }
 
   test($event: any): void {
     console.log($event);
+  }
+
+  reset(): void {
+    this.sf.reset();
   }
 }

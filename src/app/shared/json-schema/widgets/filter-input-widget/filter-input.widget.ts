@@ -2,16 +2,24 @@ import { Component, OnInit } from '@angular/core';
 import { ControlUIWidget, SFValue } from '@delon/form';
 import { SFSchemaType } from '@delon/form/src/schema';
 import { SFUISchemaItem } from '@delon/form/src/schema/ui';
-import { FilterType } from '../../../components/filter-input/filter.types';
+import { FilterType, Options } from '../../../components/filter-input/filter.types';
 
 export interface FilterSFUISchemaItem extends SFUISchemaItem {
-  options?: string[];
+  /** 用户可选操作，如 >, >=, <, <= 等 */
+  options?: Options[];
+  /** 选择操作的组件宽度 */
   selectWidth?: number;
+  /** 输入框的placeholder */
   inputPlaceholder?: string;
+  /** 操作选择框的placeholder */
   selectPlaceholder?: string;
+  /** 过滤类型 */
   filterType: FilterType;
+  /** 操作显示方式: 国际化 | 简写 | 符号 */
   optionShowType: 'i18n' | 'shorthand' | 'symbol';
+  /** 当过滤类型为 ’set‘ 时展示的下拉列表数组 */
   selectValues: Array<{ label: string; value: any } | string>;
+  /** 每次修改内容时的回调，可以用来调试 */
   change?: (value: SFValue) => void;
 }
 
@@ -34,6 +42,7 @@ export interface FilterSFUISchemaItem extends SFUISchemaItem {
     </sf-item-wrap>
   `,
 })
+// tslint:disable-next-line:component-class-suffix
 export class FilterInputWidget extends ControlUIWidget<FilterSFUISchemaItem> implements OnInit {
   static readonly KEY = 'filter-input';
 

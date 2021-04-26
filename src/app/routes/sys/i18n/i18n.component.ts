@@ -1,10 +1,9 @@
-import { ColDef, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
+import { GridOptions, GridReadyEvent } from '@ag-grid-community/core';
 import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SFSchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
-import { IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
-import { defaultPropertiesUI } from '@shared';
+import { AclColDef, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
 import { DataSourceUtils } from '../../DataSourceUtils';
 
 @Component({
@@ -12,29 +11,33 @@ import { DataSourceUtils } from '../../DataSourceUtils';
   templateUrl: './i18n.component.html',
 })
 export class SysI18nComponent implements OnInit {
-  schema: SFSchema = defaultPropertiesUI(
-    {
-      properties: {
-        id: { type: 'integer', title: 'id' },
-        i18n: { type: 'string', title: 'i18n' },
-        message: { type: 'string', title: 'message' },
-        language: { type: 'array', title: '语言', ui: { selectValues: ['zh_CN', 'en_US', 'zh_TW'] } },
-        typeGroup: { type: 'array', title: '类型', ui: { selectValues: ['服务端', '客户端'] } },
-        md5: { type: 'string', title: 'md5', default: 'test' },
-        creator: { type: 'string', title: '创建人' },
-        createdTime: { type: 'string', title: '创建时间', format: 'date-time' },
-        updater: { type: 'string', title: '更新人' },
-        updatedTime: { type: 'string', title: '更新时间', format: 'date-time' },
-      },
-      required: ['text'],
-      ui: { width: 275, spanLabelFixed: 80 },
+  // properties 的定义为 filter-input.widget.ts -> FilterSFUISchemaItem 接口
+  schema: SFSchema = {
+    properties: {
+      id: { type: 'integer', title: 'id', ui: { options: ['greaterThanOrEqual'], acl: { ability: ['POST:/TEST'] } } },
+      i18n: { type: 'string', title: 'i18n', ui: { options: ['startsWith'] } },
+      message: { type: 'string', title: 'message', ui: { options: ['startsWith'] } },
+      language: { type: 'array', title: '语言', ui: { options: ['in'], selectValues: ['zh_CN', 'en_US', 'zh_TW'] } },
+      typeGroup: { type: 'array', title: '类型', ui: { options: ['in'], selectValues: ['服务端', '客户端'] } },
+      md5: { type: 'string', title: 'md5', default: 'test' },
+      creator: { type: 'string', title: '创建人' },
+      createdTime: { type: 'string', title: '创建时间', format: 'date-time' },
+      updater: { type: 'string', title: '更新人' },
+      updatedTime: { type: 'string', title: '更新时间', format: 'date-time' },
     },
-    'symbol',
-  );
+    required: ['text'],
+    ui: {
+      width: 275,
+      spanLabelFixed: 80,
+      optionShowType: 'symbol',
+      aclTmpl: 'POST:/{}/OUT',
+      acl: { ability: ['POST:/TEST0'] },
+    },
+  };
 
-  columnDefs: ColDef[] = [
+  columnDefs: AclColDef[] = [
     { headerName: 'id', field: 'id', sort: 'desc', sortable: true, checkboxSelection: true, headerCheckboxSelection: true },
-    { headerName: 'i18n', field: 'i18n' },
+    { headerName: 'i18n', field: 'i18n', acl: { ability: ['POST:/TEST'] } },
     { headerName: 'message', field: 'message', resizable: false },
     { headerName: '语言', field: 'language', enableRowGroup: true, checkboxSelection: true },
     { headerName: '类型', field: 'typeGroup', enableRowGroup: true },
@@ -106,6 +109,7 @@ export class SysI18nComponent implements OnInit {
     this.table.addMenu({
       name: 'test',
       show: 'selected',
+      acl: { ability: ['POST:/TEST'] },
       callback: (selected) => {
         console.log(selected);
       },

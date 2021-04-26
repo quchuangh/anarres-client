@@ -2,6 +2,7 @@ export declare type DateOption = 'equals' | 'greaterThan' | 'greaterThanOrEqual'
 export declare type NumberOption = DateOption;
 export declare type SetOption = 'in' | 'notIn';
 export declare type TextOption = 'equals' | 'notEqual' | 'startsWith' | 'endsWith' | 'contains' | 'notContains';
+export declare type Options = DateOption | SetOption | TextOption;
 export declare type FilterType = 'text' | 'set' | 'number' | 'date';
 
 export const TEXT_FILTERS: TextOption[] = ['equals', 'notEqual', 'startsWith', 'endsWith', 'contains', 'notContains'];
@@ -50,7 +51,7 @@ export const Shorthand = {
 
 export interface IFilter {
   field: string;
-  type: FilterType;
+  filterType: FilterType;
 
   option: TextOption | SetOption | NumberOption | DateOption;
   value: any;

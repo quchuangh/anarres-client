@@ -3,39 +3,53 @@ import { ColDef, ColGroupDef } from '@ag-grid-community/core/dist/cjs/entities/c
 import { SFSchema } from '@delon/form';
 import { DATE_FILTERS, NUMBER_FILTERS, SET_FILTERS, TEXT_FILTERS } from '../filter-input';
 
-export function defaultPropertiesUI(schema: SFSchema, optionShowType: 'i18n' | 'shorthand' | 'symbol' = 'i18n'): SFSchema {
+export function asRowQueryPropertiesUI(schema: SFSchema): SFSchema {
   if (!schema.properties) {
     return schema;
   }
-  Object.values(schema.properties).forEach((value) => {
-    if (!value.ui) {
-      value.ui = {};
-    }
+  Object.keys(schema.properties).forEach((key: string) => {
+    // @ts-ignore
+    const value = schema.properties[key] as SFSchema;
+
+    const oldUI = value.ui ? value.ui : {};
+
+    let newUI;
     switch (value.type) {
       case 'integer':
       case 'number':
-        // @ts-ignore
-        value.ui = { widget: 'filter-input', options: NUMBER_FILTERS, optionShowType, ...value.ui };
-        break;
-      case 'array':
-      case 'boolean':
-        // @ts-ignore
-        value.ui = { widget: 'filter-input', options: SET_FILTERS, optionShowType, ...value.ui };
+        newUI = { filterType: 'number', options: NUMBER_FILTERS };
         break;
       case 'string':
         if (value.format && value.format.startsWith('date')) {
-          // @ts-ignore
-          value.ui = { widget: 'filter-input', options: DATE_FILTERS, optionShowType, ...value.ui };
+          newUI = { filterType: 'date', options: DATE_FILTERS };
           break;
         } else {
-          // @ts-ignore
-          value.ui = { widget: 'filter-input', options: TEXT_FILTERS, optionShowType, ...value.ui };
+          newUI = { filterType: 'text', options: TEXT_FILTERS };
           break;
         }
-      default:
-        // @ts-ignore
-        value.ui = { widget: 'filter-input', options: TEXT_FILTERS, optionShowType, ...value.ui };
+      case 'array':
+      case 'boolean':
+        newUI = { filterType: 'set', options: SET_FILTERS };
+        value.type = 'string';
         break;
+      default:
+        newUI = { filterType: 'text', options: TEXT_FILTERS };
+        break;
+    }
+
+    if (schema.ui && typeof schema.ui !== 'string') {
+      const ui = schema.ui;
+      if (ui.optionShowType) {
+        // @ts-ignore
+        value.ui = { widget: 'filter-input', optionShowType: ui.optionShowType, ...newUI, ...oldUI };
+      }
+      if (ui.aclTmpl) {
+        // @ts-ignore
+        value.ui = { acl: { ability: [ui.aclTmpl.replace('{}', key)] }, ...value.ui };
+      }
+    } else {
+      // @ts-ignore
+      value.ui = { widget: 'filter-input', optionShowType: 'symbol', ...newUI, ...oldUI };
     }
   });
   return schema;

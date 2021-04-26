@@ -1,7 +1,8 @@
+import { formatDate } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { FilterType, Shorthand, Symbols } from './filter.types';
+import { FilterType, Options, Shorthand, Symbols } from './filter.types';
 
 @Component({
   selector: 'filter-input',
@@ -16,7 +17,7 @@ import { FilterType, Shorthand, Symbols } from './filter.types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterInputComponent implements ControlValueAccessor, OnInit {
-  @Input() options!: string[];
+  @Input() options!: Options[];
   @Input() selectWidth = 80;
   @Input() inputPlaceholder = '';
   @Input() selectPlaceholder = '';
@@ -25,8 +26,9 @@ export class FilterInputComponent implements ControlValueAccessor, OnInit {
   @Input() optionShowType: 'i18n' | 'shorthand' | 'symbol' = 'i18n';
 
   @Input() selectValues: Array<{ label: string; value: any }> = [];
+  @Input() defaultOption!: Options;
 
-  value = {} as { option: string; value: any };
+  value = {} as { option: Options; value: any; filterType: string; valueTo?: any };
 
   propagateOnChange: (value: any) => void = (_: any) => {};
   propagateOnTouched: (value: any) => void = (_: any) => {};
@@ -34,7 +36,8 @@ export class FilterInputComponent implements ControlValueAccessor, OnInit {
   constructor(private cdRef: ChangeDetectorRef, private translate: TranslateService) {}
 
   ngOnInit(): void {
-    this.value.option = this.options[0];
+    this.value.option = this.defaultOption ? this.defaultOption : this.options[0];
+    this.value.filterType = this.filterType;
   }
 
   registerOnChange(fn: any): void {
@@ -48,17 +51,35 @@ export class FilterInputComponent implements ControlValueAccessor, OnInit {
   writeValue(obj: any): void {
     if (obj) {
       this.value.value = obj;
-      this.cdRef.detectChanges();
+    } else {
+      this.value.value = null;
+      this.value.valueTo = null;
     }
+
+    this.updateValue();
+    this.cdRef.detectChanges();
   }
 
-  selectOnChange($event: any): void {
-    this.value.option = $event;
+  onOptionChange(option: Options): void {
+    if (option === 'inRange' || this.value.option === 'inRange') {
+      delete this.value.value;
+      delete this.value.valueTo;
+    }
+    this.value.option = option;
     this.updateValue();
   }
 
-  inputOnChange($event: any): void {
-    this.value.value = $event;
+  onValueChange(value: any): void {
+    if (this.filterType === 'date') {
+      this.handDateValue(value);
+    } else {
+      this.value.value = value;
+    }
+    this.updateValue();
+  }
+
+  onValueToChange(valueTo: any): void {
+    this.value.valueTo = valueTo;
     this.updateValue();
   }
 
@@ -66,7 +87,19 @@ export class FilterInputComponent implements ControlValueAccessor, OnInit {
     if (!this.value.option) {
       this.value.option = this.options[0];
     }
-    this.propagateOnChange(this.value);
+    if (!this.value.filterType) {
+      this.value.filterType = this.filterType;
+    }
+
+    if (this.value.option !== 'inRange') {
+      delete this.value.valueTo;
+    }
+
+    if (this.value.value && this.value.value.toString().length) {
+      this.propagateOnChange(this.value);
+    } else {
+      this.propagateOnChange({});
+    }
   }
 
   showLabel(option: string): string {
@@ -83,4 +116,25 @@ export class FilterInputComponent implements ControlValueAccessor, OnInit {
         return '';
     }
   }
+
+  handDateValue(dates: Date[]): void {
+    this.value.value = formatDate(dates[0], 'yyyy-MM-dd HH:mm:ss', 'zh_CH');
+    if (this.value.option === 'inRange') {
+      this.value.valueTo = formatDate(dates[1], 'yyyy-MM-dd HH:mm:ss', 'zh_CH');
+    }
+  }
+
+  // handDateValue(dates: Date[]): void {
+  //   if (dates[0] &&  dates[1]) {
+  //     this.value.value = formatDate(dates[0], 'yyyy-MM-dd HH:mm:ss', 'zh_CH');
+  //     this.value.valueTo = formatDate(dates[1], 'yyyy-MM-dd HH:mm:ss', 'zh_CH');
+  //     this.value.option = 'inRange';
+  //   } else if (dates[0]) {
+  //     this.value.value = formatDate(dates[0], 'yyyy-MM-dd HH:mm:ss', 'zh_CH');
+  //     this.value.option = 'greaterThanOrEqual';
+  //   } else if (dates[1]) {
+  //     this.value.value = formatDate(dates[1], 'yyyy-MM-dd HH:mm:ss', 'zh_CH');
+  //     this.value.option = 'lessThanOrEqual';
+  //   }
+  // }
 }

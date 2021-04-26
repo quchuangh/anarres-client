@@ -9,19 +9,20 @@ import {
   IServerSideGetRowsParams,
   MenuItemDef,
 } from '@ag-grid-community/core';
+import { ColGroupDef } from '@ag-grid-community/core/dist/cjs/entities/colDef';
 import { GetContextMenuItems } from '@ag-grid-community/core/dist/cjs/entities/gridOptions';
 import { TemplateRef } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { SFSchema } from '@delon/form';
+import { ACLService } from '@delon/acl';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { filter, takeUntil, takeWhile } from 'rxjs/operators';
-import { DATE_FILTERS, IFilter, NUMBER_FILTERS, SET_FILTERS, TEXT_FILTERS } from '../filter-input/filter.types';
+import { IFilter } from '../filter-input/filter.types';
 import { TemplateRendererComponent } from './inner-tags/template-renderer.component';
 import { GRID_LOCALE_TEXT } from './localeText';
 import { NgxGridTableConstants } from './ngx-grid-table-constants';
-import { ApiGetter, IRowQuery, MenuItem, TreeDataCfg } from './ngx-grid-table-model';
-import { deepEach } from './ngx-grid-table-utils';
+import { AclColDef, ApiGetter, IRowQuery, MenuItem, TreeDataCfg } from './ngx-grid-table-model';
+import { deepEach, isGroup } from './ngx-grid-table-utils';
 
 export function buildFrameworkComponents(gridOptions: GridOptions): void {
   if (gridOptions.frameworkComponents) {
@@ -62,6 +63,7 @@ export function buildStatusBar(gridOptions: GridOptions, defaultStatusBar: boole
 export function buildMenus(
   gridOptions: GridOptions,
   translateService: TranslateService,
+  acl: ACLService,
   additionMenu: Array<MenuItem>,
   deleteMenu: boolean,
   destroy$: Subject<any>,
@@ -134,16 +136,26 @@ export function buildMenus(
       );
     }
     // 用户添加菜单
-    const menus: MenuItemDef[] = additionMenu.map((value) => {
-      const disabled: boolean = !(value.show === 'selected' ? params.node && params.node.data : value.show(selectedData, params, apis.api));
-      return {
-        ...value,
-        action: () => {
-          value.callback(params.node.data, params, apis.api);
-        },
-        disabled,
-      } as MenuItemDef;
-    });
+    const menus: MenuItemDef[] = additionMenu
+      .filter((value) => {
+        if (!value.acl) {
+          return true;
+        }
+        return acl.can(value.acl);
+      })
+      .map((value) => {
+        let disabled = false;
+        if (value.show) {
+          disabled = !(value.show === 'selected' ? params.node && params.node.data : value.show(selectedData, params, apis.api));
+        }
+        return {
+          ...value,
+          action: () => {
+            value.callback(params.node.data, params, apis.api);
+          },
+          disabled,
+        } as MenuItemDef;
+      });
     if (menus.length) {
       fixed.splice(0, 0, ...menus, 'separator');
     }
@@ -186,6 +198,34 @@ export function repairRowModeType(gridOptions: GridOptions, dataLoadModel: 'page
     gridOptions.rowModelType = Constants.ROW_MODEL_TYPE_CLIENT_SIDE;
   } else {
     gridOptions.rowModelType = Constants.ROW_MODEL_TYPE_SERVER_SIDE;
+  }
+}
+
+export function buildColACL(gridOptions: GridOptions, acl: ACLService, colACLTmpl?: string): void {
+  if (gridOptions.columnDefs) {
+    deepEach(gridOptions.columnDefs, (col) => {
+      const aclCol = col as AclColDef;
+      if (!aclCol.acl && colACLTmpl && colACLTmpl.length && aclCol.field) {
+        aclCol.acl = colACLTmpl.replace('{}', aclCol.field);
+      }
+    });
+    checkACL(gridOptions.columnDefs, acl);
+  }
+}
+
+function checkACL(columnDefs: (ColDef | ColGroupDef)[], acl: ACLService): void {
+  for (let i = 0; i < columnDefs.length; ) {
+    const value = columnDefs[i];
+    if (isGroup(value)) {
+      checkACL((value as ColGroupDef).children, acl);
+    } else {
+      const aclCol = value as AclColDef;
+      if (aclCol.acl && !acl.can(aclCol.acl)) {
+        columnDefs.splice(i, 1);
+        continue;
+      }
+    }
+    i++;
   }
 }
 
@@ -362,7 +402,7 @@ function asRowQuery(
     const f = filterModel[key];
     const r = {
       field: key,
-      type: f.filterType,
+      filterType: f.filterType,
       option: f.type,
       value: f.filter || f.dateFrom || f.values,
       valueTo: f.filterTo || f.dateTo,

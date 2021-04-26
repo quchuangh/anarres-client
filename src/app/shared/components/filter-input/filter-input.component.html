@@ -2,9 +2,10 @@
   <!-- text -->
   <nz-input-group *ngSwitchCase="'text'" nzCompact style="display: flex; flex-wrap: nowrap">
     <nz-select
+      *ngIf="options.length > 1"
       [nzPlaceHolder]="selectPlaceholder"
       [ngStyle]="{ width: selectWidth + 'px', 'min-width': '50px' }"
-      (ngModelChange)="selectOnChange($event)"
+      (ngModelChange)="onOptionChange($event)"
       [ngModel]="value.option"
     >
       <nz-option *ngFor="let option of options" [nzLabel]="showLabel(option)" [nzValue]="option"></nz-option>
@@ -14,7 +15,7 @@
       type="text"
       nz-input
       [placeholder]="inputPlaceholder ? inputPlaceholder : ''"
-      (ngModelChange)="inputOnChange($event)"
+      (ngModelChange)="onValueChange($event)"
       [ngModel]="value.value"
     />
   </nz-input-group>
@@ -22,25 +23,52 @@
   <!-- number -->
   <nz-input-group *ngSwitchCase="'number'" nzCompact style="display: flex; flex-wrap: nowrap">
     <nz-select
+      *ngIf="options.length > 1"
       [nzPlaceHolder]="selectPlaceholder"
       [ngStyle]="{ width: selectWidth + 'px', 'min-width': '50px' }"
-      (ngModelChange)="selectOnChange($event)"
+      (ngModelChange)="onOptionChange($event)"
       [ngModel]="value.option"
     >
       <nz-option *ngFor="let option of options" [nzLabel]="showLabel(option)" [nzValue]="option"></nz-option>
     </nz-select>
-    <nz-input-number style="flex-grow: 1; width: 10px" (ngModelChange)="inputOnChange($event)" [ngModel]="value.value"> </nz-input-number>
+    <nz-input-number style="flex-grow: 1; width: 10px" (ngModelChange)="onValueChange($event)" [ngModel]="value.value"> </nz-input-number>
+    <nz-input-number
+      *ngIf="this.value.option === 'inRange'"
+      style="flex-grow: 1; width: 10px"
+      (ngModelChange)="onValueToChange($event)"
+      [ngModel]="value.valueTo"
+    ></nz-input-number>
   </nz-input-group>
 
   <!-- date -->
   <nz-input-group *ngSwitchCase="'date'" nzCompact style="display: flex; flex-wrap: nowrap">
+    <nz-select
+      *ngIf="options.length > 1"
+      [nzPlaceHolder]="selectPlaceholder"
+      [ngStyle]="{ width: selectWidth + 'px', 'min-width': '50px' }"
+      (ngModelChange)="onOptionChange($event)"
+      [ngModel]="value.option"
+    >
+      <nz-option *ngFor="let option of options" [nzLabel]="showLabel(option)" [nzValue]="option"></nz-option>
+    </nz-select>
+    <nz-date-picker
+      *ngIf="this.value.option !== 'inRange'"
+      [nzShowTime]="true"
+      [nzShowNow]="true"
+      [nzShowToday]="true"
+      [nzFormat]="'yyyy-MM-dd HH:mm:ss'"
+      (ngModelChange)="onValueChange([$event])"
+      ngModel
+    >
+    </nz-date-picker>
     <nz-range-picker
-      nzShowTime
-      nzShowNow
-      nzShowToday
-      nzFormat="yyyy-MM-dd HH:mm:ss"
-      (ngModelChange)="inputOnChange($event)"
-      [ngModel]="value.value"
+      *ngIf="this.value.option === 'inRange'"
+      [nzShowTime]="true"
+      [nzShowNow]="true"
+      [nzShowToday]="true"
+      [nzFormat]="'yyyy-MM-dd HH:mm:ss'"
+      (ngModelChange)="onValueChange($event)"
+      ngModel
     >
     </nz-range-picker>
   </nz-input-group>
@@ -48,9 +76,10 @@
   <!-- set -->
   <nz-input-group *ngSwitchCase="'set'" nzCompact style="display: flex; flex-wrap: nowrap">
     <nz-select
+      *ngIf="options.length > 1"
       [nzPlaceHolder]="selectPlaceholder"
       [ngStyle]="{ width: selectWidth + 'px', 'min-width': '50px' }"
-      (ngModelChange)="selectOnChange($event)"
+      (ngModelChange)="onOptionChange($event)"
       [ngModel]="value.option"
     >
       <nz-option *ngFor="let option of options" [nzLabel]="showLabel(option)" [nzValue]="option"></nz-option>
@@ -61,7 +90,7 @@
       nzMode="multiple"
       [nzPlaceHolder]="inputPlaceholder"
       [ngModel]="value.value"
-      (ngModelChange)="inputOnChange($event)"
+      (ngModelChange)="onValueChange($event)"
     >
       <nz-option
         *ngFor="let option of selectValues"

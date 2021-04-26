@@ -40,5 +40,6 @@ export class NgxGridTableConstants {
     showSizeChanger: true,
     showQuickJumper: true,
   };
+
   static OPTION_FIELD = '__OPTION__';
 }
