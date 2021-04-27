@@ -52,6 +52,7 @@
       <nz-option *ngFor="let option of options" [nzLabel]="showLabel(option)" [nzValue]="option"></nz-option>
     </nz-select>
     <nz-date-picker
+      style="flex-grow: 1; width: 10px"
       *ngIf="this.value.option !== 'inRange'"
       [nzShowTime]="true"
       [nzShowNow]="true"
@@ -63,6 +64,7 @@
     </nz-date-picker>
     <nz-range-picker
       *ngIf="this.value.option === 'inRange'"
+      style="flex-grow: 1; width: 10px"
       [nzShowTime]="true"
       [nzShowNow]="true"
       [nzShowToday]="true"

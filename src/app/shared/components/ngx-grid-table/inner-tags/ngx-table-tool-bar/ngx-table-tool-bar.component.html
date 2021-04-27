@@ -3,7 +3,7 @@
     <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: this.left }"></ng-container>
     <ng-content select="left-panel"></ng-content>
   </div>
-  <div class="search-panel-center">
+  <div class="search-panel-center" *ngIf="centerPanel || (center && center.length)">
     <ng-content select="center-panel"></ng-content>
     <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: this.center }"></ng-container>
   </div>

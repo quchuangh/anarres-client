@@ -30,8 +30,8 @@ export class SysI18nComponent implements OnInit {
       width: 275,
       spanLabelFixed: 80,
       optionShowType: 'symbol',
-      aclTmpl: 'POST:/{}/OUT',
-      acl: { ability: ['POST:/TEST0'] },
+      // aclTmpl: 'POST:/{}/OUT',
+      // acl: { ability: ['POST:/TEST0'] },
     },
   };
 

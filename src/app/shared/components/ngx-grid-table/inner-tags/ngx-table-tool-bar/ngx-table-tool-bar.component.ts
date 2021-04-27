@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, Optional, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, Input, OnInit, Optional, TemplateRef, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { NgxGridTableComponent } from '../../table/ngx-grid-table.component';
 
@@ -16,6 +16,8 @@ export class NgxTableToolBarComponent implements OnInit {
 
   @Input() page!: TemplateRef<any>;
   @Input() showCenter = false;
+
+  @ContentChild('center-panel') centerPanel!: TemplateRef<any>;
 
   loading: Observable<boolean>;
   full = false;

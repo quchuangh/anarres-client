@@ -1,9 +1,9 @@
 <page-header-wrapper>
   <!-- [deleteMenu]="true" 将自动添加一个删除菜单，批量删除只会删除checkbox选中的值 -->
+  <!-- [colACLTmpl]="'POST:/TEST{}:OUT'"  被所有列添加一个权限末班{}是列名的占位-->
   <ngx-grid-table
     #table
     [gridOptions]="gridOptions"
-    [colACLTmpl]="'POST:/TEST{}:OUT'"
     [dataLoadModel]="'pageable'"
     [showPagination]="false"
     [gridTableStyle]="{ height: '70%' }"
@@ -20,8 +20,7 @@
     <!--      <span>this is header</span>-->
     <!--    </ngx-table-header>-->
 
-    <ngx-table-tool-bar top [center]="['search', 'reset']" [left]="['data-mode']" [right]="['page']" [page]="table.pageViewTmpl">
-    </ngx-table-tool-bar>
+    <ngx-table-tool-bar top [center]="['search', 'reset']" [left]="['data-mode']"> </ngx-table-tool-bar>
 
     <ngx-table-tool-bar bottom [left]="['full', 'export']" [right]="['page']" [page]="table.pageViewTmpl"> </ngx-table-tool-bar>
 
@@ -33,5 +32,6 @@
 
 <!-- cell 和 row对应的是 TemplateRendererComponent 中的 $implicit(默认值ICellRendererParams对象) 和 row（RowNode对象） -->
 <ng-template #option let-cell let-row="row">
-  <button [acl]="{ ability: ['POST:/TEST'] }" (click)="print(cell, row)">test</button>
+  <!--  <button [acl]="{ ability: ['POST:/TEST'] }" (click)="print(cell, row)">test</button>-->
+  <button (click)="print(cell, row)">test</button>
 </ng-template>
