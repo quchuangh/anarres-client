@@ -81,7 +81,7 @@ export class SysAbilityComponent implements OnInit {
   }
 
   save(item: any): void {
-    this.http.post('/api/sys/ability/create', item).subscribe(() => {
+    this.http.post(`/api/sys/ability/${item.id ? 'update' : 'create'}`, item).subscribe(() => {
       if (item.id <= 0) {
         this.getData();
         this.op = '';
@@ -91,6 +91,7 @@ export class SysAbilityComponent implements OnInit {
         this.menuEvent.node!.origin = item;
         this.op = 'view';
       }
+      this.getData();
     });
   }
 
