@@ -1,0 +1,10 @@
+<nz-checkbox-wrapper (nzOnChange)="change($event)" *ngIf="canAbility" style="width: 100%; display: block">
+  <div *ngFor="let item of abilities" style="display: inline">
+    <label [nzChecked]="item.checked" [nzDisabled]="!canAssignAbility" [nzValue]="item.value" nz-checkbox>
+      <ng-container *ngIf="item.remark">
+        <i [title]="item.remark" nz-icon nz-tooltip nzTheme="outline" nzType="question-circle"></i>
+      </ng-container>
+      {{ item.label }}
+    </label>
+  </div>
+</nz-checkbox-wrapper>

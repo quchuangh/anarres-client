@@ -5,7 +5,7 @@ import { SysFileManagerComponent } from './file-manager/file-manager.component';
 import { SysI18nComponent } from './i18n/i18n.component';
 import { SysLogComponent } from './log/log.component';
 import { SysMenuComponent } from './menu/menu.component';
-import { SysPermissionComponent } from './permission/permission.component';
+import { SysAbilityComponent } from './ability/ability.component';
 import { SysRoleComponent } from './role/role.component';
 import { SysUserEditComponent } from './user/edit/edit.component';
 import { SysUserComponent } from './user/user.component';
@@ -16,7 +16,7 @@ const routes: Routes = [
   { path: 'user/:id', component: SysUserViewComponent },
   { path: 'user/edit/:id', component: SysUserEditComponent },
   { path: 'menu', component: SysMenuComponent },
-  { path: 'permission', component: SysPermissionComponent },
+  { path: 'permission', component: SysAbilityComponent },
   { path: 'role', component: SysRoleComponent },
   { path: 'log', component: SysLogComponent },
   { path: 'file-manager', component: SysFileManagerComponent },

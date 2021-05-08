@@ -1,14 +1,14 @@
 <div class="grid-search-action">
   <div class="search-panel-left">
     <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: this.left }"></ng-container>
-    <ng-content select="left-panel"></ng-content>
+    <ng-content select="[left]"></ng-content>
   </div>
   <div class="search-panel-center" *ngIf="centerPanel || (center && center.length)">
-    <ng-content select="center-panel"></ng-content>
+    <ng-content select="[center]"></ng-content>
     <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: this.center }"></ng-container>
   </div>
   <div class="search-panel-right">
-    <ng-content select="right-panel"></ng-content>
+    <ng-content select="[right]"></ng-content>
     <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: this.right }"></ng-container>
   </div>
 </div>

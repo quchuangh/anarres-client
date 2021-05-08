@@ -3,14 +3,14 @@
   <nz-form-item>
     <nz-form-control [nzErrorTip]="'Please enter mobile number!' | translate">
       <nz-input-group nzPrefixIcon="user" nzSize="large">
-        <input formControlName="userName" nz-input placeholder="username: admin or user" />
+        <input formControlName="userName" nz-input placeholder="username: admin or user" [ngModel]="'admin'" />
       </nz-input-group>
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
     <nz-form-control [nzErrorTip]="'Please enter password!' | translate">
       <nz-input-group nzPrefixIcon="lock" nzSize="large">
-        <input formControlName="password" nz-input placeholder="password: ng-alain.com" type="password" />
+        <input formControlName="password" nz-input placeholder="password: ng-alain.com" type="password" [ngModel]="'youandme'" />
       </nz-input-group>
     </nz-form-control>
   </nz-form-item>
@@ -28,4 +28,3 @@
     </button>
   </nz-form-item>
 </form>
-

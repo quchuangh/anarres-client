@@ -13,7 +13,7 @@ import { _HttpClient } from '@delon/theme';
 import { TranslateService } from '@ngx-translate/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { of, Subject } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Console } from '../../../utils/console';
 import { IFilter } from '../../filter-input/filter.types';
@@ -114,11 +114,11 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   /** 是否显示默认状态栏, 展示用户选中项状态数据 */
   @Input() defaultStatusBar = false;
   /** 单行还是多行 */
-  @Input() rowSelection: 'single' | 'multiple' = 'multiple';
+  @Input() rowSelection: undefined | 'single' | 'multiple' = undefined;
   /** 是否显示统计 */
   @Input() showStatistics = false;
-  /** 是否展示删除菜单 */
-  @Input() deleteMenu = true;
+  // /** 是否展示删除菜单 */
+  // @Input() deleteMenu = false;
   /** 默认是否可以改变列宽 */
   @Input() resizable = false;
   /** 分组时checkbox是否影响自己的子项 */
@@ -126,7 +126,7 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   /** 操作列模板 */
   @Input() optionCell!: TemplateRef<any>;
   /** 数据源 */
-  @Input() dataSource!: IGridDataSource;
+  @Input() dataSource!: IGridDataSource<any>;
   /** 表单schema */
   @Input() set searchSchema(schema: SFSchema) {
     this._searchSchema = asRowQueryPropertiesUI(schema);
@@ -137,6 +137,9 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   @Input() customPageView!: TemplateRef<any>;
 
   @Input() filterHand!: (filters: IFilter[]) => IFilter[];
+
+  @Input() topToolPanel!: TemplateRef<any>;
+  @Input() bottomToolPanel!: TemplateRef<any>;
 
   // ============================== 事件 ============================
   @Output() fullscreenChange = new EventEmitter<boolean>();
@@ -177,11 +180,11 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
       this.translateService,
       this.aclService,
       this.additionMenu,
-      this.deleteMenu,
+      // this.deleteMenu,
       this.destroy$,
       apiGetter,
       () => this.getSelectionData(),
-      () => this.doDelete(),
+      // () => this.doDelete(),
     );
     buildTreeDataCfg(this.gridOptions, this.treeData);
     buildStatusBar(this.gridOptions, this.defaultStatusBar);
@@ -192,12 +195,14 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
     repairRowModeType(this.gridOptions, this.dataLoadModel);
     buildColACL(this.gridOptions, this.aclService, this.colACLTmpl);
 
-    this.showPagination = {
-      ...NgxGridTableConstants.DEFAULT_PAGINATION,
-      ...this.showPagination,
-    };
+    if (this.showPagination !== false) {
+      this.showPagination = {
+        ...NgxGridTableConstants.DEFAULT_PAGINATION,
+        ...this.showPagination,
+      };
+    }
 
-    this.gridOptions = initGridOptions(this.gridOptions, this.rowSelection, (event) => this.onGridReady(event));
+    this.gridOptions = initGridOptions(this.gridOptions, this.rowSelection!, (event) => this.onGridReady(event));
   }
 
   private onGridReady(event: GridReadyEvent): void {
@@ -241,8 +246,7 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
       console.groupEnd();
       this.setDataLoading(true);
       this.api.showLoadingOverlay();
-      this.dataSource
-        .query(rowQuery)
+      this.dataSource(rowQuery)
         .pipe(
           takeUntil(this.destroy$),
           catchError((err) => {
@@ -267,31 +271,31 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
     return { getRows };
   }
 
-  private doDelete(): void {
-    const data: any[] = this.getCheckedData();
-    if (!data.length) {
-      return;
-    }
-    let mapper: (v: any) => string;
-    if (typeof this.gridOptions.getRowNodeId === 'undefined') {
-      if (typeof data[0].id !== 'undefined') {
-        mapper = (v) => v.id;
-      } else {
-        console.warn(
-          '删除操作无法获取键，默认情况下将获取id作为键，如果没有id字段或不希望使用id作为删除键，请配置 gridOptions.getRowNodeId',
-        );
-        return;
-      }
-    } else {
-      mapper = this.gridOptions.getRowNodeId;
-    }
-
-    const ids: string[] = data.map(mapper);
-
-    this.http.delete(`/api/${this.currentUrl}/deleteByKeys`, { keys: ids }).subscribe((value) => {
-      this.deleted.emit(value);
-    });
-  }
+  // private doDelete(): void {
+  //   const data: any[] = this.getCheckedData();
+  //   if (!data.length) {
+  //     return;
+  //   }
+  //   let mapper: (v: any) => string;
+  //   if (typeof this.gridOptions.getRowNodeId === 'undefined') {
+  //     if (typeof data[0].id !== 'undefined') {
+  //       mapper = (v) => v.id;
+  //     } else {
+  //       console.warn(
+  //         '删除操作无法获取键，默认情况下将获取id作为键，如果没有id字段或不希望使用id作为删除键，请配置 gridOptions.getRowNodeId',
+  //       );
+  //       return;
+  //     }
+  //   } else {
+  //     mapper = this.gridOptions.getRowNodeId;
+  //   }
+  //
+  //   const ids: string[] = data.map(mapper);
+  //
+  //   this.http.delete(`/api/${this.currentUrl}/deleteByKeys`, { keys: ids }).subscribe((value) => {
+  //     this.deleted.emit(value);
+  //   });
+  // }
 
   /**
    * 查询
@@ -311,8 +315,7 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
     this.api.showLoadingOverlay();
     this.setDataLoading(true);
 
-    this.dataSource
-      .query(rowQuery)
+    this.dataSource(rowQuery)
       .pipe(
         takeUntil(this.destroy$),
         catchError((err) => {

@@ -47,13 +47,15 @@ export interface AclColDef extends ColDef {
   acl?: ACLCanType;
 }
 
-export interface IGridDataSource {
-  query: (rowQuery: IRowQuery) => Observable<IPage<any>>;
-  modify?: (data: any) => Observable<any>;
-  delete?: (id: any) => Observable<any>;
-  create?: (data: any) => Observable<any>;
-  map: (data: any) => any;
-}
+// export interface IGridDataSource {
+//   query: (rowQuery: IRowQuery) => Observable<IPage<any>>;
+//   modify?: (data: any) => Observable<any>;
+//   delete?: (id: any) => Observable<any>;
+//   create?: (data: any) => Observable<any>;
+//   map: (data: any) => any;
+// }
+
+export type IGridDataSource<T> = <T>(rowQuery: IRowQuery) => Observable<IPage<T>>;
 
 export interface MenuItem {
   name: string;

@@ -1,0 +1,23 @@
+<div class="modal-header">
+  <div class="modal-title">分配权限({{ role.name }})</div>
+  <div class="modal-action">
+    <nz-radio-group [(ngModel)]="model" [nzSize]="'small'">
+      <label nz-radio-button nzValue="tree">树状模式</label>
+      <label nz-radio-button nzValue="table">表格模式</label>
+    </nz-radio-group>
+  </div>
+</div>
+
+<div class="content">
+  <ng-container *ngIf="model === 'tree'">
+    <app-sys-role-assign-ability-tree #tree [role]="role"></app-sys-role-assign-ability-tree>
+  </ng-container>
+
+  <ng-container *ngIf="model === 'table'">
+    <app-sys-role-assign-ability-table #table [role]="role"></app-sys-role-assign-ability-table>
+  </ng-container>
+</div>
+<div class="modal-footer">
+  <button (click)="close()" nz-button type="button">取消</button>
+  <button (click)="save()" [nzLoading]="http?.loading" nz-button nzType="primary" type="submit">确认分配</button>
+</div>

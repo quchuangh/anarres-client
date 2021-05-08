@@ -65,11 +65,11 @@ export function buildMenus(
   translateService: TranslateService,
   acl: ACLService,
   additionMenu: Array<MenuItem>,
-  deleteMenu: boolean,
+  // deleteMenu: boolean,
   destroy$: Subject<any>,
   apiGetter: ApiGetter,
   selectDataGetter: () => any[],
-  doDeleted: () => void,
+  // doDeleted: () => void,
 ): void {
   let _getContextMenuItems: GetContextMenuItems;
   if (gridOptions.getContextMenuItems) {
@@ -121,20 +121,20 @@ export function buildMenus(
       fixed.push('chartRange');
     }
 
-    if (deleteMenu && selectedData.length) {
-      fixed.splice(
-        0,
-        0,
-        {
-          name: '批量删除',
-          tooltip: '删除当前选中行',
-          disabled: !(params.node && params.node.data),
-          icon: `<i class="mdi ag-icon mdi-delete-sweep"></i>`,
-          action: () => doDeleted(),
-        } as MenuItemDef,
-        'separator',
-      );
-    }
+    // if (deleteMenu && selectedData.length) {
+    //   fixed.splice(
+    //     0,
+    //     0,
+    //     {
+    //       name: '批量删除',
+    //       tooltip: '删除当前选中行',
+    //       disabled: !(params.node && params.node.data),
+    //       icon: `<i class="mdi ag-icon mdi-delete-sweep"></i>`,
+    //       action: () => doDeleted(),
+    //     } as MenuItemDef,
+    //     'separator',
+    //   );
+    // }
     // 用户添加菜单
     const menus: MenuItemDef[] = additionMenu
       .filter((value) => {
@@ -270,11 +270,13 @@ export function buildOptionField(gridOptions: GridOptions, template: TemplateRef
     `);
     return;
   }
-  optionCell.chartDataType = 'excluded';
-  optionCell.cellRendererFramework = TemplateRendererComponent;
-  optionCell.cellRendererParams = { ngTemplate: template };
-  optionCell.sortable = false;
-  optionCell.suppressSizeToFit = true;
+  if (optionCell) {
+    optionCell.chartDataType = 'excluded';
+    optionCell.cellRendererFramework = TemplateRendererComponent;
+    optionCell.cellRendererParams = { ngTemplate: template };
+    optionCell.sortable = false;
+    optionCell.suppressSizeToFit = true;
+  }
 }
 
 export function buildResizable(gridOptions: GridOptions, resizable: boolean): void {

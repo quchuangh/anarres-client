@@ -7,7 +7,10 @@
   </div>
   <!-- 工具栏 -->
   <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-    <ng-content select="ngx-table-tool-bar[top]"></ng-content>
+    <ng-container
+      [ngTemplateOutlet]="topToolPanel"
+      [ngTemplateOutletContext]="{ $implicit: this, page: this.defaultPageTmpl }"
+    ></ng-container>
   </div>
   <!-- 表格 -->
   <ag-grid-angular
@@ -30,7 +33,10 @@
   </div>
   <!-- 下工具栏 -->
   <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-    <ng-content select="ngx-table-tool-bar[bottom]"></ng-content>
+    <ng-container
+      [ngTemplateOutlet]="bottomToolPanel"
+      [ngTemplateOutletContext]="{ $implicit: this, page: defaultPageTmpl }"
+    ></ng-container>
   </div>
   <!-- 页脚 -->
   <div class="footer flex flex-grow-0 flex-shrink-1 space-between flex-wrap">

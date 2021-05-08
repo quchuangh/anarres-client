@@ -3,13 +3,9 @@
 2. 添加 JWT 拦截器，并在 alainConfig.auth 中添加 token_send_key: 'Authorization' ,这将使request中自动加上 Authorization头信息
 3. 添加proxy.conf.json
 
-
-
-
-#### 笔记
+#### 说明
 1. Lodop 组件在pro版本中没有默认支持，此组件的作用是用于打印文档
-2. <ng-content></ng-content> 表示之后会写在标签内的内容
-3. TemplateRef<void> + 页面的 <ng-template [ngTemplateOutlet]=""></ng-template> 可以传入一个模板
+
 
 
 #### 项目中导入简写成同模块导入 简写为 .. 会引发循环依赖
@@ -22,13 +18,12 @@ viewport: 视窗模型, 表格将通知服务器要显示的数据（第一行�
 
 ### 行模型的选择
 踩了一些坑之后，发现 infinite 和 viewport 没有使用的必要。官方也明确推荐在能够使用 server-side的情况下，不要使用infinite。同时也强调对viewport没有特别理解和特别需要，也不推荐使用。
-然而如此跟infinite和viewport相比如此优秀的server-side也有很多坑。比如不支持checkbox。
+然而跟infinite和viewport相比如此优秀的server-side也有很多坑。比如不支持checkbox。
 最终无奈的发现最符合一般人使用习惯的反而是使用client-side来获取服务端数据后进行处理。
 最后的结论是：分页使用client-side最合适。无限使用server-side最合适。
 
 ### 任务
-1. 菜单开发 -> 完成
-2. 表格开发 -> 进行中..  暂时使用归档1的表格，回头参考front进行修改。
+
 
 ### ng-template ng-container ng-content 
 * 参考  https://blog.csdn.net/wuyuxing24/article/details/82825608
@@ -38,3 +33,10 @@ viewport: 视窗模型, 表格将通知服务器要显示的数据（第一行�
     还能通过 let-xx 来定义变量
     对应的对象为: ViewContainerRef
     createEmbeddedView(TemplateRef) 可以给其添加一个模板
+    
+#### 表格默认行为
+早前，ngx-table-grid 内置了默认的增删改查功能，表格根据传入的 IDatasource对象对数据进行增加，删除，修改和查询。\
+这种做法已经被放弃，IDatasource也修改成简单的查询接口。这样做的原因如下：
+1. 表格的作用主要是用于展示数据，过多默认行为会让表格显得比较重。
+2. 自带的功能虽然尽可能地做到通用，但通用意味着它总是无法让人满意。当用户想要重写时，不仅得不到表格的任何帮助，还可能因为需要考虑表格默认行为的影响而让事情变得复杂。
+3. 服务端的Generator已经给 增,删,改 功能提供替代方案。服务端代码生成工具将会自动生成相关代码。虽然它也不总是令人满意。但它很容易修改。

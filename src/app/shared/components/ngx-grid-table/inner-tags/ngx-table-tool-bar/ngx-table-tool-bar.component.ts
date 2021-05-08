@@ -12,22 +12,23 @@ export type Actions = 'search' | 'reset' | 'data-mode' | 'full' | 'export' | 'pa
 export class NgxTableToolBarComponent implements OnInit {
   @Input() left: Array<Actions> = [];
   @Input() center: Array<Actions> = [];
-  @Input() right: Array<Actions> = ['page'];
+  @Input() right: Array<Actions> = [];
 
   @Input() page!: TemplateRef<any>;
   @Input() showCenter = false;
+  @Input() table!: NgxGridTableComponent;
 
   @ContentChild('center-panel') centerPanel!: TemplateRef<any>;
 
-  loading: Observable<boolean>;
+  loading!: Observable<boolean>;
   full = false;
 
-  constructor(@Optional() public table: NgxGridTableComponent) {
-    this.loading = table.dataLoadingChange.asObservable();
-    this.full = table.fullscreen;
-  }
+  constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loading = this.table.dataLoadingChange.asObservable();
+    this.full = this.table.fullscreen;
+  }
 
   onSearch(): void {
     this.table.refresh();

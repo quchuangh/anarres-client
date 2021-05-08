@@ -1,48 +1,69 @@
 <page-header-wrapper>
-  <div nz-row [nzGutter]="32">
-    <div nz-col nzMd="24" nzLg="8">
-      <nz-card [nzTitle]="'common.list' | translate" [nzExtra]="extraTpl">
-        <ng-template #extraTpl>
-          <button (click)="add(null)" nz-button nzSize="small">{{ 'common.add' | translate }}</button>
-        </ng-template>
-        <div *ngIf="data.length === 0">{{ 'common.no-data' | translate }}</div>
-        <nz-tree
-          *ngIf="data.length > 0"
-          [nzData]="data"
-          [nzDraggable]="true"
-          (nzClick)="show($event)"
-          (nzContextMenu)="showContextMenu($event, ccMenu)"
-          [nzBeforeDrop]="move"
-        >
-        </nz-tree>
-      </nz-card>
-    </div>
-    <div nz-col nzMd="24" nzLg="16" *ngIf="item && permission">
-      <nz-card nzTitle="编辑">
-        <form nz-form #f="ngForm" se-container="1" (ngSubmit)="save()">
-          <se label="名称" required>
-            <input nz-input [(ngModel)]="item.text" name="item.text" />
-          </se>
-          <se label="授权">
-            <nz-tree [nzData]="permission" [nzCheckedKeys]="item.permission" nzExpandAll [nzCheckable]="true" [nzCheckStrictly]="true">
-            </nz-tree>
-          </se>
-          <se>
-            <button nz-button nzType="primary" [disabled]="f.invalid">保存</button>
-          </se>
-        </form>
-      </nz-card>
-    </div>
-  </div>
+  <!-- [colACLTmpl]="'POST:/TEST{}:OUT'"  被所有列添加一个权限末班{}是列名的占位-->
+  <ngx-grid-table
+    #table
+    [gridOptions]="gridOptions"
+    [dataLoadModel]="'pageable'"
+    [gridTableStyle]="{ height: '70%' }"
+    [defaultStatusBar]="true"
+    [resizable]="true"
+    [topToolPanel]="topToolPanel"
+    [bottomToolPanel]="bottomToolPanel"
+    [groupSelectsChildren]="true"
+    [optionCell]="option"
+    [dataSource]="dataSource"
+    [searchSchema]="schema"
+    (pageIndexChange)="onPageIndexChange($event)"
+    (gridReady)="onGridReady($event)"
+  >
+    <!--    <ngx-table-header>-->
+    <!--      <span>this is header</span>-->
+    <!--    </ngx-table-header>-->
+
+    <!--    <ngx-table-footer>-->
+    <!--      <span>this is footer</span>-->
+    <!--    </ngx-table-footer>-->
+  </ngx-grid-table>
 </page-header-wrapper>
-<nz-dropdown-menu #ccMenu="nzDropdownMenu">
-  <ul nz-menu>
-    <li nz-menu-item [nzDisabled]="delDisabled">
-      <div *ngIf="!delDisabled" nz-popconfirm [nzPopconfirmTitle]="delMsg" (nzOnConfirm)="del()">
-        删除
-      </div>
-      <div *ngIf="delDisabled">删除</div>
-    </li>
-    <li nz-menu-item (click)="add(item)">添加子项</li>
-  </ul>
-</nz-dropdown-menu>
+
+<!-- 上工具栏 -->
+<ng-template #topToolPanel let-table let-page="page">
+  <ngx-table-tool-bar [center]="['search', 'reset']" [left]="['data-mode']" [table]="table" [page]="page">
+    <div right>
+      <button nz-button acl [acl-ability]="'role:create'" nzSize="small" nzType="primary" (click)="onCreate()">新增</button>
+    </div>
+  </ngx-table-tool-bar>
+</ng-template>
+
+<!-- 下工具栏 -->
+<ng-template #bottomToolPanel let-table let-page="page">
+  <ngx-table-tool-bar [left]="['full']" [right]="['page']" [page]="page" [table]="table">
+    <div left>
+      <button nz-button acl [acl-ability]="'role:export'" nzSize="small" nzType="primary" (click)="this.table.exportAllPageData()">
+        <i nz-icon nzType="file-excel" nzTheme="outline"></i>导出
+      </button>
+    </div>
+  </ngx-table-tool-bar>
+</ng-template>
+
+<!-- cell 和 row对应的是 TemplateRendererComponent 中的 \$implicit(默认值ICellRendererParams对象) 和 row（RowNode对象） -->
+<ng-template #option let-cell let-row="row">
+  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'role:read'" (click)="onView(cell, row)">详细</button>
+  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'role:update'" (click)="onEdit(cell, row)">编辑</button>
+  <button nz-button nzSize="small" nzType="primary" acl [acl-ability]="'role:assign'" (click)="onAssign(cell, row)">授权</button>
+</ng-template>
+
+<nz-drawer
+  (nzOnClose)="closeAssignResources()"
+  [nzBodyStyle]="{ padding: 0 }"
+  [nzHeight]="height"
+  [nzVisible]="!!assignRole"
+  nzClosable="false"
+  nzPlacement="bottom"
+  nzWrapClassName="role-assign-ability-drawer"
+>
+  <div (nzResize)="onResize($event)" [nzMinHeight]="200" class="drawer-body" nz-resizable nzBounds="window">
+    <nz-resize-handles [nzDirections]="['top']"></nz-resize-handles>
+    <app-assign-role *ngIf="assignRole" (onClose)="closeAssignResources()" [role]="assignRole"> </app-assign-role>
+  </div>
+</nz-drawer>

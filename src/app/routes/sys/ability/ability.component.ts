@@ -1,6 +1,6 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SFSchema } from '@delon/form';
-import { Menu, _HttpClient } from '@delon/theme';
+import { _HttpClient } from '@delon/theme';
 import { ArrayService } from '@delon/util';
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -9,10 +9,10 @@ import { of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-sys-permission',
-  templateUrl: './permission.component.html',
+  selector: 'app-sys-ability',
+  templateUrl: './ability.component.html',
 })
-export class SysPermissionComponent implements OnInit {
+export class SysAbilityComponent implements OnInit {
   private menuEvent!: NzFormatEmitEvent;
 
   data: NzTreeNode[] = [];
@@ -22,9 +22,21 @@ export class SysPermissionComponent implements OnInit {
 
   schema: SFSchema = {
     properties: {
-      text: { type: 'string', title: '名称' },
-      code: { type: 'string', title: '代号' },
-      remark: { type: 'string', title: '描述', ui: { widget: 'textarea', grid: { span: 24 } } },
+      name: { type: 'string', title: '名称' },
+      ability: { type: 'string', title: '权限点' },
+      sortRank: { type: 'number', title: '排序值' },
+      abilityType: {
+        type: 'string',
+        title: '权限类型',
+        default: 'MENU',
+        enum: [
+          { label: '菜单', title: '菜单', value: 'MENU', checked: true },
+          { label: '功能', title: '功能', value: 'FUNCTION' },
+          { label: '字段', title: '字段', value: 'FIELD' },
+        ],
+      },
+      enabled: { type: 'boolean', title: '是否启用', default: true },
+      description: { type: 'string', title: '描述', ui: { widget: 'textarea', grid: { span: 24 } } },
     },
     required: ['text'],
     ui: { grid: { md: 24, lg: 12 }, spanLabelFixed: 100 },
@@ -42,15 +54,15 @@ export class SysPermissionComponent implements OnInit {
   }
 
   private getData(): void {
-    this.http.get('/permission').subscribe(
-      (res: Menu[]) =>
-        (this.data = this.arrSrv.arrToTreeNode(res, {
-          titleMapName: 'text',
-          cb: (item, _parent, deep) => {
-            item.expanded = deep <= 1;
-          },
-        })),
-    );
+    this.http.get('/api/sys/ability/all').subscribe((res: any[]) => {
+      this.data = this.arrSrv.arrToTreeNode(res, {
+        titleMapName: 'name',
+        parentIdMapName: 'parentId',
+        cb: (item, _parent, deep) => {
+          item.expanded = deep <= 1;
+        },
+      });
+    });
   }
 
   add(item: any): void {
@@ -59,7 +71,7 @@ export class SysPermissionComponent implements OnInit {
     this.item = {
       id: 0,
       text: '',
-      parent_id: item ? item.id : 0,
+      parentId: item ? item.id : 0,
     };
   }
 
@@ -69,7 +81,7 @@ export class SysPermissionComponent implements OnInit {
   }
 
   save(item: any): void {
-    this.http.post('/permission', item).subscribe(() => {
+    this.http.post('/api/sys/ability/create', item).subscribe(() => {
       if (item.id <= 0) {
         this.getData();
         this.op = '';
@@ -84,7 +96,7 @@ export class SysPermissionComponent implements OnInit {
 
   del(): void {
     this.closeContextMenu();
-    this.http.delete(`/permission/${this.item.id}`).subscribe(() => {
+    this.http.delete(`/api/sys/ability/delete/${this.item.id}`).subscribe(() => {
       this.getData();
       this.op = '';
     });
@@ -102,23 +114,27 @@ export class SysPermissionComponent implements OnInit {
   }
 
   move = (e: NzFormatBeforeDropEvent) => {
-    if (e.pos !== 0) {
-      this.msg.warning(`只支持不同类目的移动，且无法移动至顶层`);
-      return of(false);
-    }
+    // if (e.pos !== 0) {
+    //   this.msg.warning(`只支持不同类目的移动，且无法移动至顶层`);
+    //   return of(false);
+    // }
     if (e.dragNode.origin.parent_id === e.node.origin.id) {
       return of(false);
     }
     const from = e.dragNode.origin.id;
     const to = e.node.origin.id;
     return this.http
-      .post('/permission/move', {
+      .post('/api/sys/ability/move', {
         from,
         to,
+        pos: e.pos,
       })
       .pipe(
-        tap(() => (this.op = '')),
-        map(() => true),
+        tap(() => {
+          this.op = '';
+          this.getData();
+        }),
+        map((data) => false),
       );
     // tslint:disable-next-line: semicolon
   };

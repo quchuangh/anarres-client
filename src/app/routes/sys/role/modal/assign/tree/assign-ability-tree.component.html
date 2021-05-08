@@ -1,0 +1,45 @@
+<nz-spin *ngIf="!nodes" class="modal-spin"></nz-spin>
+<div class="tree-wrapper">
+  <nz-tree
+    #tree
+    [nzCheckedKeys]="defaultCheckedKeys"
+    [nzData]="nodes"
+    [nzExpandedKeys]="defaultExpandedKeys"
+    [nzSelectedKeys]="defaultSelectedKeys"
+    [nzTreeTemplate]="nzTreeTemplate"
+    nzCheckable
+  >
+  </nz-tree>
+  <ng-template #nzTreeTemplate let-node>
+    <span class="custom-node">
+      <nz-tag *ngIf="node.origin.abilityType === 'MENU'" nzMode="default" nzColor="blue">
+        <i nz-icon nzType="file" nzTheme="outline"></i>页面
+      </nz-tag>
+      <nz-tag *ngIf="node.origin.abilityType === 'FUNCTION'" nzMode="default" nzColor="geekblue">
+        <i nz-icon nzType="function" nzTheme="outline"></i>功能
+      </nz-tag>
+      <nz-tag *ngIf="node.origin.abilityType === 'FIELD'" nzMode="default" nzColor="orange">
+        <i nz-icon nzType="number" nzTheme="outline"></i>字段
+      </nz-tag>
+      <span [ngClass]="{ 'search-label': node.isMatched }" class="folder-name">
+        <i
+          *ngIf="node.origin.description"
+          [nzTooltipTitle]="node.origin.description"
+          nz-icon
+          nz-tooltip
+          nzType="question-circle"
+          nzTheme="outline"
+        >
+        </i
+        >{{ node.origin.name }}
+      </span>
+
+      <nz-switch
+        [nzDisabled]="node.origin.disableOpt"
+        [(ngModel)]="node.origin.licensable"
+        nzCheckedChildren="可授权"
+        nzUnCheckedChildren="不可授权"
+      ></nz-switch>
+    </span>
+  </ng-template>
+</div>

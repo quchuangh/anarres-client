@@ -26,20 +26,25 @@ export class SysMenuComponent implements OnInit {
       code: { type: 'string', title: '编号', minLength: 4 },
       i18n: { type: 'string', title: '国际化', minLength: 1 },
       group: { type: 'boolean', title: '菜单组', default: false },
-      acl: { type: 'string', title: 'ACL', default: ''},
+      acl: { type: 'string', title: 'ACL', default: '' },
       reuse: { type: 'boolean', title: '复用', default: false },
       link: { type: 'string', title: '路由', minLength: 1, default: '#' },
-      target: { type: 'string', title: '跳转方式', default: '_self', enum: [
+      target: {
+        type: 'string',
+        title: '跳转方式',
+        default: '_self',
+        enum: [
           { label: '_self', title: '_self', value: '_self', checked: true },
           { label: '_blank', title: '_blank', value: '_blank' },
           { label: '_parent', title: '_parent', value: '_parent' },
           { label: '_top', title: '_top', value: '_top' },
-      ]},
-      hide: { type: 'boolean', title: '隐藏', default: false},
+        ],
+      },
+      hide: { type: 'boolean', title: '隐藏', default: false },
       enabled: { type: 'boolean', title: '启用', default: true },
       hideInBreadcrumb: { type: 'boolean', title: '隐藏导航', default: false },
-      canShortcut: { type: 'boolean', title: '允许快捷' , default: false },
-      icon: { type: 'string', title: '图标', default: ''},
+      canShortcut: { type: 'boolean', title: '允许快捷', default: false },
+      icon: { type: 'string', title: '图标', default: '' },
       sortRank: { type: 'number', title: '排序值', default: 1 },
     },
     required: ['text'],
@@ -86,7 +91,7 @@ export class SysMenuComponent implements OnInit {
   }
 
   save(item: any): void {
-    this.http.post('/api/sys/menu/save', item).subscribe(() => {
+    this.http.post('/api/sys/menu/create', item).subscribe(() => {
       if (item.id <= 0) {
         this.getData();
         this.op = '';
@@ -133,14 +138,14 @@ export class SysMenuComponent implements OnInit {
       .post('/api/sys/menu/move', {
         from,
         to,
-        pos: e.pos
+        pos: e.pos,
       })
       .pipe(
         tap(() => {
           this.op = '';
           this.getData();
         }),
-        map(data => false),
+        map((data) => false),
       );
     // tslint:disable-next-line: semicolon
   };

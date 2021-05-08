@@ -1,147 +1,182 @@
-import { Component, OnInit } from '@angular/core';
-import { Menu, _HttpClient } from '@delon/theme';
-import { ArrayService } from '@delon/util';
-import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzFormatBeforeDropEvent, NzFormatEmitEvent, NzTreeNode } from 'ng-zorro-antd/tree';
-import { of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { GridOptions, GridReadyEvent, ICellRendererParams } from '@ag-grid-community/core';
+import { RowNode } from '@ag-grid-community/core/dist/cjs/entities/rowNode';
+import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { RoleVO } from '@core';
+import { ACLService } from '@delon/acl';
+import { SFSchema } from '@delon/form';
+import { _HttpClient } from '@delon/theme';
+import { AclColDef, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzResizeEvent } from 'ng-zorro-antd/resizable';
+import { DataSourceUtils } from '../../DataSourceUtils';
+import { SysRoleCreateComponent } from './modal/create.component';
+import { SysRoleEditComponent } from './modal/edit.component';
+import { SysRoleViewComponent } from './modal/view.component';
 
 @Component({
-  selector: 'app-sys-role',
+  host: { class: 'flex flex-column flex-grow-1' },
+  selector: 'app-role',
   templateUrl: './role.component.html',
 })
 export class SysRoleComponent implements OnInit {
-  private menuEvent!: NzFormatEmitEvent;
-
-  data: NzTreeNode[] = [];
-  permission!: NzTreeNode[];
-  item: any;
-  delDisabled = false;
-
-  constructor(
-    private http: _HttpClient,
-    private ccSrv: NzContextMenuService,
-    private arrSrv: ArrayService,
-    private msg: NzMessageService,
-  ) {}
-
-  ngOnInit(): void {
-    this.getPermission();
-    this.getData();
-  }
-
-  private getPermission(): void {
-    this.http.get('/permission').subscribe(
-      (res: Menu[]) =>
-        (this.permission = this.arrSrv.arrToTreeNode(res, {
-          titleMapName: 'text',
-          cb: (item, _parent, deep) => {
-            item.expanded = deep <= 1;
-          },
-        })),
-    );
-  }
-
-  private getData(): void {
-    this.http.get('/role').subscribe(
-      (res: Menu[]) =>
-        (this.data = this.arrSrv.arrToTreeNode(res, {
-          titleMapName: 'text',
-          cb: (item, _parent, deep) => {
-            item.expanded = deep <= 1;
-          },
-        })),
-    );
-  }
-
-  changeData(list: any[]): NzTreeNode[] {
-    return this.arrSrv.arrToTreeNode(list || [], {
-      titleMapName: 'text',
-    });
-  }
-
-  add(item: any): void {
-    this.closeContextMenu();
-    this.item = {
-      id: 0,
-      text: '',
-      parent_id: item ? item.id : 0,
-      permission: [],
-    };
-  }
-
-  edit(): void {
-    this.closeContextMenu();
-  }
-
-  save(): void {
-    const item = this.item;
-    item.permission = this.arrSrv.getKeysByTreeNode(this.permission, { includeHalfChecked: false });
-    this.http.post('/role', item).subscribe(() => {
-      this.item = null;
-      if (item.id <= 0) {
-        this.getData();
-      } else {
-        this.menuEvent.node!.title = item.text;
-        this.menuEvent.node!.origin = item;
-      }
-    });
-  }
-
-  del(): void {
-    this.closeContextMenu();
-    this.http.delete(`/role/${this.item.id}`).subscribe(() => {
-      this.getData();
-      this.item = null;
-    });
-  }
-
-  get delMsg(): string {
-    if (!this.menuEvent) {
-      return '';
-    }
-    const childrenLen = this.menuEvent.node!.children.length;
-    if (childrenLen === 0) {
-      return `确认删除【${this.menuEvent.node!.title}】吗？`;
-    }
-    return `确认删除【${this.menuEvent.node!.title}】以及所有子项吗？`;
-  }
-
-  move = (e: NzFormatBeforeDropEvent) => {
-    if (e.pos !== 0) {
-      this.msg.warning(`只支持不同类目的移动，且无法移动至顶层`);
-      return of(false);
-    }
-    if (e.dragNode.origin.parent_id === e.node.origin.id) {
-      return of(false);
-    }
-    const from = e.dragNode.origin.id;
-    const to = e.node.origin.id;
-    return this.http
-      .post('/role/move', {
-        from,
-        to,
-      })
-      .pipe(
-        tap(() => (this.item = null)),
-        map(() => true),
-      );
-    // tslint:disable-next-line: semicolon
+  // properties 的定义为 filter-input.widget.ts -> FilterSFUISchemaItem 接口
+  // 查询字段配置
+  schema: SFSchema = {
+    properties: {
+      id: { type: 'integer', title: 'id', ui: { options: ['equals'] } },
+      role: { type: 'string', title: '角色标识', ui: { options: ['contains'] } },
+      name: { type: 'string', title: '名称', ui: { options: ['contains'] } },
+      description: { type: 'string', title: '简介', ui: { options: ['contains'] } },
+      enabled: {
+        type: 'array',
+        title: '是否启用',
+        ui: {
+          options: ['in'],
+          selectValues: [
+            { label: '是', value: true },
+            { label: '否', value: false },
+          ],
+        },
+      },
+      creator: { type: 'string', title: '创建人', ui: { options: ['contains'] } },
+      createdTime: { type: 'string', title: '创建时间', format: 'date-time', ui: { options: ['inRange'] } },
+      updater: { type: 'string', title: '更新人', ui: { options: ['contains'] } },
+      updatedTime: { type: 'string', title: '更新时间', format: 'date-time', ui: { options: ['inRange'] } },
+    },
+    required: ['text'],
+    ui: {
+      width: 275,
+      spanLabelFixed: 80,
+      optionShowType: 'symbol',
+      // aclTmpl: 'POST:/{}/OUT',
+      // acl: { ability: ['POST:/TEST0'] },
+    },
   };
 
-  show(e: NzFormatEmitEvent): void {
-    this.menuEvent = e;
-    this.item = e.node!.origin;
+  // 表格配置
+  columnDefs: AclColDef[] = [
+    // { headerName: 'testACL', field: 'testACL', acl: { ability: ['POST:/TEST'] } }, //加上acl后只有符合权限的才展示出来
+    // { headerName: 'group', field: 'typeGroup', enableRowGroup: true }, // 需要分组查询，则将 enableRowGroup设置为true
+    { headerName: 'id', field: 'id', sort: 'desc', sortable: true, checkboxSelection: true, headerCheckboxSelection: true },
+    { headerName: '角色标识', field: 'role' },
+    { headerName: '名称', field: 'name' },
+    { headerName: '简介', field: 'description' },
+    { headerName: '是否启用', field: 'enabled' },
+    { headerName: '创建人', field: 'creator' },
+    { headerName: '创建时间', field: 'createdTime' },
+    { headerName: '更新人', field: 'updater' },
+    { headerName: '更新时间', field: 'updatedTime' },
+    { headerName: '操作', field: NgxGridTableConstants.OPTION_FIELD },
+  ];
+
+  gridOptions: GridOptions;
+
+  dataSource: IGridDataSource<RoleVO>;
+
+  assignRole: RoleVO | null = null;
+
+  resizeId = -1;
+
+  height: string | number = '70%';
+
+  @ViewChild(NgxGridTableComponent)
+  table!: NgxGridTableComponent;
+
+  constructor(private http: _HttpClient, private aclService: ACLService, private modal: NzModalService) {
+    this.gridOptions = {
+      enableCharts: false,
+      columnDefs: this.columnDefs,
+      enableRangeSelection: true, // 范围选择
+      getRowNodeId: (data) => {
+        return data.id;
+      },
+      onFirstDataRendered(event: FirstDataRenderedEvent): void {
+        event.columnApi.autoSizeAllColumns();
+      },
+    };
+    this.dataSource = DataSourceUtils.rowQuery(http, '/api/role/query', (r) => r);
   }
 
-  showContextMenu(e: NzFormatEmitEvent, menu: NzDropdownMenuComponent): void {
-    this.menuEvent = e;
-    this.delDisabled = e.node!.children.length !== 0;
-    this.ccSrv.create(e.event!, menu);
+  ngOnInit(): void {}
+
+  onGridReady(e: { event: GridReadyEvent; gridTable: NgxGridTableComponent }): void {
+    // 添加右键菜单
+    this.table.addMenu({
+      name: 'test',
+      show: 'selected',
+      acl: { ability: ['role:delete'] },
+      callback: (selected) => {
+        console.log(selected);
+      },
+    });
+    this.table.columnApi.autoSizeAllColumns();
   }
 
-  closeContextMenu(): void {
-    this.ccSrv.close();
+  onPageIndexChange(index: number): void {
+    console.log(index);
+  }
+
+  onCreate(): void {
+    this.modal
+      .create({
+        nzContent: SysRoleCreateComponent,
+        nzFooter: null,
+        nzMaskClosable: false,
+      })
+      .afterClose.subscribe((res) => {
+        if (res.result.success) {
+          this.table.refresh();
+        }
+        if (res.assign) {
+          this.openAssignResources(res.result.data);
+        }
+      });
+  }
+
+  onEdit(cell: ICellRendererParams, row: RowNode): void {
+    this.modal
+      .create({
+        nzContent: SysRoleEditComponent,
+        nzFooter: null,
+        nzComponentParams: { record: row.data },
+        nzMaskClosable: false,
+      })
+      .afterClose.subscribe((result) => {
+        if (result.success) {
+          this.table.refresh();
+        }
+      });
+  }
+
+  onView(cell: ICellRendererParams, row: RowNode): void {
+    this.modal.create({
+      nzContent: SysRoleViewComponent,
+      nzFooter: null,
+      nzComponentParams: { record: row.data },
+      nzMaskClosable: true,
+    });
+  }
+
+  onAssign(cell: ICellRendererParams, row: RowNode): void {
+    this.openAssignResources(row.data);
+  }
+
+  openAssignResources(role: RoleVO) {
+    this.assignRole = role;
+  }
+
+  closeAssignResources(): void {
+    this.assignRole = null;
+  }
+
+  onResize($event: NzResizeEvent) {
+    cancelAnimationFrame(this.resizeId);
+    this.resizeId = requestAnimationFrame(() => {
+      let { height } = $event;
+      if (height) {
+        this.height = height;
+      }
+    });
   }
 }

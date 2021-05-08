@@ -14,6 +14,7 @@ export class SysI18nComponent implements OnInit {
   // properties 的定义为 filter-input.widget.ts -> FilterSFUISchemaItem 接口
   schema: SFSchema = {
     properties: {
+      // test: { type: 'string', title: '测试权限', ui: { options: ['greaterThanOrEqual'], acl: { ability: ['POST:/TEST'] } } },
       id: { type: 'integer', title: 'id', ui: { options: ['greaterThanOrEqual'], acl: { ability: ['POST:/TEST'] } } },
       i18n: { type: 'string', title: 'i18n', ui: { options: ['startsWith'] } },
       message: { type: 'string', title: 'message', ui: { options: ['startsWith'] } },
@@ -51,7 +52,7 @@ export class SysI18nComponent implements OnInit {
 
   gridOptions: GridOptions;
 
-  dataSource: IGridDataSource;
+  dataSource: IGridDataSource<any>;
 
   @ViewChild(NgxGridTableComponent)
   table!: NgxGridTableComponent;
@@ -67,7 +68,7 @@ export class SysI18nComponent implements OnInit {
         event.columnApi.autoSizeAllColumns();
       },
     };
-    this.dataSource = DataSourceUtils.create(http, '/api/sys/i18n', (r) => r);
+    this.dataSource = DataSourceUtils.rowQuery(http, '/api/sys/i18n/query', (r) => r);
   }
 
   ngOnInit(): void {}
@@ -106,14 +107,14 @@ export class SysI18nComponent implements OnInit {
       current: 1,
     });
 
-    this.table.addMenu({
-      name: 'test',
-      show: 'selected',
-      acl: { ability: ['POST:/TEST'] },
-      callback: (selected) => {
-        console.log(selected);
-      },
-    });
+    // this.table.addMenu({
+    //   name: 'test',
+    //   show: 'selected',
+    //   acl: { ability: ['POST:/TEST'] },
+    //   callback: (selected) => {
+    //     console.log(selected);
+    //   },
+    // });
   }
 
   onPageIndexChange(index: number): void {
@@ -127,4 +128,6 @@ export class SysI18nComponent implements OnInit {
   print(...data: any): void {
     console.log(data);
   }
+
+  onCreate() {}
 }
