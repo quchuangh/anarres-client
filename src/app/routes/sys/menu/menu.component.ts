@@ -91,7 +91,8 @@ export class SysMenuComponent implements OnInit {
   }
 
   save(item: any): void {
-    this.http.post('/api/sys/menu/create', item).subscribe(() => {
+    item.externalLink = '';
+    this.http.post(`/api/sys/menu/${item.id ? 'update' : 'create'}`, item).subscribe(() => {
       if (item.id <= 0) {
         this.getData();
         this.op = '';

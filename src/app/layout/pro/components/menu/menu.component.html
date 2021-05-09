@@ -7,14 +7,14 @@
 </ng-template>
 <ng-template #mainLink let-i>
   <ng-template [ngTemplateOutlet]="icon" [ngTemplateOutletContext]="{ $implicit: i.icon }"></ng-template>
-  <span class="alain-pro__menu-title-text" *ngIf="!pro.onlyIcon">{{ i.text }}</span>
+  <span class="alain-pro__menu-title-text" *ngIf="!pro.onlyIcon">{{ i.text | translate }}</span>
   <div *ngIf="i.badge" class="alain-pro__menu-title-badge">
     <em>{{ i.badge }}</em>
   </div>
 </ng-template>
 <ng-template #subLink let-i>
-  <a *ngIf="!i.externalLink" [routerLink]="i.link" [target]="i.target">{{ i.text }} </a>
-  <a *ngIf="i.externalLink" [attr.href]="i.externalLink" [attr.target]="i.target">{{ i.text }} </a>
+  <a *ngIf="!i.externalLink" [routerLink]="i.link" [target]="i.target">{{ i.text | translate }} </a>
+  <a *ngIf="i.externalLink" [attr.href]="i.externalLink" [attr.target]="i.target">{{ i.text | translate }} </a>
 </ng-template>
 <ul *ngIf="menus" nz-menu [nzMode]="mode" [nzTheme]="pro.theme" [nzInlineCollapsed]="pro.isMobile ? false : pro.collapsed">
   <ng-container *ngFor="let l1 of menus">
@@ -52,7 +52,7 @@
       <ng-template #l1TitleTpl>
         <span title class="alain-pro__menu-title">
           <ng-template [ngTemplateOutlet]="icon" [ngTemplateOutletContext]="{ $implicit: l1.icon }"></ng-template>
-          <span class="alain-pro__menu-title-text" *ngIf="pro.isMobile || !pro.onlyIcon">{{ l1.text }}</span>
+          <span class="alain-pro__menu-title-text" *ngIf="pro.isMobile || !pro.onlyIcon">{{ l1.text | translate }}</span>
           <div *ngIf="l1.badge" class="alain-pro__menu-title-badge">
             <em>{{ l1.badge }}</em>
           </div>
@@ -73,7 +73,7 @@
           <li
             *ngIf="!l2._hidden && l2.children.length > 0"
             nz-submenu
-            [nzTitle]="l2.text"
+            [nzTitle]="l2.text | translate"
             [nzOpen]="l2._open"
             [nzDisabled]="l2.disabled"
             (nzOpenChange)="openChange(l2, $event)"

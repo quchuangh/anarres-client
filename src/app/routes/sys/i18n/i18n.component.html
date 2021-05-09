@@ -1,53 +1,24 @@
 <page-header-wrapper>
-  <!-- [deleteMenu]="true" 将自动添加一个删除菜单，批量删除只会删除checkbox选中的值 -->
-  <!-- [colACLTmpl]="'POST:/TEST{}:OUT'"  被所有列添加一个权限末班{}是列名的占位-->
-  <ngx-grid-table
-    #table
-    [gridOptions]="gridOptions"
-    [dataLoadModel]="'pageable'"
-    [showPagination]="false"
-    [gridTableStyle]="{ height: '70%' }"
-    [defaultStatusBar]="true"
-    [resizable]="true"
-    [groupSelectsChildren]="true"
-    [optionCell]="option"
-    [dataSource]="dataSource"
-    [searchSchema]="schema"
-    (pageIndexChange)="onPageIndexChange($event)"
-    (gridReady)="onGridReady($event)"
-  >
-    <!--    <ngx-table-header>-->
-    <!--      <span>this is header</span>-->
-    <!--    </ngx-table-header>-->
+  <nz-radio-group [(ngModel)]="tabType" (ngModelChange)="tabType = $event; getData()" style="margin-bottom: 8px">
+    <label nz-radio-button [nzValue]="'server'">服务端</label>
+    <label nz-radio-button [nzValue]="'client'">客户端</label>
+  </nz-radio-group>
 
-    <!--    <ngx-table-footer>-->
-    <!--      <span>this is footer</span>-->
-    <!--    </ngx-table-footer>-->
-  </ngx-grid-table>
+  <div nz-row [nzGutter]="16">
+    <div nz-col [nzMd]="12" [nzLg]="6">
+      <cdk-virtual-scroll-viewport itemSize="30" class="demo-infinite-container">
+        <nz-list>
+          <nz-list-item *cdkVirtualFor="let item of i18ns">
+            <nz-skeleton *ngIf="!item" [nzAvatar]="true" [nzParagraph]="{ rows: 1 }"></nz-skeleton>
+            <nz-list-item-meta *ngIf="item">
+              <nz-list-item-meta-title>
+                <button nz-button nzType="link">{{ item }}</button>
+              </nz-list-item-meta-title>
+            </nz-list-item-meta>
+          </nz-list-item>
+        </nz-list>
+      </cdk-virtual-scroll-viewport>
+    </div>
+    <div nz-col [nzMd]="12" [nzLg]="18"></div>
+  </div>
 </page-header-wrapper>
-
-<!-- 上工具栏 -->
-<ng-template #topToolPanel let-table let-page="page">
-  <ngx-table-tool-bar [center]="['search', 'reset']" [left]="['data-mode']" [table]="table" [page]="page">
-    <div right>
-      <button nz-button nzSize="small" nzType="primary" (click)="onCreate()">新增</button>
-    </div>
-  </ngx-table-tool-bar>
-</ng-template>
-
-<!-- 下工具栏 -->
-<ng-template #bottomToolPanel let-table let-page="page">
-  <ngx-table-tool-bar [left]="['full']" [right]="['page']" [page]="page" [table]="table">
-    <div left>
-      <button nz-button acl [acl-ability]="'role:export'" nzSize="small" nzType="primary" (click)="this.table.exportAllPageData()">
-        导出
-      </button>
-    </div>
-  </ngx-table-tool-bar>
-</ng-template>
-
-<!-- cell 和 row对应的是 TemplateRendererComponent 中的 $implicit(默认值ICellRendererParams对象) 和 row（RowNode对象） -->
-<ng-template #option let-cell let-row="row">
-  <!--  <button [acl]="{ ability: ['POST:/TEST'] }" (click)="print(cell, row)">test</button>-->
-  <button (click)="print(cell, row)">test</button>
-</ng-template>

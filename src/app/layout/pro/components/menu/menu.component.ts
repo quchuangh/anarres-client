@@ -49,7 +49,6 @@ export class LayoutProMenuComponent implements OnInit, OnDestroy {
       }
     });
     this.menus = res;
-
     this.openStatus();
   }
 

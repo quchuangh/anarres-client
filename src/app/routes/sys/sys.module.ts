@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { NgModule, Type } from '@angular/core';
 import { IconDefinition } from '@ant-design/icons-angular';
 import { NumberOutline, FileOutline, FunctionOutline } from '@ant-design/icons-angular/icons';
@@ -48,7 +49,7 @@ const COMPONENTS_NOROUNT: Type<void>[] = [
 ];
 
 @NgModule({
-  imports: [SharedModule, SysRoutingModule, NzIconModule.forRoot(icons)],
+  imports: [SharedModule, SysRoutingModule, NzIconModule.forRoot(icons), ScrollingModule],
   declarations: [...COMPONENTS, ...COMPONENTS_NOROUNT],
   entryComponents: COMPONENTS_NOROUNT,
 })
