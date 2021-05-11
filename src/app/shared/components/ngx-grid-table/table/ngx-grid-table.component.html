@@ -1,5 +1,5 @@
 <full-content [(fullscreen)]="fullscreen" class="flex flex-column flex-grow-1" [ngStyle]="{ 'margin-top': fullscreen ? '-70px' : '0' }">
-  <sf-query-form *ngIf="_searchSchema" [searchSchema]="_searchSchema" [searchFormData]="initFormData"></sf-query-form>
+  <sf-query-form *ngIf="searchSchema" [searchSchema]="searchSchema" [searchFormData]="initFormData"></sf-query-form>
 
   <!-- 表格头 -->
   <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">

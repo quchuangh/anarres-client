@@ -6,9 +6,10 @@ import { RoleVO } from '@core';
 import { ACLService } from '@delon/acl';
 import { SFSchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
-import { AclColDef, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
+import { AclColDef, asFilterInputPropertiesUI, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzResizeEvent } from 'ng-zorro-antd/resizable';
+import { FilterInputUISchema } from '../../../shared/json-schema/widgets/filter-input-widget/filter-input.widget';
 import { DataSourceUtils } from '../../DataSourceUtils';
 import { SysRoleCreateComponent } from './modal/create.component';
 import { SysRoleEditComponent } from './modal/edit.component';
@@ -20,29 +21,34 @@ import { SysRoleViewComponent } from './modal/view.component';
   templateUrl: './role.component.html',
 })
 export class SysRoleComponent implements OnInit {
-  // properties 的定义为 filter-input.widget.ts -> FilterSFUISchemaItem 接口
+  // properties 的定义为 filter-input.widget.ts -> FilterInputUISchema 接口
+  // id会转换为 { type: 'integer', title: 'id', ui: { widget: 'filter-input', filterType: 'number', options: ['equals'] } }
+  private filter_properties = asFilterInputPropertiesUI({
+    id: { type: 'integer', title: 'id', ui: { options: ['equals'] } },
+    role: { type: 'string', title: '角色标识', ui: { options: ['contains'] } },
+    name: { type: 'string', title: '名称', ui: { options: ['contains'] } },
+    description: { type: 'string', title: '简介', ui: { options: ['contains'] } },
+    enabled: {
+      type: 'array',
+      title: '是否启用',
+      ui: {
+        options: ['in'],
+        selectValues: [
+          { label: '是', value: true },
+          { label: '否', value: false },
+        ],
+      },
+    },
+    creator: { type: 'string', title: '创建人', ui: { options: ['contains'] } },
+    createdTime: { type: 'string', title: '创建时间', format: 'date-time', ui: { options: ['inRange'] } },
+    updater: { type: 'string', title: '更新人', ui: { options: ['contains'] } },
+    updatedTime: { type: 'string', title: '更新时间', format: 'date-time', ui: { options: ['inRange'] } },
+  });
+
   // 查询字段配置
   schema: SFSchema = {
     properties: {
-      id: { type: 'integer', title: 'id', ui: { options: ['equals'] } },
-      role: { type: 'string', title: '角色标识', ui: { options: ['contains'] } },
-      name: { type: 'string', title: '名称', ui: { options: ['contains'] } },
-      description: { type: 'string', title: '简介', ui: { options: ['contains'] } },
-      enabled: {
-        type: 'array',
-        title: '是否启用',
-        ui: {
-          options: ['in'],
-          selectValues: [
-            { label: '是', value: true },
-            { label: '否', value: false },
-          ],
-        },
-      },
-      creator: { type: 'string', title: '创建人', ui: { options: ['contains'] } },
-      createdTime: { type: 'string', title: '创建时间', format: 'date-time', ui: { options: ['inRange'] } },
-      updater: { type: 'string', title: '更新人', ui: { options: ['contains'] } },
-      updatedTime: { type: 'string', title: '更新时间', format: 'date-time', ui: { options: ['inRange'] } },
+      ...this.filter_properties,
     },
     required: ['text'],
     ui: {

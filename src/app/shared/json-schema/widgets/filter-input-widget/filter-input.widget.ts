@@ -4,7 +4,7 @@ import { SFSchemaType } from '@delon/form/src/schema';
 import { SFUISchemaItem } from '@delon/form/src/schema/ui';
 import { FilterType, Options } from '../../../components/filter-input/filter.types';
 
-export interface FilterSFUISchemaItem extends SFUISchemaItem {
+export interface FilterInputUISchema extends SFUISchemaItem {
   /** 用户可选操作，如 >, >=, <, <= 等 */
   options?: Options[];
   /** 选择操作的组件宽度 */
@@ -43,7 +43,7 @@ export interface FilterSFUISchemaItem extends SFUISchemaItem {
   `,
 })
 // tslint:disable-next-line:component-class-suffix
-export class FilterInputWidget extends ControlUIWidget<FilterSFUISchemaItem> implements OnInit {
+export class FilterInputWidget extends ControlUIWidget<FilterInputUISchema> implements OnInit {
   static readonly KEY = 'filter-input';
 
   ngOnInit(): void {}

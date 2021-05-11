@@ -44,7 +44,6 @@ import {
   PaginationCfg,
   TreeDataCfg,
 } from '../ngx-grid-table-model';
-import { asRowQueryPropertiesUI } from '../ngx-grid-table-utils';
 import { SfQueryFormComponent } from '../sf-query-form/sf-query-form.component';
 
 /**
@@ -86,8 +85,6 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   /** 表格页面所在的url */
   currentUrl: string;
 
-  _searchSchema!: SFSchema;
-
   // ================================== 基本配置（外部） =============================
   /** 是否为全屏状态 */
   @Input() fullscreen = false;
@@ -128,15 +125,13 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   /** 数据源 */
   @Input() dataSource!: IGridDataSource<any>;
   /** 表单schema */
-  @Input() set searchSchema(schema: SFSchema) {
-    this._searchSchema = asRowQueryPropertiesUI(schema);
-  }
+  @Input() searchSchema!: SFSchema;
   /** 初始表单数据 */
   @Input() initFormData!: any;
 
   @Input() customPageView!: TemplateRef<any>;
 
-  @Input() filterHand!: (filters: IFilter[]) => IFilter[];
+  @Input() filterHand!: (filters: IFilter[], form: SfQueryFormComponent) => IFilter[];
 
   @Input() topToolPanel!: TemplateRef<any>;
   @Input() bottomToolPanel!: TemplateRef<any>;
@@ -233,7 +228,7 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
       filters = [...this.form.filter];
     }
     if (this.filterHand) {
-      filters = [...this.filterHand(filters)];
+      filters = [...this.filterHand(filters, this.form)];
     }
     return filters;
   }
