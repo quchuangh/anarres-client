@@ -303,7 +303,7 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const rowQuery: IRowQuery = clientSideAsRowQuery(this.api, pageNum, pageSize, this.filters());
+    const rowQuery: IRowQuery = clientSideAsRowQuery(this.api, this.columnApi, pageNum, pageSize, this.filters());
     Console.collapse('grid-table.component getData', 'indigoBg', 'queryParams', 'indigoOutline');
     console.log(rowQuery);
     console.groupEnd();

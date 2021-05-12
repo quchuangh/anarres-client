@@ -1,0 +1,30 @@
+<ngx-grid-table
+  #table
+  [gridOptions]="gridOptions"
+  [dataLoadModel]="'infinite'"
+  [gridTableStyle]="{ height: '70%' }"
+  [defaultStatusBar]="true"
+  [resizable]="true"
+  [topToolPanel]="topToolPanel"
+  [groupSelectsChildren]="true"
+  [optionCell]="option"
+  [dataSource]="dataSource"
+  [filterHand]="filterHand"
+  (gridReady)="onGridReady($event)"
+>
+</ngx-grid-table>
+
+<!-- 上工具栏 -->
+<ng-template #topToolPanel let-table let-page="page">
+  <ngx-table-tool-bar [center]="['search']">
+    <div right>
+      <button nz-button acl [acl-ability]="'dict:create'" nzSize="small" nzType="primary" (click)="onCreate()">新增</button>
+    </div>
+  </ngx-table-tool-bar>
+</ng-template>
+
+<!-- cell 和 row对应的是 TemplateRendererComponent 中的 \$implicit(默认值ICellRendererParams对象) 和 row（RowNode对象） -->
+<ng-template #option let-cell let-row="row">
+  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'dict:update'" (click)="onEdit(cell, row)">编辑</button>
+  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'dict:create'" (click)="onCreateChild(cell, row)">新增子级</button>
+</ng-template>

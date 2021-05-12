@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <div class="modal-title">编辑-字典类型;({{ record.id }})</div>
+</div>
+
+<sf #sf [schema]="schema" [formData]="record" button="none" mode="edit">
+  <div class="modal-footer">
+    <button (click)="close()" nz-button type="button">关闭</button>
+    <button
+      (click)="save(sf.value)"
+      [disabled]="!sf.valid"
+      [nzLoading]="http.loading"
+      nz-button
+      nzType="primary"
+      acl
+      [acl-ability]="rolePrefix + 'update'"
+      type="submit"
+    >
+      修改
+    </button>
+  </div>
+</sf>

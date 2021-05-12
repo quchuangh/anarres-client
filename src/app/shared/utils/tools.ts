@@ -164,6 +164,7 @@ export function buildTreeData(
     }
     // @ts-ignore
     if (
+      parentId &&
       item[parentId] !== null &&
       // @ts-ignore
       item[parentId] !== undefined &&
@@ -207,7 +208,7 @@ export function incrementalObject(original: any, target: any): any | false {
  * @param size 拆分大小
  */
 export function arrayPartition<T>(items: Array<T>, size: number = 3): Array<Array<T>> {
-  return items.reduce((previousValue, currentValue) => {
+  return items.reduce((previousValue: Array<Array<T>>, currentValue) => {
     // @ts-ignore
     !previousValue.length || previousValue[previousValue.length - 1].length === size
       ? previousValue.push([currentValue])

@@ -2,33 +2,30 @@ import { GridOptions, GridReadyEvent, ICellRendererParams } from '@ag-grid-commu
 import { RowNode } from '@ag-grid-community/core/dist/cjs/entities/rowNode';
 import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { RoleVO } from '@core';
 import { ACLService } from '@delon/acl';
-import { SFSchema } from '@delon/form';
+import { SFSchema, SFSchemaEnum } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
 import { AclColDef, asFilterInputPropertiesUI, IFilter, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzResizeEvent } from 'ng-zorro-antd/resizable';
+import { of } from 'rxjs';
 import { SfQueryFormComponent } from '../../../shared/components/ngx-grid-table/sf-query-form/sf-query-form.component';
 import { DataSourceUtils } from '../../DataSourceUtils';
-import { SysRoleCreateComponent } from './modal/create.component';
-import { SysRoleEditComponent } from './modal/edit.component';
-import { SysRoleViewComponent } from './modal/view.component';
+import { SysDictCreateComponent } from './modal/create.component';
+import { SysDictEditComponent } from './modal/edit.component';
+import { SysDictViewComponent } from './modal/view.component';
 
 @Component({
-  host: { class: 'flex flex-column flex-grow-1' },
-  selector: 'app-role',
-  templateUrl: './role.component.html',
+  selector: 'app-dict',
+  templateUrl: './dict.component.html',
 })
-export class SysRoleComponent implements OnInit {
+export class SysDictComponent implements OnInit {
   // properties 的定义为 filter-input.widget.ts -> FilterInputUISchema 接口
   // id会转换为 { type: 'integer', title: 'id', ui: { widget: 'filter-input', filterType: 'number', options: ['equals'] } }
   schema: SFSchema = asFilterInputPropertiesUI({
     properties: {
-      id: { type: 'integer', title: 'id', ui: { options: ['equals'] } },
-      role: { type: 'string', title: '角色标识', ui: { options: ['contains'] } },
-      name: { type: 'string', title: '名称', ui: { options: ['contains'] } },
-      description: { type: 'string', title: '简介', ui: { options: ['contains'] } },
+      code: { type: 'string', title: '编码', ui: { options: ['contains'] } },
       enabled: {
         type: 'array',
         title: '是否启用',
@@ -40,9 +37,9 @@ export class SysRoleComponent implements OnInit {
           ],
         },
       },
+      name: { type: 'string', title: '昵称', ui: { options: ['contains'] } },
       creator: { type: 'string', title: '创建人', ui: { options: ['contains'] } },
       createdTime: { type: 'string', title: '创建时间', format: 'date-time', ui: { options: ['inRange'] } },
-      updater: { type: 'string', title: '更新人', ui: { options: ['contains'] } },
       updatedTime: { type: 'string', title: '更新时间', format: 'date-time', ui: { options: ['inRange'] } },
     },
     required: ['text'],
@@ -60,10 +57,10 @@ export class SysRoleComponent implements OnInit {
     // { headerName: 'testACL', field: 'testACL', acl: { ability: ['POST:/TEST'] } }, //加上acl后只有符合权限的才展示出来
     // { headerName: 'group', field: 'typeGroup', enableRowGroup: true }, // 需要分组查询，则将 enableRowGroup设置为true
     { headerName: 'id', field: 'id', sort: 'desc', sortable: true, checkboxSelection: true, headerCheckboxSelection: true },
-    { headerName: '角色标识', field: 'role' },
-    { headerName: '名称', field: 'name' },
-    { headerName: '简介', field: 'description' },
+    { headerName: '编码', field: 'code' },
     { headerName: '是否启用', field: 'enabled' },
+    { headerName: '昵称', field: 'name' },
+    { headerName: '说明', field: 'description' },
     { headerName: '创建人', field: 'creator' },
     { headerName: '创建时间', field: 'createdTime' },
     { headerName: '更新人', field: 'updater' },
@@ -73,44 +70,59 @@ export class SysRoleComponent implements OnInit {
 
   gridOptions: GridOptions;
 
-  dataSource: IGridDataSource<RoleVO>;
+  dataSource: IGridDataSource<any>;
 
-  assignRole: RoleVO | null = null;
+  addItemDict!: any;
+
+  height: string | number = '80%';
 
   resizeId = -1;
-
-  height: string | number = '70%';
 
   @ViewChild(NgxGridTableComponent)
   table!: NgxGridTableComponent;
 
-  constructor(private http: _HttpClient, private aclService: ACLService, private modal: NzModalService) {
+  constructor(private http: _HttpClient, private aclService: ACLService, private message: NzMessageService, private modal: NzModalService) {
     this.gridOptions = {
       enableCharts: false,
       columnDefs: this.columnDefs,
-      enableRangeSelection: true, // 范围选择
-      getRowNodeId: (data) => {
-        return data.id;
-      },
+      enableRangeSelection: true,
+      getRowNodeId: this.idGetter,
       onFirstDataRendered(event: FirstDataRenderedEvent): void {
         event.columnApi.autoSizeAllColumns();
       },
     };
-    this.dataSource = DataSourceUtils.rowQuery(http, '/api/role/query', (r) => r);
+    this.dataSource = DataSourceUtils.rowQuery(http, '/api/dict/type/query', (r) => r);
   }
 
   ngOnInit(): void {}
 
+  idGetter(data: any): any {
+    return data.id;
+  }
+
   onGridReady(e: { event: GridReadyEvent; gridTable: NgxGridTableComponent }): void {
     // 添加右键菜单
     this.table.addMenu({
-      name: 'test',
+      name: '删除',
       show: 'selected',
-      acl: { ability: ['role:delete'] },
+      acl: { ability: ['dict:delete'] },
       callback: (selected) => {
-        console.log(selected);
+        this.http.delete(`/api/dict/type/delete/${this.idGetter(selected)}`).subscribe((value) => {
+          this.message.success('删除成功');
+          this.table.refresh();
+        });
       },
     });
+    // 添加右键菜单
+    this.table.addMenu({
+      name: '值配置',
+      show: 'selected',
+      acl: { ability: ['dict:edit'] },
+      callback: (selected) => {
+        this.onAddItem(selected);
+      },
+    });
+    // 按每列内容重新分配列宽
     this.table.columnApi.autoSizeAllColumns();
   }
 
@@ -131,33 +143,53 @@ export class SysRoleComponent implements OnInit {
     return filter;
   }
 
-  onPageIndexChange(index: number): void {
-    console.log(index);
+  onPageIndexChange(index: number): void {}
+
+  valueRegexSearcher(q: string): Promise<Array<SFSchemaEnum>> {
+    const r = { label: q, value: q } as SFSchemaEnum;
+    return of([
+      { label: '任意', value: '.*' },
+      { label: '整数', value: 'n' },
+      { label: '小数', value: 'xs' },
+      { label: '字符', value: 'str' },
+      { label: '布尔', value: 'bool' },
+      r,
+    ]).toPromise();
   }
 
   onCreate(): void {
     this.modal
       .create({
-        nzContent: SysRoleCreateComponent,
+        nzContent: SysDictCreateComponent,
+        nzComponentParams: { valueRegexSearcher: this.valueRegexSearcher },
         nzFooter: null,
         nzMaskClosable: false,
       })
-      .afterClose.subscribe((res) => {
-        if (res.result.success) {
-          this.table.refresh();
-        }
-        if (res.assign) {
-          this.openAssignResources(res.result.data);
-        }
+      .afterClose.subscribe((result) => {
+        this.table.refresh();
       });
+  }
+
+  onAddItem(selected: any): void {
+    this.addItemDict = selected;
+  }
+
+  onResize($event: NzResizeEvent) {
+    cancelAnimationFrame(this.resizeId);
+    this.resizeId = requestAnimationFrame(() => {
+      let { height } = $event;
+      if (height) {
+        this.height = height;
+      }
+    });
   }
 
   onEdit(cell: ICellRendererParams, row: RowNode): void {
     this.modal
       .create({
-        nzContent: SysRoleEditComponent,
+        nzContent: SysDictEditComponent,
+        nzComponentParams: { record: row.data, valueRegexSearcher: this.valueRegexSearcher },
         nzFooter: null,
-        nzComponentParams: { record: row.data },
         nzMaskClosable: false,
       })
       .afterClose.subscribe((result) => {
@@ -169,32 +201,10 @@ export class SysRoleComponent implements OnInit {
 
   onView(cell: ICellRendererParams, row: RowNode): void {
     this.modal.create({
-      nzContent: SysRoleViewComponent,
-      nzFooter: null,
+      nzContent: SysDictViewComponent,
       nzComponentParams: { record: row.data },
+      nzFooter: null,
       nzMaskClosable: true,
-    });
-  }
-
-  onAssign(cell: ICellRendererParams, row: RowNode): void {
-    this.openAssignResources(row.data);
-  }
-
-  openAssignResources(role: RoleVO) {
-    this.assignRole = role;
-  }
-
-  closeAssignResources(): void {
-    this.assignRole = null;
-  }
-
-  onResize($event: NzResizeEvent) {
-    cancelAnimationFrame(this.resizeId);
-    this.resizeId = requestAnimationFrame(() => {
-      let { height } = $event;
-      if (height) {
-        this.height = height;
-      }
     });
   }
 }

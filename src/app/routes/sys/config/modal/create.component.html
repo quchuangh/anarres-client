@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <div class="modal-title">创建-系统配置表</div>
+</div>
+
+<sf #sf [schema]="schema" button="none" mode="edit">
+  <div class="modal-footer">
+    <button (click)="close()" nz-button type="button">关闭</button>
+    <button
+      (click)="save(sf.value)"
+      [disabled]="!sf.valid"
+      [nzLoading]="http.loading"
+      nz-button
+      nzType="primary"
+      acl
+      [acl-ability]="rolePrefix + 'create'"
+      type="submit"
+    >
+      创建
+    </button>
+  </div>
+</sf>

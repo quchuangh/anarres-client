@@ -1,6 +1,7 @@
 import {
   AgEvent,
   ColDef,
+  ColumnApi,
   Constants,
   GetContextMenuItemsParams,
   GridApi,
@@ -351,8 +352,26 @@ export function initGridOptions(gridOptions: GridOptions, rowSelection: string, 
   };
 }
 
-export function clientSideAsRowQuery(api: GridApi, pageNum: number, pageSize: number, extFilter: IFilter[]): IRowQuery {
-  return asRowQuery(api.getFilterModel(), api.getSortModel(), pageNum, pageSize, extFilter);
+export function clientSideAsRowQuery(
+  api: GridApi,
+  columnApi: ColumnApi,
+  pageNum: number,
+  pageSize: number,
+  extFilter: IFilter[],
+): IRowQuery {
+  const sortModel = columnApi
+    .getColumnState()
+    .filter((value) => value.sort && value.sortIndex)
+    .sort((a, b) => {
+      // @ts-ignore
+      return a.sortIndex - b.sortIndex;
+    })
+    .map((value) => ({
+      colId: value.colId,
+      sort: value.sort,
+    }));
+  // @ts-ignore
+  return asRowQuery(api.getFilterModel(), sortModel, pageNum, pageSize, extFilter);
 }
 
 export function serverSideAsRowQuery(

@@ -1,69 +1,73 @@
 import { GridOptions, GridReadyEvent, ICellRendererParams } from '@ag-grid-community/core';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { RowNode } from '@ag-grid-community/core/dist/cjs/entities/rowNode';
 import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { RoleVO } from '@core';
 import { ACLService } from '@delon/acl';
-import { SFSchema } from '@delon/form';
+import { SFSchema, SFSchemaEnum, SFSelectWidgetSchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
 import { AclColDef, asFilterInputPropertiesUI, IFilter, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
-import { NzModalService } from 'ng-zorro-antd/modal';
-import { NzResizeEvent } from 'ng-zorro-antd/resizable';
+import { map } from 'rxjs/operators';
 import { SfQueryFormComponent } from '../../../shared/components/ngx-grid-table/sf-query-form/sf-query-form.component';
 import { DataSourceUtils } from '../../DataSourceUtils';
-import { SysRoleCreateComponent } from './modal/create.component';
-import { SysRoleEditComponent } from './modal/edit.component';
-import { SysRoleViewComponent } from './modal/view.component';
+import { SysConfigCreateComponent } from './modal/create.component';
+import { SysConfigEditComponent } from './modal/edit.component';
+import { SysConfigViewComponent } from './modal/view.component';
 
 @Component({
-  host: { class: 'flex flex-column flex-grow-1' },
-  selector: 'app-role',
-  templateUrl: './role.component.html',
+  selector: 'app-config',
+  templateUrl: './config.component.html',
 })
-export class SysRoleComponent implements OnInit {
+export class SysConfigComponent implements OnInit {
   // properties 的定义为 filter-input.widget.ts -> FilterInputUISchema 接口
   // id会转换为 { type: 'integer', title: 'id', ui: { widget: 'filter-input', filterType: 'number', options: ['equals'] } }
-  schema: SFSchema = asFilterInputPropertiesUI({
-    properties: {
-      id: { type: 'integer', title: 'id', ui: { options: ['equals'] } },
-      role: { type: 'string', title: '角色标识', ui: { options: ['contains'] } },
-      name: { type: 'string', title: '名称', ui: { options: ['contains'] } },
-      description: { type: 'string', title: '简介', ui: { options: ['contains'] } },
-      enabled: {
-        type: 'array',
-        title: '是否启用',
-        ui: {
-          options: ['in'],
-          selectValues: [
-            { label: '是', value: true },
-            { label: '否', value: false },
-          ],
+  schema: SFSchema = asFilterInputPropertiesUI(
+    {
+      properties: {
+        id: { type: 'integer', title: 'id', ui: { options: ['equals'] } },
+        code: { type: 'string', title: '编码', ui: { options: ['contains'] } },
+        value: { type: 'string', title: '值', ui: { options: ['contains'] } },
+        valueType: {
+          type: 'string',
+          title: '值类型',
+          ui: {
+            widget: 'select',
+            serverSearch: true,
+            searchDebounceTime: 300,
+            searchLoadingText: '搜索中...',
+            onSearch: (q) => {
+              return this.http
+                .get(`https://api.randomuser.me/?results=5&q=${q}`)
+                .pipe(map((res) => (res.results as any[]).map((i) => ({ label: i.email, value: i.email } as SFSchemaEnum))))
+                .toPromise();
+            },
+          } as SFSelectWidgetSchema,
         },
+        creator: { type: 'string', title: '创建人', ui: { options: ['contains'] } },
+        createdTime: { type: 'string', title: '创建时间', format: 'date-time', ui: { options: ['inRange'] } },
+        updater: { type: 'string', title: '更新人', ui: { options: ['contains'] } },
+        updatedTime: { type: 'string', title: '更新时间', format: 'date-time', ui: { options: ['inRange'] } },
       },
-      creator: { type: 'string', title: '创建人', ui: { options: ['contains'] } },
-      createdTime: { type: 'string', title: '创建时间', format: 'date-time', ui: { options: ['inRange'] } },
-      updater: { type: 'string', title: '更新人', ui: { options: ['contains'] } },
-      updatedTime: { type: 'string', title: '更新时间', format: 'date-time', ui: { options: ['inRange'] } },
+      required: ['text'],
+      ui: {
+        width: 275,
+        spanLabelFixed: 80,
+        optionShowType: 'symbol',
+        // aclTmpl: 'POST:/{}/OUT',
+        // acl: { ability: ['POST:/TEST0'] },
+      },
     },
-    required: ['text'],
-    ui: {
-      width: 275,
-      spanLabelFixed: 80,
-      optionShowType: 'symbol',
-      // aclTmpl: 'POST:/{}/OUT',
-      // acl: { ability: ['POST:/TEST0'] },
-    },
-  });
+    'valueType',
+  ); //valueType 不转成filter-input
 
   // 表格配置
   columnDefs: AclColDef[] = [
     // { headerName: 'testACL', field: 'testACL', acl: { ability: ['POST:/TEST'] } }, //加上acl后只有符合权限的才展示出来
     // { headerName: 'group', field: 'typeGroup', enableRowGroup: true }, // 需要分组查询，则将 enableRowGroup设置为true
     { headerName: 'id', field: 'id', sort: 'desc', sortable: true, checkboxSelection: true, headerCheckboxSelection: true },
-    { headerName: '角色标识', field: 'role' },
-    { headerName: '名称', field: 'name' },
-    { headerName: '简介', field: 'description' },
-    { headerName: '是否启用', field: 'enabled' },
+    { headerName: '编码', field: 'code' },
+    { headerName: '值', field: 'value' },
+    { headerName: '值类型', field: 'valueType' },
     { headerName: '创建人', field: 'creator' },
     { headerName: '创建时间', field: 'createdTime' },
     { headerName: '更新人', field: 'updater' },
@@ -73,13 +77,7 @@ export class SysRoleComponent implements OnInit {
 
   gridOptions: GridOptions;
 
-  dataSource: IGridDataSource<RoleVO>;
-
-  assignRole: RoleVO | null = null;
-
-  resizeId = -1;
-
-  height: string | number = '70%';
+  dataSource: IGridDataSource<any>;
 
   @ViewChild(NgxGridTableComponent)
   table!: NgxGridTableComponent;
@@ -88,7 +86,7 @@ export class SysRoleComponent implements OnInit {
     this.gridOptions = {
       enableCharts: false,
       columnDefs: this.columnDefs,
-      enableRangeSelection: true, // 范围选择
+      enableRangeSelection: true,
       getRowNodeId: (data) => {
         return data.id;
       },
@@ -96,7 +94,7 @@ export class SysRoleComponent implements OnInit {
         event.columnApi.autoSizeAllColumns();
       },
     };
-    this.dataSource = DataSourceUtils.rowQuery(http, '/api/role/query', (r) => r);
+    this.dataSource = DataSourceUtils.rowQuery(http, '/api/config/query', (r) => r);
   }
 
   ngOnInit(): void {}
@@ -106,11 +104,12 @@ export class SysRoleComponent implements OnInit {
     this.table.addMenu({
       name: 'test',
       show: 'selected',
-      acl: { ability: ['role:delete'] },
+      acl: { ability: ['config:delete'] },
       callback: (selected) => {
         console.log(selected);
       },
     });
+    // 按每列内容重新分配列宽
     this.table.columnApi.autoSizeAllColumns();
   }
 
@@ -127,74 +126,52 @@ export class SysRoleComponent implements OnInit {
    * @result 返回处理后的查询条件数组。
    */
   filterHand(filter: IFilter[], sf: SfQueryFormComponent): IFilter[] {
-    //不做任何处理，直接返回表格生成的filter对象数组。
-    return filter;
+    const v = sf.value.dictType;
+
+    return [
+      {
+        field: 'dictType',
+        filterType: 'text',
+        option: 'equals',
+        value: v,
+      } as IFilter,
+      ...filter,
+    ];
   }
 
-  onPageIndexChange(index: number): void {
-    console.log(index);
-  }
+  onPageIndexChange(index: number): void {}
 
   onCreate(): void {
     this.modal
       .create({
-        nzContent: SysRoleCreateComponent,
+        nzContent: SysConfigCreateComponent,
         nzFooter: null,
         nzMaskClosable: false,
       })
-      .afterClose.subscribe((res) => {
-        if (res.result.success) {
-          this.table.refresh();
-        }
-        if (res.assign) {
-          this.openAssignResources(res.result.data);
-        }
+      .afterClose.subscribe((result) => {
+        this.table.refresh();
       });
   }
 
   onEdit(cell: ICellRendererParams, row: RowNode): void {
     this.modal
       .create({
-        nzContent: SysRoleEditComponent,
-        nzFooter: null,
+        nzContent: SysConfigEditComponent,
         nzComponentParams: { record: row.data },
+        nzFooter: null,
         nzMaskClosable: false,
       })
       .afterClose.subscribe((result) => {
-        if (result.success) {
-          this.table.refresh();
-        }
+        this.table.refresh();
       });
   }
 
   onView(cell: ICellRendererParams, row: RowNode): void {
     this.modal.create({
-      nzContent: SysRoleViewComponent,
-      nzFooter: null,
+      nzContent: SysConfigViewComponent,
       nzComponentParams: { record: row.data },
+      nzFooter: null,
       nzMaskClosable: true,
-    });
-  }
-
-  onAssign(cell: ICellRendererParams, row: RowNode): void {
-    this.openAssignResources(row.data);
-  }
-
-  openAssignResources(role: RoleVO) {
-    this.assignRole = role;
-  }
-
-  closeAssignResources(): void {
-    this.assignRole = null;
-  }
-
-  onResize($event: NzResizeEvent) {
-    cancelAnimationFrame(this.resizeId);
-    this.resizeId = requestAnimationFrame(() => {
-      let { height } = $event;
-      if (height) {
-        this.height = height;
-      }
     });
   }
 }

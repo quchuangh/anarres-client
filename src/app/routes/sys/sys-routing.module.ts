@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { SysConfigComponent } from './config/config.component';
+import { SysDictComponent } from './dict/dict.component';
 
 import { SysFileManagerComponent } from './file-manager/file-manager.component';
 import { SysI18nComponent } from './i18n/i18n.component';
@@ -21,6 +23,8 @@ const routes: Routes = [
   { path: 'log', component: SysLogComponent },
   { path: 'file-manager', component: SysFileManagerComponent },
   { path: 'i18n', component: SysI18nComponent },
+  { path: 'config', component: SysConfigComponent },
+  { path: 'dict', component: SysDictComponent },
 ];
 
 @NgModule({

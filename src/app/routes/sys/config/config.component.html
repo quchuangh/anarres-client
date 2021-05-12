@@ -31,7 +31,7 @@
 <ng-template #topToolPanel let-table let-page="page">
   <ngx-table-tool-bar [center]="['search', 'reset']" [left]="['data-mode']" [table]="table" [page]="page">
     <div right>
-      <button nz-button acl [acl-ability]="'role:create'" nzSize="small" nzType="primary" (click)="onCreate()">新增</button>
+      <button nz-button acl [acl-ability]="'config:create'" nzSize="small" nzType="primary" (click)="onCreate()">新增</button>
     </div>
   </ngx-table-tool-bar>
 </ng-template>
@@ -40,7 +40,7 @@
 <ng-template #bottomToolPanel let-table let-page="page">
   <ngx-table-tool-bar [left]="['full']" [right]="['page']" [page]="page" [table]="table">
     <div left>
-      <button nz-button acl [acl-ability]="'role:export'" nzSize="small" nzType="primary" (click)="this.table.exportAllPageData()">
+      <button nz-button acl [acl-ability]="'config:export'" nzSize="small" nzType="primary" (click)="this.table.exportAllPageData()">
         <i nz-icon nzType="file-excel" nzTheme="outline"></i>导出
       </button>
     </div>
@@ -49,22 +49,6 @@
 
 <!-- cell 和 row对应的是 TemplateRendererComponent 中的 \$implicit(默认值ICellRendererParams对象) 和 row（RowNode对象） -->
 <ng-template #option let-cell let-row="row">
-  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'role:read'" (click)="onView(cell, row)">详细</button>
-  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'role:update'" (click)="onEdit(cell, row)">编辑</button>
-  <button nz-button nzSize="small" nzType="primary" acl [acl-ability]="'role:assign'" (click)="onAssign(cell, row)">授权</button>
+  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'config:read'" (click)="onView(cell, row)">详情</button>
+  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'config:update'" (click)="onEdit(cell, row)">编辑</button>
 </ng-template>
-
-<nz-drawer
-  (nzOnClose)="closeAssignResources()"
-  [nzBodyStyle]="{ padding: 0 }"
-  [nzHeight]="height"
-  [nzVisible]="!!assignRole"
-  nzClosable="false"
-  nzPlacement="bottom"
-  nzWrapClassName="role-assign-ability-drawer"
->
-  <div (nzResize)="onResize($event)" [nzMinHeight]="200" class="drawer-body" nz-resizable nzBounds="window">
-    <nz-resize-handles [nzDirections]="['top']"></nz-resize-handles>
-    <app-assign-role *ngIf="assignRole" (onClose)="closeAssignResources()" [role]="assignRole"> </app-assign-role>
-  </div>
-</nz-drawer>

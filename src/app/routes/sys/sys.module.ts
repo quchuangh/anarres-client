@@ -5,6 +5,19 @@ import { NumberOutline, FileOutline, FunctionOutline } from '@ant-design/icons-a
 
 import { SharedModule } from '@shared';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { SysConfigComponent } from './config/config.component';
+import { SysConfigCreateComponent } from './config/modal/create.component';
+import { SysConfigEditComponent } from './config/modal/edit.component';
+import { SysConfigViewComponent } from './config/modal/view.component';
+import { SysDictComponent } from './dict/dict.component';
+import { SysDictItemComponent } from './dict/item/dict-item.component';
+import { SysDictItemCreateComponent } from './dict/item/modal/create.component';
+import { SysDictItemEditComponent } from './dict/item/modal/edit.component';
+import { SysDictItemViewComponent } from './dict/item/modal/view.component';
+import { SysDictAddItemComponent } from './dict/modal/add-item.component';
+import { SysDictCreateComponent } from './dict/modal/create.component';
+import { SysDictEditComponent } from './dict/modal/edit.component';
+import { SysDictViewComponent } from './dict/modal/view.component';
 import { SysI18nComponent } from './i18n/i18n.component';
 import { SysRolesAbilityCellRendererComponent } from './role/modal/assign/table/ability-cell-renderer/ability-cell-renderer.component';
 import { SysRoleAssignComponent } from './role/modal/assign/assign.component';
@@ -36,6 +49,8 @@ const COMPONENTS: Type<void>[] = [
   SysLogComponent,
   SysRoleComponent,
   SysFileManagerComponent,
+  SysConfigComponent,
+  SysDictComponent,
 ];
 
 const COMPONENTS_NOROUNT: Type<void>[] = [
@@ -46,6 +61,20 @@ const COMPONENTS_NOROUNT: Type<void>[] = [
   SysRoleAssignAbilityTableComponent,
   SysRoleAssignAbilityTreeComponent,
   SysRolesAbilityCellRendererComponent,
+
+  SysConfigViewComponent,
+  SysConfigCreateComponent,
+  SysConfigEditComponent,
+
+  SysDictViewComponent,
+  SysDictEditComponent,
+  SysDictCreateComponent,
+  SysDictAddItemComponent,
+
+  SysDictItemCreateComponent,
+  SysDictItemEditComponent,
+  SysDictItemViewComponent,
+  SysDictItemComponent,
 ];
 
 @NgModule({

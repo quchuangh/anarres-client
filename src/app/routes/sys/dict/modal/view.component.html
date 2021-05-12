@@ -1,0 +1,9 @@
+<div class="modal-header">
+  <div class="modal-title">查看-字典类型;({{ record.id }})</div>
+</div>
+
+<sf #sf [schema]="schema" [formData]="record" button="none" mode="edit">
+  <div class="modal-footer">
+    <button (click)="close()" nz-button type="button">关闭</button>
+  </div>
+</sf>

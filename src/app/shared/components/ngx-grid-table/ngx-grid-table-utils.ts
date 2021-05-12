@@ -4,59 +4,60 @@ import { SFSchema, SFUISchema } from '@delon/form';
 import { FilterInputUISchema } from '../../json-schema/widgets/filter-input-widget/filter-input.widget';
 import { DATE_FILTERS, NUMBER_FILTERS, SET_FILTERS, TEXT_FILTERS } from '../filter-input';
 
-export function asFilterInputPropertiesUI(properties: { [key: string]: SFSchema }, ...ignores: string[]): { [key: string]: SFSchema } {
-  Object.keys(properties).forEach((key: string) => {
-    if (-1 == ignores.indexOf(key)) {
+export function asFilterInputPropertiesUI(schema: SFSchema, ...ignores: string[]): SFSchema {
+  if (!schema.properties) {
+    return schema;
+  }
+
+  Object.keys(schema.properties).forEach((key: string) => {
+    if (-1 !== ignores.indexOf(key)) {
       return;
     }
-    const value = properties[key] as SFSchema;
-    asFilterInputSchemaUI(value);
-  });
+    // @ts-ignore
+    const value = schema.properties[key] as SFSchema;
 
-  return properties;
-}
+    const oldUI = value.ui ? value.ui : {};
 
-export function asFilterInputSchemaUI(schema: SFSchema): void {
-  const oldUI = schema.ui ? schema.ui : {};
-
-  let newUI;
-  switch (schema.type) {
-    case 'integer':
-    case 'number':
-      newUI = { filterType: 'number', options: NUMBER_FILTERS };
-      break;
-    case 'string':
-      if (schema.format && schema.format.startsWith('date')) {
-        newUI = { filterType: 'date', options: DATE_FILTERS };
+    let newUI;
+    switch (value.type) {
+      case 'integer':
+      case 'number':
+        newUI = { filterType: 'number', options: NUMBER_FILTERS };
         break;
-      } else {
+      case 'string':
+        if (value.format && value.format.startsWith('date')) {
+          newUI = { filterType: 'date', options: DATE_FILTERS };
+          break;
+        } else {
+          newUI = { filterType: 'text', options: TEXT_FILTERS };
+          break;
+        }
+      case 'array':
+      case 'boolean':
+        newUI = { filterType: 'set', options: SET_FILTERS };
+        value.type = 'string';
+        break;
+      default:
         newUI = { filterType: 'text', options: TEXT_FILTERS };
         break;
-      }
-    case 'array':
-    case 'boolean':
-      newUI = { filterType: 'set', options: SET_FILTERS };
-      schema.type = 'string';
-      break;
-    default:
-      newUI = { filterType: 'text', options: TEXT_FILTERS };
-      break;
-  }
+    }
 
-  if (schema.ui && typeof schema.ui !== 'string') {
-    const ui = schema.ui;
-    if (ui.optionShowType) {
+    if (schema.ui && typeof schema.ui !== 'string') {
+      const ui = schema.ui;
+      if (ui.optionShowType) {
+        // @ts-ignore
+        value.ui = { widget: 'filter-input', optionShowType: ui.optionShowType, ...newUI, ...oldUI };
+      }
+      if (ui.aclTmpl) {
+        // @ts-ignore
+        value.ui = { acl: { ability: [ui.aclTmpl.replace('{}', key)] }, ...value.ui };
+      }
+    } else {
       // @ts-ignore
-      value.ui = { widget: 'filter-input', optionShowType: ui.optionShowType, ...newUI, ...oldUI };
+      value.ui = { widget: 'filter-input', optionShowType: 'symbol', ...newUI, ...oldUI };
     }
-    if (ui.aclTmpl) {
-      // @ts-ignore
-      value.ui = { acl: { ability: [ui.aclTmpl.replace('{}', key)] }, ...value.ui };
-    }
-  } else {
-    // @ts-ignore
-    value.ui = { widget: 'filter-input', optionShowType: 'symbol', ...newUI, ...oldUI };
-  }
+  });
+  return schema;
 }
 
 export function deepEach(columnDefs: (ColDef | ColGroupDef)[], each: (col: ColDef) => void): void {
