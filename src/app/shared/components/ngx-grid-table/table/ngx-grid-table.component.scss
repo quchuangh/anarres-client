@@ -8,6 +8,24 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+
+    ::ng-deep {
+      ngx-table-footer,
+      ngx-table-header {
+        display: flex;
+        flex-grow: 0;
+        flex-shrink: 1;
+        justify-content: space-between;
+        background-color: #f5f7f7;
+        border: 1px solid #bdc3c7;
+      }
+      ngx-table-footer {
+        border-top: none;
+      }
+      ngx-table-header {
+        border-bottom: none;
+      }
+    }
     .grid-bar {
       background-color: #f5f7f7;
       border: 1px solid #bdc3c7;
@@ -36,11 +54,6 @@
       max-height: 220px;
       overflow-y: auto;
     }
-  }
-
-  .footer {
-    background: #f6f7f7;
-    user-select: none;
   }
 
   .statistics-bar {

@@ -4,9 +4,7 @@
       <sf-query-form *ngIf="searchSchema" [searchSchema]="searchSchema" [searchFormData]="initFormData"></sf-query-form>
     </div>
     <!-- 表格头 -->
-    <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-      <ng-content select="ngx-table-header"></ng-content>
-    </div>
+    <ng-content select="ngx-table-header"></ng-content>
     <!-- 工具栏 -->
     <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap grid-bar top">
       <ng-container
@@ -41,9 +39,8 @@
       ></ng-container>
     </div>
     <!-- 页脚 -->
-    <div class="footer flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-      <ng-content select="ngx-table-footer"> </ng-content>
-    </div>
+
+    <ng-content select="ngx-table-footer"> </ng-content>
   </div>
 </full-content>
 
