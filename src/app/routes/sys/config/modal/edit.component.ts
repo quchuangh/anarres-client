@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { _HttpClient } from '@delon/theme';
-import { SFSchema } from '@delon/form';
+import { SFSchema, SFSchemaEnum, SFSelectWidgetSchema } from '@delon/form';
 
 @Component({
   selector: 'app-edit-config',
@@ -13,6 +13,9 @@ export class SysConfigEditComponent implements OnInit {
 
   @Input()
   record: any;
+
+  @Input()
+  valueRegexSearcher!: (q: string) => Promise<Array<SFSchemaEnum>>;
 
   schema: SFSchema = {
     properties: {
@@ -40,17 +43,16 @@ export class SysConfigEditComponent implements OnInit {
           },
         },
       },
-      dictType: {
+      valueRegex: {
         type: 'string',
-        title: '字典类型编号',
-        pattern: '^\\w+$',
+        title: '值校验',
+        default: '.*',
         ui: {
-          widget: 'string',
-          placeholder: '角色唯一标识,不可重复,由字母,下划线,数字组合',
-          errors: {
-            pattern: '仅支持输入字母、下划线、数字',
-          },
-        },
+          placeholder: '值校验',
+          widget: 'select',
+          serverSearch: true,
+          onSearch: this.valueRegexSearcher,
+        } as SFSelectWidgetSchema,
       },
     },
     required: ['code', 'value', 'dict_type'],

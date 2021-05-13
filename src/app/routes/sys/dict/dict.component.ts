@@ -145,23 +145,10 @@ export class SysDictComponent implements OnInit {
 
   onPageIndexChange(index: number): void {}
 
-  valueRegexSearcher(q: string): Promise<Array<SFSchemaEnum>> {
-    const r = { label: q, value: q } as SFSchemaEnum;
-    return of([
-      { label: '任意', value: '.*' },
-      { label: '整数', value: 'n' },
-      { label: '小数', value: 'xs' },
-      { label: '字符', value: 'str' },
-      { label: '布尔', value: 'bool' },
-      r,
-    ]).toPromise();
-  }
-
   onCreate(): void {
     this.modal
       .create({
         nzContent: SysDictCreateComponent,
-        nzComponentParams: { valueRegexSearcher: this.valueRegexSearcher },
         nzFooter: null,
         nzMaskClosable: false,
       })
@@ -188,7 +175,7 @@ export class SysDictComponent implements OnInit {
     this.modal
       .create({
         nzContent: SysDictEditComponent,
-        nzComponentParams: { record: row.data, valueRegexSearcher: this.valueRegexSearcher },
+        nzComponentParams: { record: row.data },
         nzFooter: null,
         nzMaskClosable: false,
       })

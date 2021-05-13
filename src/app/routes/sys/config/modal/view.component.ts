@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NzModalRef } from 'ng-zorro-antd/modal';
-import { SFSchema } from '@delon/form';
+import { SFSchema, SFSchemaEnum } from '@delon/form';
 
 @Component({
   selector: 'app-view-config',

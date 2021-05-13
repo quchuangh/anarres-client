@@ -11,9 +11,6 @@ import { NzModalRef } from 'ng-zorro-antd/modal';
 export class SysDictCreateComponent implements OnInit {
   rolePrefix = 'dictType:';
 
-  @Input()
-  valueRegexSearcher!: (q: string) => Promise<Array<SFSchemaEnum>>;
-
   schema: SFSchema = {
     properties: {
       code: {

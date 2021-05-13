@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { _HttpClient } from '@delon/theme';
-import { SFSchema, SFSchemaEnum } from '@delon/form';
+import { SFSchema, SFSchemaEnum, SFSelectWidgetSchema } from '@delon/form';
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -11,6 +11,9 @@ import { map } from 'rxjs/operators';
 })
 export class SysConfigCreateComponent implements OnInit {
   rolePrefix = 'config:';
+
+  @Input()
+  valueRegexSearcher!: (q: string) => Promise<Array<SFSchemaEnum>>;
 
   schema: SFSchema = {
     properties: {
@@ -38,22 +41,16 @@ export class SysConfigCreateComponent implements OnInit {
           },
         },
       },
-      valueType: {
+      valueRegex: {
         type: 'string',
-        title: '字典类型编号',
-        pattern: '^\\w+$',
+        title: '值校验',
+        default: '.*',
         ui: {
+          placeholder: '值校验',
           widget: 'select',
           serverSearch: true,
-          searchDebounceTime: 300,
-          searchLoadingText: '搜索中...',
-          onSearch: (q: string) => {
-            return this.http
-              .get(`/api/dict/all?like=${q}`)
-              .pipe(map((dictTypes: any[]) => dictTypes.map((item) => ({ label: item.code, value: item } as SFSchemaEnum))))
-              .toPromise();
-          },
-        },
+          onSearch: this.valueRegexSearcher,
+        } as SFSelectWidgetSchema,
       },
     },
     required: ['code', 'value', 'dict_type'],

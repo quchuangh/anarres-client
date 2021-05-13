@@ -1,5 +1,4 @@
 import { GridOptions, GridReadyEvent, ICellRendererParams } from '@ag-grid-community/core';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { RowNode } from '@ag-grid-community/core/dist/cjs/entities/rowNode';
 import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events';
 import { Component, OnInit, ViewChild } from '@angular/core';
@@ -7,7 +6,8 @@ import { ACLService } from '@delon/acl';
 import { SFSchema, SFSchemaEnum, SFSelectWidgetSchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
 import { AclColDef, asFilterInputPropertiesUI, IFilter, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
-import { map } from 'rxjs/operators';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { of } from 'rxjs';
 import { SfQueryFormComponent } from '../../../shared/components/ngx-grid-table/sf-query-form/sf-query-form.component';
 import { DataSourceUtils } from '../../DataSourceUtils';
 import { SysConfigCreateComponent } from './modal/create.component';
@@ -24,25 +24,8 @@ export class SysConfigComponent implements OnInit {
   schema: SFSchema = asFilterInputPropertiesUI(
     {
       properties: {
-        id: { type: 'integer', title: 'id', ui: { options: ['equals'] } },
         code: { type: 'string', title: '编码', ui: { options: ['contains'] } },
         value: { type: 'string', title: '值', ui: { options: ['contains'] } },
-        valueType: {
-          type: 'string',
-          title: '值类型',
-          ui: {
-            widget: 'select',
-            serverSearch: true,
-            searchDebounceTime: 300,
-            searchLoadingText: '搜索中...',
-            onSearch: (q) => {
-              return this.http
-                .get(`https://api.randomuser.me/?results=5&q=${q}`)
-                .pipe(map((res) => (res.results as any[]).map((i) => ({ label: i.email, value: i.email } as SFSchemaEnum))))
-                .toPromise();
-            },
-          } as SFSelectWidgetSchema,
-        },
         creator: { type: 'string', title: '创建人', ui: { options: ['contains'] } },
         createdTime: { type: 'string', title: '创建时间', format: 'date-time', ui: { options: ['inRange'] } },
         updater: { type: 'string', title: '更新人', ui: { options: ['contains'] } },
@@ -53,12 +36,10 @@ export class SysConfigComponent implements OnInit {
         width: 275,
         spanLabelFixed: 80,
         optionShowType: 'symbol',
-        // aclTmpl: 'POST:/{}/OUT',
-        // acl: { ability: ['POST:/TEST0'] },
       },
     },
-    'valueType',
-  ); //valueType 不转成filter-input
+    'valueRegex',
+  ); //valueRegex 不转成filter-input
 
   // 表格配置
   columnDefs: AclColDef[] = [
@@ -67,7 +48,7 @@ export class SysConfigComponent implements OnInit {
     { headerName: 'id', field: 'id', sort: 'desc', sortable: true, checkboxSelection: true, headerCheckboxSelection: true },
     { headerName: '编码', field: 'code' },
     { headerName: '值', field: 'value' },
-    { headerName: '值类型', field: 'valueType' },
+    { headerName: '值类型', field: 'valueRegex' },
     { headerName: '创建人', field: 'creator' },
     { headerName: '创建时间', field: 'createdTime' },
     { headerName: '更新人', field: 'updater' },
@@ -99,10 +80,22 @@ export class SysConfigComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  valueRegexSearcher(q: string): Promise<Array<SFSchemaEnum>> {
+    const r = { label: q, value: q } as SFSchemaEnum;
+    return of([
+      { label: '任意', value: '.*' },
+      { label: '整数', value: 'n' },
+      { label: '小数', value: 'xs' },
+      { label: '字符', value: 'str' },
+      { label: '布尔', value: 'bool' },
+      r,
+    ]).toPromise();
+  }
+
   onGridReady(e: { event: GridReadyEvent; gridTable: NgxGridTableComponent }): void {
     // 添加右键菜单
     this.table.addMenu({
-      name: 'test',
+      name: '删除',
       show: 'selected',
       acl: { ability: ['config:delete'] },
       callback: (selected) => {
@@ -126,17 +119,18 @@ export class SysConfigComponent implements OnInit {
    * @result 返回处理后的查询条件数组。
    */
   filterHand(filter: IFilter[], sf: SfQueryFormComponent): IFilter[] {
-    const v = sf.value.dictType;
-
-    return [
-      {
-        field: 'dictType',
-        filterType: 'text',
-        option: 'equals',
-        value: v,
-      } as IFilter,
-      ...filter,
-    ];
+    // const v = sf.value.valueRegex;
+    //
+    // return [
+    //   {
+    //     field: 'valueRegex',
+    //     filterType: 'text',
+    //     option: 'equals',
+    //     value: v,
+    //   } as IFilter,
+    //   ...filter,
+    // ];
+    return filter;
   }
 
   onPageIndexChange(index: number): void {}
@@ -145,6 +139,7 @@ export class SysConfigComponent implements OnInit {
     this.modal
       .create({
         nzContent: SysConfigCreateComponent,
+        nzComponentParams: { valueRegexSearcher: this.valueRegexSearcher },
         nzFooter: null,
         nzMaskClosable: false,
       })
@@ -157,7 +152,7 @@ export class SysConfigComponent implements OnInit {
     this.modal
       .create({
         nzContent: SysConfigEditComponent,
-        nzComponentParams: { record: row.data },
+        nzComponentParams: { record: row.data, valueRegexSearcher: this.valueRegexSearcher },
         nzFooter: null,
         nzMaskClosable: false,
       })
