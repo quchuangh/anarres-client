@@ -1,9 +1,10 @@
+import { SideBarDef } from '@ag-grid-community/core/dist/cjs/entities/sideBar';
 import { PaginationCfg } from '@shared';
 import { LoadingOverlayComponent } from './inner-tags/loading-overlay/loading-overlay.component';
 import { NoRowOverlayComponent } from './inner-tags/no-row-overlay.component';
 
 export class NgxGridTableConstants {
-  static DEFAULT_SIDE_BAR = {
+  static DEFAULT_SIDE_BAR: SideBarDef = {
     toolPanels: [
       {
         id: 'columns',

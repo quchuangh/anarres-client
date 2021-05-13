@@ -233,14 +233,17 @@ function checkACL(columnDefs: (ColDef | ColGroupDef)[], acl: ACLService): void {
 export function buildSideBar(gridOptions: GridOptions): void {
   const sideBar = JSON.parse(JSON.stringify(NgxGridTableConstants.DEFAULT_SIDE_BAR));
   if (gridOptions.sideBar) {
-    let toolPanels = sideBar.toolPanels;
-    if (typeof gridOptions.sideBar === 'string') {
+    if (gridOptions.sideBar === 'default') {
+      gridOptions.sideBar = sideBar;
+    } else if (typeof gridOptions.sideBar === 'string') {
       // todo 整合
     } else if (typeof gridOptions.sideBar === 'boolean') {
       // todo 整合
     } else {
+      let toolPanels = sideBar.toolPanels;
       toolPanels = toolPanels.concat(gridOptions.sideBar.toolPanels || []);
       gridOptions.sideBar = { ...NgxGridTableConstants.DEFAULT_SIDE_BAR, ...gridOptions.sideBar, toolPanels };
+      gridOptions.sideBar.hiddenByDefault = true;
     }
   }
 }

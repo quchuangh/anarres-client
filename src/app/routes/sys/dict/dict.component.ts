@@ -83,7 +83,8 @@ export class SysDictComponent implements OnInit {
 
   constructor(private http: _HttpClient, private aclService: ACLService, private message: NzMessageService, private modal: NzModalService) {
     this.gridOptions = {
-      enableCharts: false,
+      enableCharts: true,
+      sideBar: 'default',
       columnDefs: this.columnDefs,
       enableRangeSelection: true,
       getRowNodeId: this.idGetter,
