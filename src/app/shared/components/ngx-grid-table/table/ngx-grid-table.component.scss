@@ -8,6 +8,16 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    .grid-bar {
+      background-color: #f5f7f7;
+      border: 1px solid #bdc3c7;
+      &.bottom {
+        border-top: none;
+      }
+      &.top {
+        border-bottom: none;
+      }
+    }
   }
 
   .grid {
@@ -28,21 +38,14 @@
     }
   }
 
-  .footer,
-  .statistics-bar {
-    padding: 5px 10px;
-    border: 1px solid #bdc3c7;
-    border-top: none;
-  }
-
   .footer {
     background: #f6f7f7;
     user-select: none;
   }
 
   .statistics-bar {
-    background: white;
     padding: 5px 16px;
+    background: white;
   }
 
   .grid-footer {

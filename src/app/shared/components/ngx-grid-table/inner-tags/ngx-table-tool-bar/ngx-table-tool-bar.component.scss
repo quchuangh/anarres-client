@@ -1,28 +1,31 @@
-.grid-search-action {
-  border: 1px solid #bdc3c7;
-  border-bottom: 0;
-  background-color: #f5f7f7;
-  height: 32px;
-  padding: 0 4px 0 15px;
-  min-height: 32px;
+.bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 32px;
+  min-height: 32px;
+  padding: 0 4px 0 15px;
 
-  .search-panel-left,
-  .search-panel-right {
+  div[class^='bar-'] {
+    ::ng-deep > * {
+      margin-right: 5px;
+    }
+  }
+
+  .bar-left,
+  .bar-right {
+    display: flex;
     flex-grow: 1;
     flex-shrink: 0;
-    display: flex;
     align-items: center;
     max-width: 100%;
   }
 
-  .search-panel-center {
+  .bar-center {
     max-width: 100%;
   }
 
-  .search-panel-right {
+  .bar-right {
     justify-content: flex-end;
   }
 }
