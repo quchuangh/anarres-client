@@ -1,0 +1,50 @@
+@item-label-width: 80px; //控制label的宽度,为了美观采用固定宽度对齐
+.grid-header-search {
+  margin: 0 5px;
+  padding-bottom: 5px;
+  ::ng-deep {
+    .ant-form .ant-row,
+    .ant-form sf-object {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+
+      > sf-item {
+        margin-bottom: 0;
+        padding-top: 5px;
+        padding-bottom: 0;
+      }
+
+      .ant-form-item {
+        margin-bottom: 0;
+        .ant-form-item-label {
+          flex: 0 1 @item-label-width;
+        }
+      }
+
+      @media (max-width: 767px) {
+        & > [nz-col],
+        & > sf-item {
+          width: 50%;
+        }
+
+        & > [nz-col]:nth-child(even),
+        & > sf-item:nth-child(even) {
+          padding-left: 5px;
+        }
+
+        & > [nz-col]:nth-child(odd),
+        & > sf-item:nth-child(odd) {
+          padding-right: 5px;
+        }
+      }
+      @media (max-width: 576px) {
+        & > [nz-col],
+        & > sf-item {
+          width: 100%;
+          padding: 0 !important;
+        }
+      }
+    }
+  }
+}

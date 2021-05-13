@@ -1,3 +1,5 @@
+$grid-bar-background: #f5f7f7;
+$grid-bar-border: 1px solid #bdc3c7;
 :host {
   display: flex;
   flex-direction: column;
@@ -8,7 +10,6 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-
     ::ng-deep {
       ngx-table-footer,
       ngx-table-header {
@@ -16,8 +17,8 @@
         flex-grow: 0;
         flex-shrink: 1;
         justify-content: space-between;
-        background-color: #f5f7f7;
-        border: 1px solid #bdc3c7;
+        background-color: $grid-bar-background;
+        border: $grid-bar-border;
       }
       ngx-table-footer {
         border-top: none;
@@ -27,8 +28,8 @@
       }
     }
     .grid-bar {
-      background-color: #f5f7f7;
-      border: 1px solid #bdc3c7;
+      background-color: $grid-bar-background;
+      border: $grid-bar-border;
       &.bottom {
         border-top: none;
       }
@@ -42,61 +43,9 @@
     flex-grow: 1;
   }
 
-  .grid-header-search {
-    border: 1px solid #bdc3c7;
-    border-bottom: 0;
-    background: white;
-    padding: 5px 10px;
-  }
-
-  @media (max-width: 576px) {
-    .grid-header-search {
-      max-height: 220px;
-      overflow-y: auto;
-    }
-  }
-
   .statistics-bar {
     padding: 5px 16px;
     background: white;
-  }
-
-  .grid-footer {
-    width: 100%;
-    min-height: 28px;
-    flex-grow: 0;
-    flex-shrink: 1;
-  }
-
-  ::ng-deep .grid-table.grid {
-    .ag-status-bar {
-      border-bottom: 0;
-      box-shadow: inset 0 -1px 0 0 #bdc3c7;
-    }
-    .cell-text-right {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    a.cell-action-item {
-      margin-top: 2px;
-      margin-right: 5px;
-      padding: 0 6px;
-      line-height: 20px;
-      border-radius: 5px;
-
-      &.ant-btn-default {
-        color: rgba(0, 0, 0, 0.65);
-        background-color: rgb(255, 255, 255);
-        border: 0.5px solid #d9d9d9;
-        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.12);
-        box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
-      }
-
-      &.ant-btn-dashed {
-        border-width: 1px;
-      }
-    }
   }
 
   ::ng-deep .grid-table.grid:not(.has-status-bar) {
@@ -110,8 +59,8 @@
     display: flex;
     flex-wrap: wrap;
     > sf-item {
-      padding-bottom: 5px;
       padding-top: 5px;
+      padding-bottom: 5px;
     }
     .ant-form-item {
       margin-bottom: 8px;
