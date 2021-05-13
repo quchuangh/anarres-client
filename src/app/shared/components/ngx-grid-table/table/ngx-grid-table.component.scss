@@ -4,6 +4,12 @@
   flex-grow: 1;
   min-height: 200px;
 
+  .container-inline {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
   .grid {
     flex-grow: 1;
   }

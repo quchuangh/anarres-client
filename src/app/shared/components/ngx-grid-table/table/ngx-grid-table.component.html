@@ -1,46 +1,47 @@
-<full-content [(fullscreen)]="fullscreen" class="flex flex-column flex-grow-1" [ngStyle]="{ 'margin-top': fullscreen ? '-70px' : '0' }">
-  <sf-query-form *ngIf="searchSchema" [searchSchema]="searchSchema" [searchFormData]="initFormData"></sf-query-form>
-
-  <!-- 表格头 -->
-  <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-    <ng-content select="ngx-table-header"></ng-content>
-  </div>
-  <!-- 工具栏 -->
-  <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-    <ng-container
-      [ngTemplateOutlet]="topToolPanel"
-      [ngTemplateOutletContext]="{ $implicit: this, page: this.defaultPageTmpl }"
-    ></ng-container>
-  </div>
-  <!-- 表格 -->
-  <ag-grid-angular
-    *ngIf="__show__"
-    [class]="gridTheme"
-    [modules]="allModules"
-    [gridOptions]="gridOptions"
-    [groupSelectsChildren]="groupSelectsChildren"
-    [ngClass]="gridTableClass"
-    [ngStyle]="gridTableStyle"
-    class="grid-table grid"
-  >
-  </ag-grid-angular>
-  <!--  统计栏  -->
-  <div
-    *ngIf="showStatistics && columnApi && statistics && statistics.length"
-    class="statistics-bar flex flex-grow-0 flex-shrink-1 justify-end flex-wrap"
-  >
-    <ngx-table-statistics-bar [statistics]="statistics"></ngx-table-statistics-bar>
-  </div>
-  <!-- 下工具栏 -->
-  <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-    <ng-container
-      [ngTemplateOutlet]="bottomToolPanel"
-      [ngTemplateOutletContext]="{ $implicit: this, page: defaultPageTmpl }"
-    ></ng-container>
-  </div>
-  <!-- 页脚 -->
-  <div class="footer flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
-    <ng-content select="ngx-table-footer"></ng-content>
+<full-content [(fullscreen)]="fullscreen" class="flex flex-column flex-grow-1">
+  <div class="container-inline">
+    <sf-query-form *ngIf="searchSchema" [searchSchema]="searchSchema" [searchFormData]="initFormData"></sf-query-form>
+    <!-- 表格头 -->
+    <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
+      <ng-content select="ngx-table-header"></ng-content>
+    </div>
+    <!-- 工具栏 -->
+    <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
+      <ng-container
+        [ngTemplateOutlet]="topToolPanel"
+        [ngTemplateOutletContext]="{ $implicit: this, page: this.defaultPageTmpl }"
+      ></ng-container>
+    </div>
+    <!-- 表格 -->
+    <ag-grid-angular
+      *ngIf="__show__"
+      [class]="gridTheme"
+      [modules]="allModules"
+      [gridOptions]="gridOptions"
+      [groupSelectsChildren]="groupSelectsChildren"
+      [ngClass]="gridTableClass"
+      [ngStyle]="gridTableStyle"
+      class="grid-table grid"
+    >
+    </ag-grid-angular>
+    <!--  统计栏  -->
+    <div
+      *ngIf="showStatistics && columnApi && statistics && statistics.length"
+      class="statistics-bar flex flex-grow-0 flex-shrink-1 justify-end flex-wrap"
+    >
+      <ngx-table-statistics-bar [statistics]="statistics"></ngx-table-statistics-bar>
+    </div>
+    <!-- 下工具栏 -->
+    <div class="flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
+      <ng-container
+        [ngTemplateOutlet]="bottomToolPanel"
+        [ngTemplateOutletContext]="{ $implicit: this, page: defaultPageTmpl }"
+      ></ng-container>
+    </div>
+    <!-- 页脚 -->
+    <div class="footer flex flex-grow-0 flex-shrink-1 space-between flex-wrap">
+      <ng-content select="ngx-table-footer"></ng-content>
+    </div>
   </div>
 </full-content>
 
