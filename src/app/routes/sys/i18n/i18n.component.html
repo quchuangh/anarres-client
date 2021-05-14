@@ -1,24 +1,66 @@
 <page-header-wrapper>
-  <nz-radio-group [(ngModel)]="tabType" (ngModelChange)="tabType = $event; getData()" style="margin-bottom: 8px">
+  <nz-radio-group [ngModel]="tabType$ | async" (ngModelChange)="onChangeType($event)" style="margin-bottom: 8px">
     <label nz-radio-button [nzValue]="'server'">服务端</label>
     <label nz-radio-button [nzValue]="'client'">客户端</label>
   </nz-radio-group>
 
   <div nz-row [nzGutter]="16">
-    <div nz-col [nzMd]="12" [nzLg]="6">
-      <cdk-virtual-scroll-viewport itemSize="30" class="demo-infinite-container">
-        <nz-list>
-          <nz-list-item *cdkVirtualFor="let item of i18ns">
-            <nz-skeleton *ngIf="!item" [nzAvatar]="true" [nzParagraph]="{ rows: 1 }"></nz-skeleton>
-            <nz-list-item-meta *ngIf="item">
-              <nz-list-item-meta-title>
-                <button nz-button nzType="link">{{ item }}</button>
-              </nz-list-item-meta-title>
-            </nz-list-item-meta>
+    <div nz-col [nzMd]="12" [nzLg]="8">
+      <ngx-grid-table
+        *ngIf="loadData"
+        #table
+        [gridOptions]="gridOptions"
+        [dataLoadModel]="'pageable'"
+        gridTheme="ag-theme-alpine"
+        [gridTableStyle]="{ height: '70%' }"
+        [defaultStatusBar]="false"
+        [resizable]="true"
+        [dataSource]="dataSource"
+        (gridReady)="onGridReady($event)"
+        [groupSelectsChildren]="true"
+      >
+        <ngx-table-header style="border-bottom: none">
+          <nz-input-group class="action" nzSearch nzSize="default" [nzAddOnAfter]="suffixButton">
+            <input
+              [nzBorderless]="true"
+              [(ngModel)]="searchValue"
+              #search
+              nzSize="default"
+              type="text"
+              nz-input
+              placeholder="{{ 'search' | translate }}"
+            />
+          </nz-input-group>
+          <ng-template #suffixButton>
+            <nz-button-group>
+              <button nz-button (click)="onSearch()" nzType="primary" nzSize="default">
+                <i nz-icon nzType="search"></i>{{ 'search' | translate }}
+              </button>
+              <button nz-button nzType="default"><i nz-icon nzType="plus"></i>{{ 'create' | translate }}</button>
+            </nz-button-group>
+          </ng-template>
+        </ngx-table-header>
+      </ngx-grid-table>
+    </div>
+    <div nz-col [nzMd]="12" [nzLg]="16">
+      <div *ngIf="selectedLanguage" class="list-wrapper">
+        <div class="list-header">
+          <h3>{{ selectedData.i18n }}</h3>
+          <button nz-button (click)="onSave()" nzType="primary" nzSize="default">{{ 'save' | translate }}</button>
+        </div>
+
+        <nz-list nzBordered class="list">
+          <nz-list-item class="list-item" *ngFor="let item of langItems">
+            <label>{{ item }}</label>
+            <textarea
+              nz-input
+              [(ngModel)]="selectedLanguage[item].message"
+              placeholder="Autosize height with minimum and maximum number of lines"
+              [nzAutosize]="{ minRows: 4, maxRows: 6 }"
+            ></textarea>
           </nz-list-item>
         </nz-list>
-      </cdk-virtual-scroll-viewport>
+      </div>
     </div>
-    <div nz-col [nzMd]="12" [nzLg]="18"></div>
   </div>
 </page-header-wrapper>
