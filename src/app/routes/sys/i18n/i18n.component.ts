@@ -40,6 +40,8 @@ export class SysI18nComponent implements OnInit {
       headerName: '编码',
       field: 'i18n',
       flex: 1,
+      editable: true,
+      checkboxSelection: true,
       valueFormatter: (params) => {
         if (params && params.value) {
           return params.value.replace(/^.*\./, '');
@@ -91,9 +93,17 @@ export class SysI18nComponent implements OnInit {
     this.gridOptions = {
       enableCharts: false,
       sideBar: false,
+      headerHeight: 0,
       enableRangeSelection: true,
-      suppressRowClickSelection: false,
+      suppressRowClickSelection: true,
       groupUseEntireRow: true,
+      groupSelectsChildren: true,
+      stopEditingWhenGridLosesFocus: true,
+      rowSelection: 'multiple',
+      groupRowRendererParams: {
+        // puts a checkbox onto each group row
+        checkbox: true,
+      },
       isExternalFilterPresent(): boolean {
         return true;
       },
