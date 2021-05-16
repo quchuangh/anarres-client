@@ -256,11 +256,9 @@ export class SysI18nComponent implements OnInit, OnDestroy {
       const { i18n } = this.selectedData!;
       const type = this.tabType$.value;
       const newData = { language: this.newLanguage, message: '', i18n, typeGroup: type.toUpperCase() } as I18n;
-      this.http.post('/api/sys/i18n/create/language', newData).subscribe((next) => {
-        this.keyMap.set(i18n, [...(this.keyMap.get(i18n) || []), Object.assign({ md5: next }, newData)]);
-        this.selectedLanguage![this.newLanguage!] = '';
-        this.newLanguage = '';
-      });
+      this.keyMap.set(i18n, [...(this.keyMap.get(i18n) || []), Object.assign({}, newData)]);
+      this.selectedLanguage![this.newLanguage!] = '';
+      this.newLanguage = '';
     }
   }
 
