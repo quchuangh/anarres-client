@@ -20,7 +20,7 @@
         [groupSelectsChildren]="true"
       >
         <ngx-table-header style="border-bottom: none">
-          <nz-input-group class="action" nzSearch nzSize="default" [nzAddOnAfter]="suffixButton">
+          <nz-input-group (keydown.enter)="onSearch()" class="action" nzSearch nzSize="default" [nzAddOnAfter]="suffixButton">
             <input
               [nzBorderless]="true"
               [(ngModel)]="searchValue"
@@ -28,7 +28,7 @@
               nzSize="default"
               type="text"
               nz-input
-              placeholder="{{ 'search' | translate }}"
+              placeholder="{{ 'search' | i18n }}"
             />
           </nz-input-group>
           <ng-template #suffixButton>
@@ -36,28 +36,52 @@
               <button nz-button (click)="onSearch()" nzType="primary" nzSize="default">
                 <i nz-icon nzType="search"></i>
               </button>
-              <button nz-button nzType="primary"><i nz-icon nzType="plus"></i></button>
-              <button nz-button nzType="primary"><i nz-icon nzType="delete"></i></button>
+              <button (click)="addI18n()" nz-button nzType="primary"><i nz-icon nzType="plus"></i></button>
+
+              <button (click)="onDelete()" nz-button nzType="primary"><i nz-icon nzType="delete"></i></button>
             </nz-button-group>
           </ng-template>
         </ngx-table-header>
       </ngx-grid-table>
     </div>
     <div nz-col [nzMd]="12" [nzLg]="14">
-      <div *ngIf="selectedLanguage" class="list-wrapper">
+      <div *ngIf="selectedData" class="list-wrapper">
         <div class="list-header">
-          <h3>{{ selectedData.i18n }}</h3>
-          <button nz-button (click)="onSave()" nzType="primary" nzSize="default">{{ 'save' | translate }}</button>
+          <nz-input-group nzCompact [nzAddOnBefore]="selectedData.i18n">
+            <nz-select [(ngModel)]="newLanguage" #select style="width: 160px">
+              <nz-option
+                *ngFor="let language of language$ | async"
+                [nzValue]="language"
+                [nzHide]="selectedLanguage[language] || selectedLanguage[language] === ''"
+                [nzLabel]="'i18n.language.' + language"
+              ></nz-option>
+            </nz-select>
+            <button nz-button (click)="addLanguage()" nzType="primary" nzSize="default">{{ 'i18n.add.language' | i18n }}</button>
+          </nz-input-group>
+          <button nz-button (click)="onSave()" nzType="primary" nzSize="default">{{ 'save' | i18n }}</button>
         </div>
 
-        <nz-list nzBordered class="list">
-          <nz-list-item class="list-item" *ngFor="let item of langItems">
-            <label>{{ item }}</label>
+        <!--   <div se-container="1" class="content">
+          <se [labelWidth]="80"
+              *ngFor="let item of keyMap.get(selectedData.i18n)"
+              [label]="'i18n.language.'+item.language">
             <textarea
               nz-input
-              [(ngModel)]="selectedLanguage[item].message"
-              [placeholder]="'i18n.message.placeholder' | translate"
-              [nzAutosize]="{ minRows: 4, maxRows: 6 }"
+              [(ngModel)]="item.message"
+              [placeholder]="'i18n.message.placeholder' | i18n"
+              [nzAutosize]="{ minRows: 1, maxRows: 3 }"
+            ></textarea>
+          </se>
+
+        </div>-->
+        <nz-list nzBordered class="list">
+          <nz-list-item class="list-item" *ngFor="let item of keyMap.get(selectedData.i18n)">
+            <label>{{ 'i18n.language.' + item.language | i18n }}</label>
+            <textarea
+              nz-input
+              [(ngModel)]="item.message"
+              [placeholder]="'i18n.message.placeholder' | i18n"
+              [nzAutosize]="{ minRows: 3, maxRows: 6 }"
             ></textarea>
           </nz-list-item>
         </nz-list>
@@ -65,3 +89,16 @@
     </div>
   </div>
 </page-header-wrapper>
+<ng-template #formTemplate>
+  <form nz-form [formGroup]="languageForm">
+    <nz-form-item>
+      <nz-form-label [nzSpan]="7" nzRequired>i18n</nz-form-label>
+      <nz-form-control [nzSpan]="12" [nzErrorTip]="i18nErrorTpl">
+        <input nz-input formControlName="i18n" placeholder="i18n" />
+        <ng-template #i18nErrorTpl let-control>
+          <ng-container *ngIf="control.hasError('required')"> 请输入页面环境 </ng-container>
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+</ng-template>

@@ -259,6 +259,16 @@ export function sum(
   return result;
 }
 
+/**
+ * 把数组转换为一个{key:any}对象
+ *
+ * @param array 原数组
+ * @param f 数组类的单个对象转换为{key:any}
+ */
+export function arrayToObject<V, T>(array: Array<T>, f: (t: T, index: number) => { [key: string]: V }): { [key: string]: V } {
+  return array.map(f).reduce((previousValue, currentValue) => Object.assign({}, previousValue, currentValue), {});
+}
+
 export function groupBy(array: any[], f: (item: any) => any): { [key: string]: any[] } {
   let groups = {} as any;
   array.forEach(function (o) {
