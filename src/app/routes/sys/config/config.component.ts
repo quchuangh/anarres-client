@@ -2,20 +2,18 @@ import { GridOptions, GridReadyEvent, ICellRendererParams } from '@ag-grid-commu
 import { RowNode } from '@ag-grid-community/core/dist/cjs/entities/rowNode';
 import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events';
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { I18NService } from '@core';
 import { ACLService } from '@delon/acl';
-import { SFSchema, SFSchemaEnum } from '@delon/form';
+import { SFSchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
 import { AclColDef, asFilterInputPropertiesUI, IFilter, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { SfQueryFormComponent } from 'src/app/shared/components/ngx-grid-table/sf-query-form/sf-query-form.component';
 import { DataSourceUtils } from '../../DataSourceUtils';
 import { SysConfigCreateAndUpdateComponent } from './modal/create-update.component';
 import { SysConfigViewComponent } from './modal/view.component';
-import { fromArray } from 'rxjs/internal/observable/fromArray';
-import { mergeMap, tap } from 'rxjs/operators';
-import { I18NService } from '@core';
 
 @Component({
   selector: 'app-config',
