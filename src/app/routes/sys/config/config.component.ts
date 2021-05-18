@@ -13,6 +13,9 @@ import { SfQueryFormComponent } from 'src/app/shared/components/ngx-grid-table/s
 import { DataSourceUtils } from '../../DataSourceUtils';
 import { SysConfigCreateAndUpdateComponent } from './modal/create-update.component';
 import { SysConfigViewComponent } from './modal/view.component';
+import { fromArray } from 'rxjs/internal/observable/fromArray';
+import { mergeMap, tap } from 'rxjs/operators';
+import { I18NService } from '@core';
 
 @Component({
   selector: 'app-config',
@@ -89,7 +92,13 @@ export class SysConfigComponent implements OnInit {
   @ViewChild(NgxGridTableComponent)
   table!: NgxGridTableComponent;
 
-  constructor(private http: _HttpClient, private msgSrv: NzMessageService, private aclService: ACLService, private modal: NzModalService) {
+  constructor(
+    private http: _HttpClient,
+    private i18NService: I18NService,
+    private msgSrv: NzMessageService,
+    private aclService: ACLService,
+    private modal: NzModalService,
+  ) {
     this.gridOptions = {
       enableCharts: false,
       columnDefs: this.columnDefs,
@@ -106,30 +115,16 @@ export class SysConfigComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  valueRegexSearcher(q: string): Promise<Array<SFSchemaEnum>> {
-    const r = { label: q, value: q } as SFSchemaEnum;
-    return of([
-      { label: '任意', value: '.*' },
-      { label: '整数', value: 'n' },
-      { label: '小数', value: 'xs' },
-      { label: '字符', value: 'str' },
-      { label: '布尔', value: 'bool' },
-      r,
-    ]).toPromise();
-  }
-
   onGridReady(e: { event: GridReadyEvent; gridTable: NgxGridTableComponent }): void {
     // 添加右键菜单
-    this.table.addMenu({
-      name: '删除',
-      show: 'selected',
-      acl: { ability: ['config:delete'] },
-      callback: (selected) => {
-        console.log(selected);
-      },
-    });
-    // 按每列内容重新分配列宽
-    this.table.columnApi.autoSizeAllColumns();
+    /* this.table.addMenu({
+       name: '删除',
+       show: 'selected',
+       acl: { ability: ['config:delete'] },
+       callback: (selected) => {
+         console.log(selected);
+       },
+     });*/
   }
 
   /**
@@ -164,7 +159,7 @@ export class SysConfigComponent implements OnInit {
   onCreate(): void {
     this.modal
       .create({
-        nzTitle: '创建-系统配置表',
+        nzTitle: this.i18NService.fanyi('sys.config.create.title'),
         nzContent: SysConfigCreateAndUpdateComponent,
         nzComponentParams: { valueRegexList: this.valueRegexList },
         nzFooter: null,
@@ -172,10 +167,27 @@ export class SysConfigComponent implements OnInit {
       })
       .afterClose.subscribe((result) => {
         if (result) {
-          this.msgSrv.success('创建成功~');
+          this.msgSrv.success(this.i18NService.fanyi('sys.config.create.success'));
           this.table.refresh();
         }
       });
+  }
+
+  onDelete(cell: ICellRendererParams, row: RowNode): void {
+    const { data } = row;
+    this.modal.confirm({
+      nzContent: this.i18NService.fanyi('sys.config.delete.confirm'),
+      nzOnOk: () => {
+        return this.http
+          .delete(`/api/config/delete/${data.id}`)
+          .pipe(
+            tap(() => {
+              this.table.refresh();
+            }),
+          )
+          .toPromise();
+      },
+    });
   }
 
   onEdit(cell: ICellRendererParams, row: RowNode): void {
@@ -187,7 +199,7 @@ export class SysConfigComponent implements OnInit {
     }
     this.modal
       .create({
-        nzTitle: `编辑-系统配置表 (${id})`,
+        nzTitle: this.i18NService.fanyi('sys.config.edit.title', { id }),
         nzContent: SysConfigCreateAndUpdateComponent,
         nzComponentParams: { data, valueRegexList: regexList, actionType: 'update' },
         nzFooter: null,
@@ -195,7 +207,7 @@ export class SysConfigComponent implements OnInit {
       })
       .afterClose.subscribe((result) => {
         if (result) {
-          this.msgSrv.success('修改成功~');
+          this.msgSrv.success(this.i18NService.fanyi('sys.config.edit.success'));
           this.table.refresh();
         }
       });

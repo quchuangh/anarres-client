@@ -49,6 +49,8 @@
 
 <!-- cell 和 row对应的是 TemplateRendererComponent 中的 \$implicit(默认值ICellRendererParams对象) 和 row（RowNode对象） -->
 <ng-template #option let-cell let-row="row">
-  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'config:read'" (click)="onView(cell, row)">详情</button>
+  <!--  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'config:read'" (click)="onView(cell, row)">详情</button>-->
   <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'config:update'" (click)="onEdit(cell, row)">编辑</button>
+
+  <button nz-button nzSize="small" nzType="danger" acl [acl-ability]="'config:delete'" (click)="onDelete(cell, row)">删除</button>
 </ng-template>
