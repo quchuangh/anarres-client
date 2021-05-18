@@ -1,5 +1,5 @@
 import { AgEvent, ColDef, ColumnApi, GridApi, GridOptions, GridReadyEvent } from '@ag-grid-community/core';
-import { CellValueChangedEvent, RowClickedEvent, RowNode } from '@ag-grid-enterprise/all-modules';
+import { RowClickedEvent, RowNode } from '@ag-grid-enterprise/all-modules';
 import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { I18NService } from '@core';
@@ -10,7 +10,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { of } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { fromArray } from 'rxjs/internal/observable/fromArray';
-import { mergeMap, multicast, share, switchMap, tap } from 'rxjs/operators';
+import { mergeMap, share, switchMap, tap } from 'rxjs/operators';
 
 declare type I18nType = 'server' | 'client';
 
@@ -50,6 +50,8 @@ export class SysI18nComponent implements OnInit, OnDestroy {
       headerName: '编码',
       field: 'i18n',
       flex: 1,
+      sort: 'asc',
+
       checkboxSelection: true,
       valueFormatter: (params) => {
         if (params && params.value) {

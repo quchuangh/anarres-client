@@ -3,15 +3,15 @@ import { RowNode } from '@ag-grid-community/core/dist/cjs/entities/rowNode';
 import { FirstDataRenderedEvent } from '@ag-grid-community/core/dist/cjs/events';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ACLService } from '@delon/acl';
-import { SFSchema, SFSchemaEnum, SFSelectWidgetSchema } from '@delon/form';
+import { SFSchema, SFSchemaEnum } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
 import { AclColDef, asFilterInputPropertiesUI, IFilter, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { of } from 'rxjs';
-import { SfQueryFormComponent } from '../../../shared/components/ngx-grid-table/sf-query-form/sf-query-form.component';
+import { SfQueryFormComponent } from 'src/app/shared/components/ngx-grid-table/sf-query-form/sf-query-form.component';
 import { DataSourceUtils } from '../../DataSourceUtils';
-import { SysConfigCreateComponent } from './modal/create.component';
-import { SysConfigEditComponent } from './modal/edit.component';
+import { SysConfigCreateAndUpdateComponent } from './modal/create-update.component';
 import { SysConfigViewComponent } from './modal/view.component';
 
 @Component({
@@ -19,6 +19,14 @@ import { SysConfigViewComponent } from './modal/view.component';
   templateUrl: './config.component.html',
 })
 export class SysConfigComponent implements OnInit {
+  valueRegexList: Array<{ label: string; value: string }> = [
+    { label: '不限制', value: '^.+$' },
+    { label: '整数类型', value: '^(-|)\\d+$' },
+    { label: '英文字母', value: '^[A-z]+$' },
+    { label: '布尔类型', value: '^(false|true)$' },
+    { label: '英文数组', value: '^[^,]([A-z,]+)$' },
+  ];
+
   // properties 的定义为 filter-input.widget.ts -> FilterInputUISchema 接口
   // id会转换为 { type: 'integer', title: 'id', ui: { widget: 'filter-input', filterType: 'number', options: ['equals'] } }
   schema: SFSchema = asFilterInputPropertiesUI(
@@ -39,21 +47,39 @@ export class SysConfigComponent implements OnInit {
       },
     },
     'valueRegex',
-  ); //valueRegex 不转成filter-input
+  ); // valueRegex 不转成filter-input
 
   // 表格配置
   columnDefs: AclColDef[] = [
     // { headerName: 'testACL', field: 'testACL', acl: { ability: ['POST:/TEST'] } }, //加上acl后只有符合权限的才展示出来
     // { headerName: 'group', field: 'typeGroup', enableRowGroup: true }, // 需要分组查询，则将 enableRowGroup设置为true
-    { headerName: 'id', field: 'id', sort: 'desc', sortable: true, checkboxSelection: true, headerCheckboxSelection: true },
+    {
+      headerName: 'id',
+      field: 'id',
+      sort: 'desc',
+      sortable: true,
+      checkboxSelection: true,
+      headerCheckboxSelection: true,
+    },
     { headerName: '编码', field: 'code' },
     { headerName: '值', field: 'value' },
-    { headerName: '值类型', field: 'valueRegex' },
+    {
+      headerName: '值类型',
+      field: 'valueRegex',
+      valueFormatter: (params) => {
+        if (params && params.value) {
+          const value = this.valueRegexList.find((item) => item.value === params.value);
+          return value ? value.label : params.value;
+        }
+        return null;
+      },
+    },
+
     { headerName: '创建人', field: 'creator' },
     { headerName: '创建时间', field: 'createdTime' },
     { headerName: '更新人', field: 'updater' },
     { headerName: '更新时间', field: 'updatedTime' },
-    { headerName: '操作', field: NgxGridTableConstants.OPTION_FIELD },
+    { headerName: '操作', field: NgxGridTableConstants.OPTION_FIELD, flex: 1 },
   ];
 
   gridOptions: GridOptions;
@@ -63,7 +89,7 @@ export class SysConfigComponent implements OnInit {
   @ViewChild(NgxGridTableComponent)
   table!: NgxGridTableComponent;
 
-  constructor(private http: _HttpClient, private aclService: ACLService, private modal: NzModalService) {
+  constructor(private http: _HttpClient, private msgSrv: NzMessageService, private aclService: ACLService, private modal: NzModalService) {
     this.gridOptions = {
       enableCharts: false,
       columnDefs: this.columnDefs,
@@ -138,26 +164,40 @@ export class SysConfigComponent implements OnInit {
   onCreate(): void {
     this.modal
       .create({
-        nzContent: SysConfigCreateComponent,
-        nzComponentParams: { valueRegexSearcher: this.valueRegexSearcher },
+        nzTitle: '创建-系统配置表',
+        nzContent: SysConfigCreateAndUpdateComponent,
+        nzComponentParams: { valueRegexList: this.valueRegexList },
         nzFooter: null,
         nzMaskClosable: false,
       })
       .afterClose.subscribe((result) => {
-        this.table.refresh();
+        if (result) {
+          this.msgSrv.success('创建成功~');
+          this.table.refresh();
+        }
       });
   }
 
   onEdit(cell: ICellRendererParams, row: RowNode): void {
+    const { data } = row;
+    const { id, valueRegex } = data;
+    let regexList = this.valueRegexList;
+    if (regexList.every((item) => item.value !== valueRegex)) {
+      regexList = [...regexList, { label: valueRegex, value: valueRegex }];
+    }
     this.modal
       .create({
-        nzContent: SysConfigEditComponent,
-        nzComponentParams: { record: row.data, valueRegexSearcher: this.valueRegexSearcher },
+        nzTitle: `编辑-系统配置表 (${id})`,
+        nzContent: SysConfigCreateAndUpdateComponent,
+        nzComponentParams: { data, valueRegexList: regexList, actionType: 'update' },
         nzFooter: null,
         nzMaskClosable: false,
       })
       .afterClose.subscribe((result) => {
-        this.table.refresh();
+        if (result) {
+          this.msgSrv.success('修改成功~');
+          this.table.refresh();
+        }
       });
   }
 

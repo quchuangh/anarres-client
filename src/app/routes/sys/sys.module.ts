@@ -6,8 +6,8 @@ import { FileOutline, FunctionOutline, NumberOutline, SaveOutline } from '@ant-d
 import { SharedModule } from '@shared';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { SysConfigComponent } from './config/config.component';
-import { SysConfigCreateComponent } from './config/modal/create.component';
-import { SysConfigEditComponent } from './config/modal/edit.component';
+import { SysConfigCreateAndUpdateComponent } from './config/modal/create-update.component';
+
 import { SysConfigViewComponent } from './config/modal/view.component';
 import { SysDictComponent } from './dict/dict.component';
 import { SysDictItemComponent } from './dict/item/dict-item.component';
@@ -63,8 +63,7 @@ const COMPONENTS_NOROUNT: Type<void>[] = [
   SysRolesAbilityCellRendererComponent,
 
   SysConfigViewComponent,
-  SysConfigCreateComponent,
-  SysConfigEditComponent,
+  SysConfigCreateAndUpdateComponent,
 
   SysDictViewComponent,
   SysDictEditComponent,

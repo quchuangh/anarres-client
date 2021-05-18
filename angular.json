@@ -22,10 +22,7 @@
             "main": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
-            "assets": [
-              "src/assets",
-              "src/favicon.ico"
-            ],
+            "assets": ["src/assets", "src/favicon.ico"],
             "styles": [
               "node_modules/perfect-scrollbar/css/perfect-scrollbar.css",
               "node_modules/quill/dist/quill.snow.css",
@@ -44,6 +41,8 @@
               "node_modules/perfect-scrollbar/dist/perfect-scrollbar.js"
             ],
             "allowedCommonJsDependencies": [
+              "rxjs/internal/observable/fromArray",
+              "rxjs/internal/BehaviorSubject",
               "@ant-design/colors",
               "@antv/adjust",
               "@antv/attr",
@@ -117,22 +116,14 @@
               "node_modules/perfect-scrollbar/dist/perfect-scrollbar.js"
             ],
             "styles": [],
-            "assets": [
-              "src/assets"
-            ]
+            "assets": ["src/assets"]
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["tsconfig.app.json", "tsconfig.spec.json", "e2e/tsconfig.json"],
+            "exclude": ["**/node_modules/**"]
           }
         },
         "e2e": {
