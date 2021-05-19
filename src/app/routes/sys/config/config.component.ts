@@ -25,7 +25,7 @@ export class SysConfigComponent implements OnInit {
     { label: '整数类型', value: '^(-|)\\d+$' },
     { label: '英文字母', value: '^[A-z]+$' },
     { label: '布尔类型', value: '^(false|true)$' },
-    { label: '英文数组', value: '^[^,]([A-z,]+)$' },
+    { label: '字符数组', value: '^\\w+(,\\w+)*$' },
   ];
 
   // properties 的定义为 filter-input.widget.ts -> FilterInputUISchema 接口
