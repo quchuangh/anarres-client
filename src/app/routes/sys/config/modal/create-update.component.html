@@ -25,6 +25,7 @@
     <nz-form-label [nzSpan]="7" nzRequired>{{ 'sys.config.valueRegex' | i18n }}</nz-form-label>
     <nz-form-control [nzSpan]="12" [nzErrorTip]="valueRegexErrorTpl">
       <nz-select
+        [nzDisabled]="actionType === 'update'"
         formControlName="valueRegex"
         nzShowSearch
         [nzDropdownRender]="renderTemplate"
