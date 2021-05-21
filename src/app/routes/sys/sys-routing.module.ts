@@ -9,9 +9,9 @@ import { SysLogComponent } from './log/log.component';
 import { SysMenuComponent } from './menu/menu.component';
 import { SysAbilityComponent } from './ability/ability.component';
 import { SysRoleComponent } from './role/role.component';
-import { SysUserEditComponent } from './user/edit/edit.component';
+import { SysUserEditComponent } from './user/modal/edit.component';
 import { SysUserComponent } from './user/user.component';
-import { SysUserViewComponent } from './user/view/view.component';
+import { SysUserViewComponent } from './user/modal/view.component';
 
 const routes: Routes = [
   { path: 'user', component: SysUserComponent },

@@ -1,13 +1,54 @@
-<page-header-wrapper>
-  <nz-card>
-    <sf
-      #sf
-      mode="search"
-      [schema]="searchSchema"
-      [formData]="params"
-      (formSubmit)="st.reset($event)"
-      (formReset)="st.reset(params)"
-    ></sf>
-    <st #st [data]="url" [columns]="columns" [req]="{ params: params }"></st>
-  </nz-card>
+<page-header-wrapper [autoTitle]="false">
+  <!-- [colACLTmpl]="'POST:/TEST{}:OUT'"  被所有列添加一个权限末班{}是列名的占位-->
+  <ngx-grid-table
+    #table
+    [gridOptions]="gridOptions"
+    [dataLoadModel]="'pageable'"
+    [gridTableStyle]="{ height: '70%' }"
+    [defaultStatusBar]="true"
+    [resizable]="true"
+    [topToolPanel]="topToolPanel"
+    [bottomToolPanel]="bottomToolPanel"
+    [groupSelectsChildren]="true"
+    [optionCell]="option"
+    [dataSource]="dataSource"
+    [searchSchema]="schema"
+    [filterHand]="filterHand"
+    (pageIndexChange)="onPageIndexChange($event)"
+    (gridReady)="onGridReady($event)"
+  >
+    <!--    <ngx-table-header>-->
+    <!--      <span>this is header</span>-->
+    <!--    </ngx-table-header>-->
+
+    <!--    <ngx-table-footer>-->
+    <!--      <span>this is footer</span>-->
+    <!--    </ngx-table-footer>-->
+  </ngx-grid-table>
 </page-header-wrapper>
+
+<!-- 上工具栏 -->
+<ng-template #topToolPanel let-table let-page="page">
+  <ngx-table-tool-bar [center]="['search', 'reset']" [left]="['data-mode']" [table]="table" [page]="page">
+    <div right>
+      <button nz-button acl [acl-ability]="'user:create'" nzSize="small" nzType="primary" (click)="onCreate()">新增</button>
+    </div>
+  </ngx-table-tool-bar>
+</ng-template>
+
+<!-- 下工具栏 -->
+<ng-template #bottomToolPanel let-table let-page="page">
+  <ngx-table-tool-bar [left]="['full']" [right]="['page']" [page]="page" [table]="table">
+    <div left>
+      <button nz-button acl [acl-ability]="'user:export'" nzSize="small" nzType="primary" (click)="this.table.exportAllPageData()">
+        <i nz-icon nzType="file-excel" nzTheme="outline"></i>导出
+      </button>
+    </div>
+  </ngx-table-tool-bar>
+</ng-template>
+
+<!-- cell 和 row对应的是 TemplateRendererComponent 中的 \$implicit(默认值ICellRendererParams对象) 和 row（RowNode对象） -->
+<ng-template #option let-cell let-row="row">
+  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'user:read'" (click)="onView(cell, row)">详情</button>
+  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'user:update'" (click)="onEdit(cell, row)">编辑</button>
+</ng-template>
