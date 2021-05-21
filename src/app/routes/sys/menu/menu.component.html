@@ -1,12 +1,12 @@
 <page-header-wrapper>
   <div nz-row [nzGutter]="32">
     <div nz-col nzMd="24" nzLg="8">
-      <nz-card [nzTitle]="'app.sys.menu.list' | translate" [nzExtra]="extraTpl">
+      <nz-card [nzTitle]="'app.menu.list' | translate" [nzExtra]="extraTpl">
         <ng-template #extraTpl>
-          <button (click)="add(null)" nz-button nzSize="small">{{ 'app.sys.menu.root' | translate }}</button>
+          <button (click)="add(null)" nz-button nzSize="small">{{ 'app.menu.root' | translate }}</button>
         </ng-template>
         <div *ngIf="data.length === 0">{{ 'common.no-data' | translate }}</div>
-        <div *ngIf="data.length > 0" scrollbar class="position-relative" style="height: 500px;">
+        <div *ngIf="data.length > 0" scrollbar class="position-relative" style="height: 500px">
           <nz-tree
             [nzData]="data"
             [nzDraggable]="true"
@@ -19,7 +19,9 @@
       </nz-card>
     </div>
     <div nz-col nzMd="24" nzLg="16" *ngIf="op">
-      <nz-card [nzTitle]="op === 'view' ? ('查看 #' + item.id + ' -> ' + item.code) : item.id > 0 ? ('编辑 #' + item.id  + ' -> ' + item.code): '新增'">
+      <nz-card
+        [nzTitle]="op === 'view' ? '查看 #' + item.id + ' -> ' + item.code : item.id > 0 ? '编辑 #' + item.id + ' -> ' + item.code : '新增'"
+      >
         <sv-container *ngIf="op === 'view'" col="2">
           <sv label="父ID">{{ item.parentId }}</sv>
           <sv label="编号">{{ item.code }}</sv>
@@ -47,9 +49,7 @@
   <ul nz-menu>
     <li nz-menu-item (click)="edit()">修改</li>
     <li nz-menu-item [nzDisabled]="delDisabled">
-      <div *ngIf="!delDisabled" nz-popconfirm [nzPopconfirmTitle]="delMsg" (nzOnConfirm)="del()">
-        删除
-      </div>
+      <div *ngIf="!delDisabled" nz-popconfirm [nzPopconfirmTitle]="delMsg" (nzOnConfirm)="del()">删除</div>
       <div *ngIf="delDisabled">删除</div>
     </li>
     <li nz-menu-item (click)="add(item)">添加子项</li>

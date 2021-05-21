@@ -157,7 +157,7 @@ export class SysConfigComponent implements OnInit {
   onCreate(): void {
     this.modal
       .create({
-        nzTitle: this.i18NService.fanyi('sys.config.create.title'),
+        nzTitle: this.i18NService.fanyi('app.config.create.title'),
         nzContent: SysConfigCreateAndUpdateComponent,
         nzComponentParams: { valueRegexList: this.valueRegexList },
         nzFooter: null,
@@ -165,7 +165,7 @@ export class SysConfigComponent implements OnInit {
       })
       .afterClose.subscribe((result) => {
         if (result) {
-          this.msgSrv.success(this.i18NService.fanyi('sys.config.create.success'));
+          this.msgSrv.success(this.i18NService.fanyi('app.config.create.success'));
           this.table.refresh();
         }
       });
@@ -174,7 +174,7 @@ export class SysConfigComponent implements OnInit {
   onDelete(cell: ICellRendererParams, row: RowNode): void {
     const { data } = row;
     this.modal.confirm({
-      nzContent: this.i18NService.fanyi('sys.config.delete.confirm'),
+      nzContent: this.i18NService.fanyi('app.config.delete.confirm'),
       nzOnOk: () => {
         return this.http
           .delete(`/api/config/delete/${data.id}`)
@@ -197,7 +197,7 @@ export class SysConfigComponent implements OnInit {
     }
     this.modal
       .create({
-        nzTitle: this.i18NService.fanyi('sys.config.edit.title', { id }),
+        nzTitle: this.i18NService.fanyi('app.config.edit.title', { id }),
         nzContent: SysConfigCreateAndUpdateComponent,
         nzComponentParams: { data, valueRegexList: regexList, actionType: 'update' },
         nzFooter: null,
@@ -205,7 +205,7 @@ export class SysConfigComponent implements OnInit {
       })
       .afterClose.subscribe((result) => {
         if (result) {
-          this.msgSrv.success(this.i18NService.fanyi('sys.config.edit.success'));
+          this.msgSrv.success(this.i18NService.fanyi('app.config.edit.success'));
           this.table.refresh();
         }
       });

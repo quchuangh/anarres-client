@@ -1,7 +1,7 @@
 <page-header-wrapper>
   <nz-radio-group [ngModel]="tabType$ | async" (ngModelChange)="onChangeType($event)" style="margin-bottom: 8px">
-    <label nz-radio-button [nzValue]="'server'">服务端</label>
-    <label nz-radio-button [nzValue]="'client'">客户端</label>
+    <label nz-radio-button [nzValue]="'server'">{{ 'app.i18n.server.label' | i18n }}</label>
+    <label nz-radio-button [nzValue]="'client'">{{ 'app.i18n.client.label' | i18n }}</label>
   </nz-radio-group>
 
   <div nz-row [nzGutter]="16">
@@ -53,10 +53,10 @@
                 *ngFor="let language of language$ | async"
                 [nzValue]="language"
                 [nzHide]="selectedLanguage[language] || selectedLanguage[language] === ''"
-                [nzLabel]="'i18n.language.' + language"
+                [nzLabel]="'app.i18n.language.' + language | i18n"
               ></nz-option>
             </nz-select>
-            <button nz-button (click)="addLanguage()" nzType="primary" nzSize="default">{{ 'i18n.add.language' | i18n }}</button>
+            <button nz-button (click)="addLanguage()" nzType="primary" nzSize="default">{{ 'app.i18n.add_language' | i18n }}</button>
           </nz-input-group>
           <button nz-button (click)="onSave()" nzType="primary" nzSize="default">{{ 'save' | i18n }}</button>
         </div>
@@ -76,11 +76,11 @@
         </div>-->
         <nz-list nzBordered class="list">
           <nz-list-item class="list-item" *ngFor="let item of keyMap.get(selectedData.i18n)">
-            <label>{{ 'i18n.language.' + item.language | i18n }}</label>
+            <label>{{ 'app.i18n.language.' + item.language | i18n }}</label>
             <textarea
               nz-input
               [(ngModel)]="item.message"
-              [placeholder]="'i18n.message.placeholder' | i18n"
+              [placeholder]="'app.i18n.message.placeholder' | i18n"
               [nzAutosize]="{ minRows: 3, maxRows: 6 }"
             ></textarea>
           </nz-list-item>

@@ -1,35 +1,35 @@
 <form nz-form [formGroup]="form">
   <nz-form-item>
-    <nz-form-label [nzSpan]="7" nzRequired>{{ 'sys.config.code' | i18n }}</nz-form-label>
+    <nz-form-label [nzSpan]="7" nzRequired>{{ 'app.config.code.label' | i18n }}</nz-form-label>
     <nz-form-control [nzSpan]="12" [nzErrorTip]="codeErrorTpl">
-      <input nz-input formControlName="code" [placeholder]="'sys.config.value.placeHolder' | i18n" />
+      <input nz-input formControlName="code" [placeholder]="'app.config.code.placeholder' | i18n" />
       <ng-template #codeErrorTpl let-control>
-        <ng-container *ngIf="control.hasError('required')"> {{ 'sys.config.code.required' | i18n }} </ng-container>
-        <ng-container *ngIf="control.hasError('pattern')"> {{ 'sys.config.code.pattern' | i18n }} </ng-container>
+        <ng-container *ngIf="control.hasError('required')"> {{ 'app.config.code.required' | i18n }} </ng-container>
+        <ng-container *ngIf="control.hasError('pattern')"> {{ 'app.config.code.pattern' | i18n }} </ng-container>
       </ng-template>
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
-    <nz-form-label [nzSpan]="7" nzRequired>{{ 'sys.config.value' | i18n }}</nz-form-label>
+    <nz-form-label [nzSpan]="7" nzRequired>{{ 'app.config.value.label' | i18n }}</nz-form-label>
     <nz-form-control [nzSpan]="12" [nzErrorTip]="valueErrorTpl">
-      <input nz-input formControlName="value" [placeholder]="'sys.config.value.placeHolder' | i18n" />
+      <input nz-input formControlName="value" [placeholder]="'app.config.value.placeholder' | i18n" />
       <ng-template #valueErrorTpl let-control let-form>
-        <ng-container *ngIf="control.hasError('required')"> {{ 'sys.config.value.required' | i18n }} </ng-container>
-        <ng-container *ngIf="control.hasError('pattern')"> {{ 'sys.config.value.pattern' | i18n }} </ng-container>
-        <ng-container *ngIf="control.hasError('valueRegex')"> {{ 'sys.config.value.valueRegex' | i18n }} </ng-container>
+        <ng-container *ngIf="control.hasError('required')"> {{ 'app.config.value.required' | i18n }} </ng-container>
+        <ng-container *ngIf="control.hasError('pattern')"> {{ 'app.config.value.pattern' | i18n }} </ng-container>
+        <ng-container *ngIf="control.hasError('valueRegex')"> {{ 'app.config.value.value-regex' | i18n }} </ng-container>
       </ng-template>
     </nz-form-control>
   </nz-form-item>
 
   <nz-form-item>
-    <nz-form-label [nzSpan]="7" nzRequired>{{ 'sys.config.valueRegex' | i18n }}</nz-form-label>
+    <nz-form-label [nzSpan]="7" nzRequired>{{ 'app.config.value-regex.label' | i18n }}</nz-form-label>
     <nz-form-control [nzSpan]="12" [nzErrorTip]="valueRegexErrorTpl">
       <nz-select
         [nzDisabled]="actionType === 'update'"
         formControlName="valueRegex"
         nzShowSearch
         [nzDropdownRender]="renderTemplate"
-        [nzPlaceHolder]="'sys.config.valueRegex.placeHolder' | i18n"
+        [nzPlaceHolder]="'app.config.value-regex.placeholder' | i18n"
       >
         <nz-option *ngFor="let item of valueRegexList" [nzLabel]="item.label" [nzValue]="item.value"></nz-option>
       </nz-select>
@@ -37,12 +37,14 @@
         <nz-divider style="margin: 5px 0"></nz-divider>
         <div class="container">
           <input type="text" nz-input #inputElement />
-          <a class="add-item" (click)="addItem(inputElement)"><i nz-icon nzType="plus"></i> {{ 'sys.config.valueRegex.custom' | i18n }} </a>
+          <a class="add-item" (click)="addItem(inputElement)"
+            ><i nz-icon nzType="plus"></i> {{ 'app.config.value-regex.custom' | i18n }}
+          </a>
         </div>
       </ng-template>
       <ng-template #valueRegexErrorTpl let-control>
-        <ng-container *ngIf="control.hasError('required')"> {{ 'sys.config.valueRegex.required' | i18n }} </ng-container>
-        <ng-container *ngIf="control.hasError('regexp')"> {{ 'sys.config.valueRegex.regexp' | i18n }} </ng-container>
+        <ng-container *ngIf="control.hasError('required')"> {{ 'app.config.value-regex.required' | i18n }} </ng-container>
+        <ng-container *ngIf="control.hasError('regexp')"> {{ 'app.config.value-regex.regexp' | i18n }} </ng-container>
       </ng-template>
     </nz-form-control>
   </nz-form-item>

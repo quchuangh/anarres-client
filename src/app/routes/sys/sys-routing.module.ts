@@ -18,7 +18,7 @@ const routes: Routes = [
   { path: 'user/:id', component: SysUserViewComponent },
   { path: 'user/edit/:id', component: SysUserEditComponent },
   { path: 'menu', component: SysMenuComponent },
-  { path: 'permission', component: SysAbilityComponent },
+  { path: 'ability', component: SysAbilityComponent },
   { path: 'role', component: SysRoleComponent },
   { path: 'log', component: SysLogComponent },
   { path: 'file-manager', component: SysFileManagerComponent },

@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="setting-drawer__body-item">
-        {{ 'app.setting.content-width' | translate }}
+        {{ 'app.setting.content-width.label' | translate }}
         <nz-select [(ngModel)]="layout.contentWidth" (ngModelChange)="setLayout('contentWidth', layout.contentWidth)" nzSize="small">
           <nz-option
             *ngFor="let i of contentWidths"
@@ -94,7 +94,7 @@
         nz-tooltip="{{ brand.menu === 'top' ? '' : ('app.setting.onlyicon.hint' | translate) }}"
         nzTooltipPlacement="left"
       >
-        <span [style.opacity]="brand.menu !== 'top' ? 0.5 : 1">{{ 'app.setting.onlyicon' | translate }}</span>
+        <span [style.opacity]="brand.menu !== 'top' ? 0.5 : 1">{{ 'app.setting.onlyicon.label' | translate }}</span>
         <nz-switch
           [nzDisabled]="brand.menu !== 'top'"
           nzSize="small"

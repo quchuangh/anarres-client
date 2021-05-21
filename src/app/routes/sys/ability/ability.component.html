@@ -1,9 +1,9 @@
 <page-header-wrapper>
   <div nz-row [nzGutter]="32">
     <div nz-col nzMd="24" nzLg="8">
-      <nz-card [nzTitle]="'app.sys.permission.list' | translate" [nzExtra]="extraTpl">
+      <nz-card [nzTitle]="'app.ability.list' | translate" [nzExtra]="extraTpl">
         <ng-template #extraTpl>
-          <button (click)="add(null)" nz-button nzSize="small">{{ 'app.sys.permission.root' | translate }}</button>
+          <button (click)="add(null)" nz-button nzSize="small">{{ 'app.ability.root' | translate }}</button>
         </ng-template>
         <div *ngIf="data.length === 0">{{ 'common.no-data' | translate }}</div>
         <div *ngIf="data.length > 0" scrollbar class="position-relative" style="height: 300px">

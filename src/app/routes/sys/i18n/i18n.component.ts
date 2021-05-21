@@ -267,7 +267,7 @@ export class SysI18nComponent implements OnInit, OnDestroy {
   addI18n(): void {
     this.languageForm.reset();
     this.modalService.create({
-      nzTitle: this.i18NService.fanyi('i18n.add.i18n'),
+      nzTitle: this.i18NService.fanyi('app.i18n.title.add'),
       nzContent: this.formTemplate,
       nzOnOk: () => {
         if (!this.languageForm.valid) {
@@ -305,11 +305,11 @@ export class SysI18nComponent implements OnInit, OnDestroy {
   onDelete(): void {
     const data = this.api?.getSelectedRows();
     if (!data || !data.length) {
-      this.messageService.warning(this.i18NService.fanyi('i18n.delete.warning'));
+      this.messageService.warning(this.i18NService.fanyi('app.i18n.warning.delete'));
       return;
     }
     this.modalService.confirm({
-      nzContent: this.i18NService.fanyi('i18n.delete.confirm', { count: data.length }),
+      nzContent: this.i18NService.fanyi('app.i18n.confirm.delete', { count: data.length }),
       nzOnOk: () => {
         return fromArray(data)
           .pipe(

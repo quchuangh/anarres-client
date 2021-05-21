@@ -1,4 +1,4 @@
-<page-header-wrapper>
+<page-header-wrapper [autoTitle]="false">
   <!-- [colACLTmpl]="'POST:/TEST{}:OUT'"  被所有列添加一个权限末班{}是列名的占位-->
   <ngx-grid-table
     #table
@@ -40,7 +40,7 @@
 <ng-template #bottomToolPanel let-table let-page="page">
   <ngx-table-tool-bar [left]="['full']" [right]="['page']" [page]="page" [table]="table">
     <div left>
-      <button nz-button acl [acl-ability]="'config:export'" nzSize="small" nzType="primary" (click)="this.table.exportAllPageData()">
+      <button nz-button acl [acl-ability]="'config:export'" nzSize="small" nzType="primary" (click)="table.exportAllPageData()">
         <i nz-icon nzType="file-excel" nzTheme="outline"></i>导出
       </button>
     </div>
