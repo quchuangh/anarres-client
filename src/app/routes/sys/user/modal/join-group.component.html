@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <div class="modal-title">绑定角色({{ user.username }})</div>
+</div>
+
+<nz-card [nzTitle]="'app.organization.list' | translate" [nzExtra]="actions">
+  <div *ngIf="data?.length === 0">{{ 'common.no-data' | translate }}</div>
+  <div *ngIf="data?.length > 0" scrollbar class="position-relative" style="height: 600px">
+    <nz-tree [nzData]="node" [nzDraggable]="false" [nzTreeTemplate]="nzTreeTmpl"> </nz-tree>
+  </div>
+  <ng-template #actions>
+    <button nz-button [nzType]="'primary'" (click)="submit()">确认</button>
+  </ng-template>
+</nz-card>
+<ng-template #nzTreeTmpl let-node>
+  {{ node.origin.name }}
+  <nz-switch
+    [disabled]="!node.origin.enabled"
+    [(ngModel)]="node.origin.joined"
+    nzCheckedChildren="已加入"
+    nzUnCheckedChildren="未加入"
+  ></nz-switch>
+</ng-template>

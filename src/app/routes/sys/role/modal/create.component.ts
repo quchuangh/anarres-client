@@ -33,6 +33,17 @@ export class SysRoleCreateComponent implements OnInit {
           placeholder: '填入角色名字（可以用中文）',
         },
       },
+      roleType: {
+        type: 'string',
+        title: '角色类型',
+        enum: [
+          { label: '用户角色', value: 'USER_ROLE' },
+          { label: '组织角色', value: 'ORG_ROLE' },
+          { label: '职位角色', value: 'POS_ROLE' },
+        ],
+        default: true,
+        ui: { placeholder: '角色类型', widget: 'select' },
+      },
       description: {
         type: 'string',
         title: '简介',

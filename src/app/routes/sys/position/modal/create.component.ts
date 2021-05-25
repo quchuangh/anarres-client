@@ -1,24 +1,21 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { _HttpClient } from '@delon/theme';
 import { SFSchema } from '@delon/form';
 
 @Component({
-  selector: 'app-edit-role',
-  templateUrl: './edit.component.html',
+  selector: 'app-create-position',
+  templateUrl: './create.component.html',
 })
-export class SysRoleEditComponent implements OnInit {
-  rolePrefix = 'role:';
-
-  @Input()
-  record: any;
+export class SysPositionCreateComponent implements OnInit {
+  rolePrefix = 'position:';
 
   schema: SFSchema = {
     properties: {
-      role: {
+      positionCode: {
         type: 'string',
-        title: '角色标识',
+        title: '职位编号',
         pattern: '^\\w+$',
         ui: {
           widget: 'string',
@@ -32,17 +29,6 @@ export class SysRoleEditComponent implements OnInit {
         type: 'string',
         title: '名称',
       },
-      roleType: {
-        type: 'string',
-        title: '角色类型',
-        enum: [
-          { label: '用户角色', value: 'USER_ROLE' },
-          { label: '组织角色', value: 'ORG_ROLE' },
-          { label: '职位角色', value: 'POS_ROLE' },
-        ],
-        default: true,
-        ui: { placeholder: '角色类型', widget: 'select' },
-      },
       description: {
         type: 'string',
         title: '简介',
@@ -51,6 +37,10 @@ export class SysRoleEditComponent implements OnInit {
           autosize: { minRows: 2, maxRows: 10 },
           placeholder: '添加描述',
         },
+      },
+      organizationCode: {
+        type: 'string',
+        title: '组织编号',
       },
       enabled: {
         type: 'boolean',
@@ -62,8 +52,12 @@ export class SysRoleEditComponent implements OnInit {
         default: true,
         ui: { placeholder: '是否启用', widget: 'select' },
       },
+      roleCode: {
+        type: 'string',
+        title: '自带角色',
+      },
     },
-    required: ['role', 'name', 'description', 'enabled'],
+    required: ['position_code', 'name', 'description', 'organization_code', 'enabled', 'role_code'],
     ui: {
       spanLabelFixed: 100,
       grid: { span: 24 },
@@ -80,8 +74,8 @@ export class SysRoleEditComponent implements OnInit {
   ngOnInit(): void {}
 
   save(value: any) {
-    this.http.post(`/api/role/update`, value).subscribe((res) => {
-      this.msgSrv.success('修改成功');
+    this.http.post(`/api/position/create`, value).subscribe((res) => {
+      this.msgSrv.success('添加成功');
       this.modal.close(res);
     });
   }

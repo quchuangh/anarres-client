@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <div class="modal-title">修改密码 ({{ user.username }})</div>
+</div>
+
+<sf #sf [schema]="schema" [formData]="{ username: user.username }" button="none" mode="edit">
+  <div class="modal-footer">
+    <button (click)="close()" nz-button type="button">关闭</button>
+    <button
+      (click)="save(sf.value)"
+      [disabled]="!sf.valid"
+      [nzLoading]="http.loading"
+      nz-button
+      nzType="primary"
+      acl
+      [acl-ability]="force ? 'user:force-change-pwd' : 'user:change-pwd'"
+      type="submit"
+    >
+      修改
+    </button>
+  </div>
+</sf>

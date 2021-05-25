@@ -10,8 +10,12 @@ import { _HttpClient } from '@delon/theme';
 import { AclColDef, asFilterInputPropertiesUI, IFilter, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
 import { SfQueryFormComponent } from '../../../shared/components/ngx-grid-table/sf-query-form/sf-query-form.component';
 import { DataSourceUtils } from '../../DataSourceUtils';
+import { SysUserAppointmentComponent } from './modal/appointment.component';
+import { SysUserChangePwdComponent } from './modal/change-pwd.component';
 import { SysUserCreateComponent } from './modal/create.component';
 import { SysUserEditComponent } from './modal/edit.component';
+import { SysUserAssignComponent } from './modal/assign.component';
+import { SysUserJoinGroupComponent } from './modal/join-group.component';
 import { SysUserViewComponent } from './modal/view.component';
 
 @Component({
@@ -25,31 +29,22 @@ export class SysUserComponent implements OnInit {
     properties: {
       id: { type: 'integer', title: 'id', ui: { options: ['equals'] } },
       username: { type: 'string', title: '账号', ui: { options: ['contains'] } },
-      password: { type: 'string', title: '密码', ui: { options: ['contains'] } },
-      salt: { type: 'string', title: '盐', ui: { options: ['contains'] } },
       // 所有未知的复杂类型都当作枚举处理
-      state: { type: 'array', title: '状态', ui: { options: ['in'], selectValues: ['0', '1'] } },
-      loginTimes: { type: 'integer', title: '登录次数', ui: { options: ['equals'] } },
-      lastLoginTime: { type: 'string', title: '最后登录时间', format: 'date-time', ui: { options: ['inRange'] } },
-      lastLoginIp: { type: 'string', title: '最后登录IP', ui: { options: ['contains'] } },
-      loginSuccessTimes: { type: 'integer', title: '登录成功次数', ui: { options: ['equals'] } },
-      ipBound: { type: 'string', title: '绑定IP', ui: { options: ['contains'] } },
-      macBound: { type: 'string', title: '绑定MAC', ui: { options: ['contains'] } },
-      deleted: {
+      state: {
         type: 'array',
-        title: '是否删除',
+        title: '状态',
         ui: {
           options: ['in'],
           selectValues: [
-            { label: '是', value: true },
-            { label: '否', value: false },
+            { label: '正常', value: 'NORMAL' },
+            { label: '锁定', value: 'LOCKED' },
           ],
         },
       },
+      ipBound: { type: 'string', title: '绑定IP', ui: { options: ['contains'] } },
+      macBound: { type: 'string', title: '绑定MAC', ui: { options: ['contains'] } },
       creator: { type: 'string', title: '创建人', ui: { options: ['contains'] } },
       createdTime: { type: 'string', title: '创建时间', format: 'date-time', ui: { options: ['inRange'] } },
-      updater: { type: 'string', title: '更新人', ui: { options: ['contains'] } },
-      updatedTime: { type: 'string', title: '更新时间', format: 'date-time', ui: { options: ['inRange'] } },
     },
     required: ['text'],
     ui: {
@@ -66,9 +61,8 @@ export class SysUserComponent implements OnInit {
     // { headerName: 'testACL', field: 'testACL', acl: { ability: ['POST:/TEST'] } }, //加上acl后只有符合权限的才展示出来
     // { headerName: 'group', field: 'typeGroup', enableRowGroup: true }, // 需要分组查询，则将 enableRowGroup设置为true
     { headerName: 'id', field: 'id', sort: 'desc', sortable: true, checkboxSelection: true, headerCheckboxSelection: true },
+    { headerName: '操作', field: NgxGridTableConstants.OPTION_FIELD },
     { headerName: '账号', field: 'username' },
-    { headerName: '密码', field: 'password' },
-    { headerName: '盐', field: 'salt' },
     { headerName: '状态', field: 'state' },
     { headerName: '登录次数', field: 'loginTimes' },
     { headerName: '最后登录时间', field: 'lastLoginTime' },
@@ -81,7 +75,6 @@ export class SysUserComponent implements OnInit {
     { headerName: '创建时间', field: 'createdTime' },
     { headerName: '更新人', field: 'updater' },
     { headerName: '更新时间', field: 'updatedTime' },
-    { headerName: '操作', field: NgxGridTableConstants.OPTION_FIELD },
   ];
 
   gridOptions: GridOptions;
@@ -122,6 +115,24 @@ export class SysUserComponent implements OnInit {
           this.message.success('删除成功');
           this.table.refresh();
         });
+      },
+    });
+
+    this.table.addMenu({
+      name: '强制修改密码',
+      show: 'selected',
+      acl: { ability: ['user:force-change-pwd'] },
+      callback: (selected) => {
+        this.modal
+          .create({
+            nzContent: SysUserChangePwdComponent,
+            nzComponentParams: { user: selected, force: true },
+            nzFooter: null,
+            nzMaskClosable: false,
+          })
+          .afterClose.subscribe((result) => {
+            this.table.refresh();
+          });
       },
     });
     // 按每列内容重新分配列宽
@@ -176,6 +187,33 @@ export class SysUserComponent implements OnInit {
     this.modal.create({
       nzContent: SysUserViewComponent,
       nzComponentParams: { record: row.data },
+      nzFooter: null,
+      nzMaskClosable: true,
+    });
+  }
+
+  assignRole(cell: any, row: any): void {
+    this.modal.create({
+      nzContent: SysUserAssignComponent,
+      nzComponentParams: { user: row.data },
+      nzFooter: null,
+      nzMaskClosable: true,
+    });
+  }
+
+  joinGroup(cell: any, row: any): void {
+    this.modal.create({
+      nzContent: SysUserJoinGroupComponent,
+      nzComponentParams: { user: row.data },
+      nzFooter: null,
+      nzMaskClosable: true,
+    });
+  }
+
+  appointment(cell: any, row: any): void {
+    this.modal.create({
+      nzContent: SysUserAppointmentComponent,
+      nzComponentParams: { user: row.data },
       nzFooter: null,
       nzMaskClosable: true,
     });

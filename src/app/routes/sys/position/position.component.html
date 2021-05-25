@@ -1,4 +1,4 @@
-<page-header-wrapper [autoTitle]="false" [autoBreadcrumb]="false">
+<page-header-wrapper [autoTitle]="false">
   <!-- [colACLTmpl]="'POST:/TEST{}:OUT'"  被所有列添加一个权限末班{}是列名的占位-->
   <ngx-grid-table
     #table
@@ -31,7 +31,7 @@
 <ng-template #topToolPanel let-table let-page="page">
   <ngx-table-tool-bar [center]="['search', 'reset']" [left]="['data-mode']" [table]="table" [page]="page">
     <div right>
-      <button nz-button acl [acl-ability]="'user:create'" nzSize="small" nzType="primary" (click)="onCreate()">新增</button>
+      <button nz-button acl [acl-ability]="'position:create'" nzSize="small" nzType="primary" (click)="onCreate()">新增</button>
     </div>
   </ngx-table-tool-bar>
 </ng-template>
@@ -40,7 +40,7 @@
 <ng-template #bottomToolPanel let-table let-page="page">
   <ngx-table-tool-bar [left]="['full']" [right]="['page']" [page]="page" [table]="table">
     <div left>
-      <button nz-button acl [acl-ability]="'user:export'" nzSize="small" nzType="primary" (click)="this.table.exportAllPageData()">
+      <button nz-button acl [acl-ability]="'position:export'" nzSize="small" nzType="primary" (click)="this.table.exportAllPageData()">
         <i nz-icon nzType="file-excel" nzTheme="outline"></i>导出
       </button>
     </div>
@@ -49,9 +49,6 @@
 
 <!-- cell 和 row对应的是 TemplateRendererComponent 中的 \$implicit(默认值ICellRendererParams对象) 和 row（RowNode对象） -->
 <ng-template #option let-cell let-row="row">
-  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'user:query'" (click)="onView(cell, row)">详情</button>
-  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'user:update'" (click)="onEdit(cell, row)">编辑</button>
-  <button nz-button nzSize="small" nzType="primary" acl [acl-ability]="'user:assign-role'" (click)="assignRole(cell, row)">绑定角色</button>
-  <button nz-button nzSize="small" nzType="primary" acl [acl-ability]="'user:join-group'" (click)="joinGroup(cell, row)">加入组织</button>
-  <button nz-button nzSize="small" nzType="primary" acl [acl-ability]="'user:appointment'" (click)="appointment(cell, row)">任命</button>
+  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'position:read'" (click)="onView(cell, row)">详情</button>
+  <button nz-button nzSize="small" nzType="default" acl [acl-ability]="'position:update'" (click)="onEdit(cell, row)">编辑</button>
 </ng-template>

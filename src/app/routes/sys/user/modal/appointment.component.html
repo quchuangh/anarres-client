@@ -1,0 +1,17 @@
+<div class="modal-header">
+  <div class="modal-title">任命({{ user.username }})</div>
+</div>
+
+<nz-list nzBordered nzSize="small">
+  <nz-list-item *ngFor="let item of positions">
+    <nz-list-item-meta [nzTitle]="item.name" [nzDescription]="item.description"></nz-list-item-meta>
+    <ul nz-list-item-actions>
+      <nz-list-item-action>
+        <label nz-checkbox [(ngModel)]="item.checked"></label>
+      </nz-list-item-action>
+    </ul>
+  </nz-list-item>
+  <nz-list-footer>
+    <button nz-button [nzType]="'primary'" [nzSize]="'large'" (click)="submit()">确认</button>
+  </nz-list-footer>
+</nz-list>

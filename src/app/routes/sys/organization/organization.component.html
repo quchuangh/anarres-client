@@ -1,9 +1,9 @@
 <page-header-wrapper>
   <div nz-row [nzGutter]="32">
     <div nz-col nzMd="24" nzLg="8">
-      <nz-card [nzTitle]="'app.ability.list' | translate" [nzExtra]="extraTpl">
+      <nz-card [nzTitle]="'app.organization.list' | translate" [nzExtra]="extraTpl">
         <ng-template #extraTpl>
-          <button (click)="add(null)" nz-button nzSize="small">{{ 'app.ability.root' | translate }}</button>
+          <button (click)="add(null)" nz-button nzSize="small">{{ 'app.organization.root' | translate }}</button>
         </ng-template>
         <div *ngIf="data.length === 0">{{ 'common.no-data' | translate }}</div>
         <div *ngIf="data.length > 0" scrollbar class="position-relative" style="height: 600px">
@@ -23,8 +23,8 @@
         <sv-container *ngIf="op === 'view'" col="2">
           <sv label="父ID">{{ item.parentId }}</sv>
           <sv label="名称">{{ item.name }}</sv>
-          <sv label="权限点">{{ item.ability }}</sv>
-          <sv label="类型">{{ item.abilityType }}</sv>
+          <sv label="编号">{{ item.code }}</sv>
+          <sv label="角色编号">{{ item.roleCode }}</sv>
           <sv label="是否启用">{{ item.enabled }}</sv>
           <sv label="排序值">{{ item.sortRank }}</sv>
           <sv label="创建时间">{{ item.createdTime | date }}</sv>

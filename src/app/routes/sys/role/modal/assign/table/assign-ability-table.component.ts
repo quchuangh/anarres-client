@@ -177,4 +177,8 @@ export class SysRoleAssignAbilityTableComponent implements OnInit {
     // });
     // return {resources: Array.from(new Set(resources)), fields: [...this.roleFields]};
   }
+
+  refresh() {
+    this.table.refresh();
+  }
 }

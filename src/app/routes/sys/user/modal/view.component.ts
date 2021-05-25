@@ -44,8 +44,8 @@ export class SysUserViewComponent implements OnInit {
         type: 'array',
         title: '状态',
         enum: [
-          { label: 'v0', value: 0 },
-          { label: 'v1', value: 1 },
+          { label: '正常', value: 'NORMAL' },
+          { label: '禁用', value: 'LOCKED' },
         ],
         default: 0,
         readOnly: true,

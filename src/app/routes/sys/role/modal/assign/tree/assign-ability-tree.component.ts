@@ -30,7 +30,11 @@ export class SysRoleAssignAbilityTreeComponent implements OnInit {
   constructor(private http: _HttpClient, private aclService: ACLService, private arrayService: ArrayService) {}
 
   ngOnInit() {
-    const can = this.aclService.canAbility('ability:query');
+    this.refresh();
+  }
+
+  refresh() {
+    const can = this.aclService.canAbility('role:assign');
 
     const roleAbilities$ = can ? this.http.get<Array<AbilityVO>>(`/api/role/${this.role.id}/abilities/full`) : of([]);
 

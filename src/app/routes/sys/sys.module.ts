@@ -19,6 +19,11 @@ import { SysDictCreateComponent } from './dict/modal/create.component';
 import { SysDictEditComponent } from './dict/modal/edit.component';
 import { SysDictViewComponent } from './dict/modal/view.component';
 import { SysI18nComponent } from './i18n/i18n.component';
+import { SysOrganizationComponent } from './organization/organization.component';
+import { SysPositionCreateComponent } from './position/modal/create.component';
+import { SysPositionEditComponent } from './position/modal/edit.component';
+import { SysPositionViewComponent } from './position/modal/view.component';
+import { SysPositionComponent } from './position/position.component';
 import { SysRoleAssignComponent } from './role/modal/assign/assign.component';
 import { SysRolesAbilityCellRendererComponent } from './role/modal/assign/table/ability-cell-renderer/ability-cell-renderer.component';
 import { SysRoleAssignAbilityTableComponent } from './role/modal/assign/table/assign-ability-table.component';
@@ -33,10 +38,14 @@ import { SysFileManagerComponent } from './file-manager/file-manager.component';
 import { SysLogComponent } from './log/log.component';
 import { SysMenuComponent } from './menu/menu.component';
 import { SysRoleComponent } from './role/role.component';
+import { SysUserAppointmentComponent } from './user/modal/appointment.component';
 import { SysUserCreateComponent } from './user/modal/create.component';
 import { SysUserEditComponent } from './user/modal/edit.component';
+import { SysUserJoinGroupComponent } from './user/modal/join-group.component';
 import { SysUserComponent } from './user/user.component';
 import { SysUserViewComponent } from './user/modal/view.component';
+import { SysUserAssignComponent } from './user/modal/assign.component';
+import { SysUserChangePwdComponent } from './user/modal/change-pwd.component';
 
 const icons: IconDefinition[] = [NumberOutline, FunctionOutline, FileOutline, SaveOutline];
 
@@ -52,6 +61,8 @@ const COMPONENTS: Type<void>[] = [
   SysFileManagerComponent,
   SysConfigComponent,
   SysDictComponent,
+  SysOrganizationComponent,
+  SysPositionComponent,
 ];
 
 const COMPONENTS_NOROUNT: Type<void>[] = [
@@ -79,6 +90,14 @@ const COMPONENTS_NOROUNT: Type<void>[] = [
   SysUserEditComponent,
   SysUserViewComponent,
   SysUserCreateComponent,
+  SysUserChangePwdComponent,
+  SysUserAssignComponent,
+  SysUserAppointmentComponent,
+  SysUserJoinGroupComponent,
+
+  SysPositionCreateComponent,
+  SysPositionEditComponent,
+  SysPositionViewComponent,
 ];
 
 @NgModule({
