@@ -1,7 +1,7 @@
 import { ColDef, ColumnApi, GetContextMenuItemsParams, GridApi } from '@ag-grid-community/core';
 import { ACLCanType, ACLType } from '@delon/acl';
 import { Observable } from 'rxjs';
-import { FilterType, IFilter } from '../filter-input/filter.types';
+import { FilterType, IFilter } from '../filter-input';
 
 export interface IPage<T> {
   /** 数据 */

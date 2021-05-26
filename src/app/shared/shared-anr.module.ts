@@ -1,4 +1,4 @@
 import { FilterInputModule } from './components/filter-input';
-import { NgxGridTableModule } from './components/ngx-grid-table';
+import { NgxGridTableModule, SfQueryFormModule } from './components/ngx-grid-table';
 
-export const SHARED_ANR_MODULES = [NgxGridTableModule, FilterInputModule];
+export const SHARED_ANR_MODULES = [NgxGridTableModule, FilterInputModule, SfQueryFormModule];

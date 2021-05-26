@@ -1,7 +1,6 @@
 import { GridApi } from '@ag-grid-community/core';
 import { ColDef, ColGroupDef } from '@ag-grid-community/core/dist/cjs/entities/colDef';
-import { SFSchema, SFUISchema } from '@delon/form';
-import { FilterInputUISchema } from '../../json-schema/widgets/filter-input-widget/filter-input.widget';
+import { SFSchema } from '@delon/form';
 import { DATE_FILTERS, NUMBER_FILTERS, SET_FILTERS, TEXT_FILTERS } from '../filter-input';
 
 export function asFilterInputPropertiesUI(schema: SFSchema, ...ignores: string[]): SFSchema {
