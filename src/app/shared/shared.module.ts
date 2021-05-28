@@ -27,6 +27,7 @@ import { MasonryModule } from './components/masonry';
 import { MouseFocusModule } from './components/mouse-focus';
 import { ScrollbarModule } from './components/scrollbar';
 import { StatusLabelModule } from './components/status-label';
+import { ObjectSelectModule } from './components/object-select';
 
 const MODULES = [
   AddressModule,
@@ -36,10 +37,12 @@ const MODULES = [
   MasonryModule,
   MouseFocusModule,
   ScrollbarModule,
+  ObjectSelectModule,
   StatusLabelModule,
   ...PRO_SHARED_MODULES,
   ...SHARED_ANR_MODULES,
 ];
+
 // #endregion
 
 @NgModule({
@@ -75,5 +78,6 @@ const MODULES = [
     // third libs
     ...THIRDMODULES,
   ],
+  declarations: [],
 })
 export class SharedModule {}

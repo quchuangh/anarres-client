@@ -10,6 +10,7 @@ export * from './components/address/index';
 export * from './components/langs/index';
 export * from './components/ngx-grid-table/index';
 export * from './components/filter-input/index';
+export * from './components/object-select/index';
 
 // Utils
 export * from './utils/yuan';

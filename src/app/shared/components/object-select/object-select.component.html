@@ -1,0 +1,26 @@
+<nz-input-group nzCompact>
+  <nz-select
+    [ngStyle]="item.value.style"
+    [ngModel]="value[item.key]"
+    (ngModelChange)="onChange($event, item.value, item.key)"
+    [nzMode]="item.value.mode"
+    *ngFor="let item of options | keyvalue"
+    [nzAllowClear]="item.value.allowClear"
+    [nzServerSearch]="item.value.serverSearch"
+    [nzMaxMultipleCount]="item.value.maxMultipleCount || 1000"
+    [nzPlaceHolder]="item.value.placeHolder"
+    [nzMaxTagCount]="item.value.maxTagCount || 3"
+    [nzLoading]="loading[item.key]"
+    nzShowSearch
+  >
+    <nz-option *ngIf="item.value.title" nzDisabled nzCustomContent>
+      <div class="title">{{ item.value.title }}</div>
+    </nz-option>
+    <ng-container *ngFor="let o of itemList[item.key]">
+      <nz-option *ngIf="!loading[item.key]" [nzLabel]="o.label" [nzValue]="o.value"> </nz-option>
+    </ng-container>
+    <nz-option *ngIf="loading[item.key]" nzDisabled nzCustomContent>
+      <i nz-icon nzType="loading" class="loading-icon"></i> Loading...
+    </nz-option>
+  </nz-select>
+</nz-input-group>

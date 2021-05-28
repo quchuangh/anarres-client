@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { SFSchema } from '@delon/form';
 import { Menu, _HttpClient } from '@delon/theme';
 import { ArrayService } from '@delon/util';
+import { ObjectSelectOption } from '@shared';
+
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzFormatBeforeDropEvent, NzFormatEmitEvent, NzTreeNode } from 'ng-zorro-antd/tree';
 import { of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { delay, map, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sys-menu',
@@ -19,13 +21,20 @@ export class SysMenuComponent implements OnInit {
   op!: string;
   item!: Menu;
   delDisabled = false;
-
+  objectOptions: Map<string, ObjectSelectOption> = new Map<string, ObjectSelectOption>();
   schema: SFSchema = {
     properties: {
       text: { type: 'string', title: '名称', minLength: 1 },
       code: { type: 'string', title: '编号', minLength: 4 },
       i18n: { type: 'string', title: '国际化', minLength: 1 },
-      acl: { type: 'string', title: 'ACL', default: '' },
+      acl: {
+        type: 'string',
+        title: 'ACL',
+        ui: {
+          widget: 'object-select',
+          options: this.objectOptions,
+        },
+      },
       reuse: { type: 'boolean', title: '复用', default: false },
       link: { type: 'string', title: '路由', minLength: 1, default: '#' },
       target: {
@@ -50,15 +59,72 @@ export class SysMenuComponent implements OnInit {
     ui: { grid: { md: 24, lg: 12 }, spanLabelFixed: 100 },
   };
 
-  constructor(
-    private http: _HttpClient,
-    private ccSrv: NzContextMenuService,
-    private arrSrv: ArrayService,
-    private msg: NzMessageService,
-  ) {}
+  objectSelect = {};
+
+  constructor(private http: _HttpClient, private ccSrv: NzContextMenuService, private arrSrv: ArrayService, private msg: NzMessageService) {
+    this.objectOptions.set('a', {
+      title: '角色',
+      style: { width: '200px' },
+      maxMultipleCount: 8,
+      maxTagCount: 2,
+
+      options: () =>
+        of([
+          { label: '11', value: 11 },
+          {
+            label: '22',
+            value: 22,
+          },
+          { label: '33', value: 33, groupLabel: '角色' },
+          {
+            label: '44',
+            value: 44,
+          },
+        ]).pipe(delay(5000)),
+    });
+    this.objectOptions.set('b', {
+      title: '权限',
+      style: { width: '100px' },
+      mode: 'default',
+
+      options: () =>
+        of([
+          { label: 'aa', value: 'aa' },
+          { label: 'bb', value: 'bb' },
+          { label: 'cc', value: 'cc' },
+          {
+            label: 'dd',
+            value: 'dd',
+          },
+        ]),
+    });
+    this.objectOptions.set('c', {
+      title: '其他',
+      style: { width: '100px' },
+      mode: 'default',
+      options: () =>
+        of([
+          { label: 'gg', value: 'gg' },
+          {
+            label: 'hh',
+            value: 'hh',
+            groupLabel: '其他',
+          },
+          { label: 'jj', value: 'jj' },
+          {
+            label: 'kk',
+            value: 'kk',
+          },
+        ]),
+    });
+  }
 
   ngOnInit(): void {
     this.getData();
+  }
+
+  objectSelectChange(value: any): void {
+    console.log(value);
   }
 
   private getData(): void {
@@ -101,6 +167,9 @@ export class SysMenuComponent implements OnInit {
   }
 
   save(item: any): void {
+    if (item.acl) {
+      item = Object.assign({}, item, { acl: JSON.parse(item.acl) });
+    }
     item.externalLink = '';
     this.http.post(`/api/sys/menu/${item.id ? 'update' : 'create'}`, item).subscribe(() => {
       if (item.id <= 0) {
