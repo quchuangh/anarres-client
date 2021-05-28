@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ControlWidget } from '@delon/form';
+import { ControlUIWidget } from '@delon/form';
+import { SFUISchemaItem } from '@delon/form/src/schema/ui';
 import { ObjectSelectOption } from '../../../components/object-select';
+
+export interface ObjectSelectUISchema extends SFUISchemaItem {
+  /** 用户可选操作，如 >, >=, <, <= 等 */
+  options: ObjectSelectOption[];
+}
 
 @Component({
   selector: 'sf-object-select',
@@ -8,7 +14,7 @@ import { ObjectSelectOption } from '../../../components/object-select';
   styleUrls: ['./object-select.widget.less'],
 })
 // tslint:disable-next-line:component-class-suffix
-export class ObjectSelectWidget extends ControlWidget implements OnInit {
+export class ObjectSelectWidget extends ControlUIWidget<ObjectSelectUISchema> implements OnInit {
   /* 用于注册小部件 KEY 值 */
   static readonly KEY = 'object-select';
 
@@ -22,13 +28,11 @@ export class ObjectSelectWidget extends ControlWidget implements OnInit {
   }
 
   reset(value: string): void {
-    console.log(value);
     this.defaultValue = value;
   }
 
   change(value: any): void {
     const result = JSON.stringify(value);
-
     if (this.ui.change) {
       this.ui.change(result);
     }
