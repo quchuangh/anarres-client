@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { debounceTime, map, switchMap } from 'rxjs/operators';
 
 export interface ObjectSelectOption {
+  id: string;
   title?: string;
   maxTagCount?: number;
   allowClear?: boolean;
@@ -36,11 +37,11 @@ export interface ObjectSelectOption {
 })
 export class ObjectSelectComponent implements OnInit, ControlValueAccessor {
   value: { [key: string]: any } = {};
-
+  width = '';
   @Input()
-  options: Map<string, ObjectSelectOption> = new Map<string, ObjectSelectOption>();
+  options: ObjectSelectOption[] = [];
 
-  searchChange$ = new BehaviorSubject<{ value: string; id: string } | null>(null);
+  searchChange$ = new BehaviorSubject<{ value: string; select: ObjectSelectOption } | null>(null);
   itemList: { [key: string]: NzSelectOptionInterface[] } = {};
 
   loading: { [key: string]: boolean } = {};
@@ -50,9 +51,9 @@ export class ObjectSelectComponent implements OnInit, ControlValueAccessor {
 
   constructor(private cdr: ChangeDetectorRef) {}
 
-  onSearch(searchValue: string, id: string): void {
-    this.loading[id] = true;
-    this.searchChange$.next({ value: searchValue, id });
+  onSearch(searchValue: string, select: ObjectSelectOption): void {
+    this.loading[select.id] = true;
+    this.searchChange$.next({ value: searchValue, select });
   }
 
   writeValue(obj: any): void {
@@ -74,10 +75,13 @@ export class ObjectSelectComponent implements OnInit, ControlValueAccessor {
   }
 
   ngOnInit(): void {
-    const getItems = (params: { value: string; id: string } | null): Observable<{ [key: string]: NzSelectOptionInterface[] }> => {
-      if (params && this.options.has(params.id)) {
-        const option = this.options.get(params.id)!;
-        return option.options(params.value).pipe(map((data) => ({ [params.id]: data })));
+    this.width = `${100 / Object.keys(this.options).length}%`;
+
+    const getItems = (
+      params: { value: string; select: ObjectSelectOption } | null,
+    ): Observable<{ [key: string]: NzSelectOptionInterface[] }> => {
+      if (params) {
+        return params.select.options(params.value).pipe(map((data) => ({ [params.select.id]: data })));
       }
       return of({});
     };
@@ -89,9 +93,9 @@ export class ObjectSelectComponent implements OnInit, ControlValueAccessor {
       this.updateOptions(next);
     });
 
-    Array.from(this.options.keys()).forEach((key) => {
-      this.loading[key] = true;
-      getItems({ id: key, value: '' }).subscribe((next) => {
+    this.options.forEach((item) => {
+      this.loading[item.id] = true;
+      getItems({ select: item, value: '' }).subscribe((next) => {
         this.updateOptions(next);
       });
     });
@@ -103,13 +107,13 @@ export class ObjectSelectComponent implements OnInit, ControlValueAccessor {
     this.cdr.markForCheck();
   }
 
-  onChange(value: any, item: ObjectSelectOption, id: string): void {
+  onChange(value: any, item: ObjectSelectOption): void {
     this.onModelTouched();
 
     if (item.valueParser) {
       this.value = item.valueParser(value, this.value);
     } else {
-      Object.assign(this.value, { [id]: value });
+      Object.assign(this.value, { [item.id]: value });
     }
     this.onModelChange(this.value);
   }

@@ -12,7 +12,7 @@ export class ObjectSelectWidget extends ControlWidget implements OnInit {
   /* 用于注册小部件 KEY 值 */
   static readonly KEY = 'object-select';
 
-  options: Map<string, ObjectSelectOption> = new Map<string, ObjectSelectOption>();
+  options: ObjectSelectOption[] = [];
 
   defaultValue = {};
 
@@ -28,10 +28,10 @@ export class ObjectSelectWidget extends ControlWidget implements OnInit {
 
   change(value: any): void {
     const result = JSON.stringify(value);
-    console.log(result);
+
     if (this.ui.change) {
       this.ui.change(result);
     }
-    this.setValue(JSON.stringify(result));
+    this.setValue(result);
   }
 }

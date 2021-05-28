@@ -21,7 +21,64 @@ export class SysMenuComponent implements OnInit {
   op!: string;
   item!: Menu;
   delDisabled = false;
-  objectOptions: Map<string, ObjectSelectOption> = new Map<string, ObjectSelectOption>();
+  objectOptions = [
+    {
+      id: 'role',
+      title: '角色',
+      maxMultipleCount: 8,
+      maxTagCount: 2,
+      mode: 'multiple',
+      options: () =>
+        of([
+          { label: '11', value: 11 },
+          {
+            label: '22',
+            value: 22,
+          },
+          { label: '33', value: 33, groupLabel: '角色' },
+          {
+            label: '44',
+            value: 44,
+          },
+        ]).pipe(delay(5000)),
+    },
+    {
+      id: 'ability',
+      title: '权限',
+      maxMultipleCount: 8,
+      maxTagCount: 2,
+      mode: 'multiple',
+      options: () =>
+        of([
+          { label: 'aa', value: 'aa' },
+          { label: 'bb', value: 'bb' },
+          { label: 'cc', value: 'cc' },
+          {
+            label: 'dd',
+            value: 'dd',
+          },
+        ]),
+    },
+    {
+      id: 'c',
+      title: '其他',
+      mode: 'default',
+      options: () =>
+        of([
+          { label: 'gg', value: 'gg' },
+          {
+            label: 'hh',
+            value: 'hh',
+            groupLabel: '其他',
+          },
+          { label: 'jj', value: 'jj' },
+          {
+            label: 'kk',
+            value: 'kk',
+          },
+        ]),
+    },
+  ];
   schema: SFSchema = {
     properties: {
       text: { type: 'string', title: '名称', minLength: 1 },
@@ -61,63 +118,12 @@ export class SysMenuComponent implements OnInit {
 
   objectSelect = {};
 
-  constructor(private http: _HttpClient, private ccSrv: NzContextMenuService, private arrSrv: ArrayService, private msg: NzMessageService) {
-    this.objectOptions.set('a', {
-      title: '角色',
-      style: { width: '200px' },
-      maxMultipleCount: 8,
-      maxTagCount: 2,
-
-      options: () =>
-        of([
-          { label: '11', value: 11 },
-          {
-            label: '22',
-            value: 22,
-          },
-          { label: '33', value: 33, groupLabel: '角色' },
-          {
-            label: '44',
-            value: 44,
-          },
-        ]).pipe(delay(5000)),
-    });
-    this.objectOptions.set('b', {
-      title: '权限',
-      style: { width: '100px' },
-      mode: 'default',
-
-      options: () =>
-        of([
-          { label: 'aa', value: 'aa' },
-          { label: 'bb', value: 'bb' },
-          { label: 'cc', value: 'cc' },
-          {
-            label: 'dd',
-            value: 'dd',
-          },
-        ]),
-    });
-    this.objectOptions.set('c', {
-      title: '其他',
-      style: { width: '100px' },
-      mode: 'default',
-      options: () =>
-        of([
-          { label: 'gg', value: 'gg' },
-          {
-            label: 'hh',
-            value: 'hh',
-            groupLabel: '其他',
-          },
-          { label: 'jj', value: 'jj' },
-          {
-            label: 'kk',
-            value: 'kk',
-          },
-        ]),
-    });
-  }
+  constructor(
+    private http: _HttpClient,
+    private ccSrv: NzContextMenuService,
+    private arrSrv: ArrayService,
+    private msg: NzMessageService,
+  ) {}
 
   ngOnInit(): void {
     this.getData();
@@ -130,17 +136,17 @@ export class SysMenuComponent implements OnInit {
   private getData(): void {
     // https://ng-alain.com/util/array/zh?#arrToTree
     this.http.get('/api/sys/menu/all').subscribe((res: Menu[]) => {
-      // res = res.map(item => {
-      //   if(item.acl) {
-      //     item.acl = JSON.parse(item.acl as string);
-      //   } else {
-      //     item.acl = {
-      //       role: [],
-      //       ability: []
-      //     }
-      //   }
-      //   return item;
-      // })
+      res = res.map((item) => {
+        if (item.acl) {
+          item.acl = JSON.parse(item.acl as string);
+        } else {
+          item.acl = {
+            role: [],
+            ability: [],
+          };
+        }
+        return item;
+      });
       this.data = this.arrSrv.arrToTreeNode(res, {
         titleMapName: 'text',
         parentIdMapName: 'parentId',
@@ -167,15 +173,15 @@ export class SysMenuComponent implements OnInit {
   }
 
   save(item: any): void {
-    if (item.acl) {
-      item = Object.assign({}, item, { acl: JSON.parse(item.acl) });
-    }
     item.externalLink = '';
     this.http.post(`/api/sys/menu/${item.id ? 'update' : 'create'}`, item).subscribe(() => {
       if (item.id <= 0) {
         this.getData();
         this.op = '';
       } else {
+        if (item && typeof item.acl === 'string') {
+          item = Object.assign({}, item, { acl: JSON.parse(item.acl) });
+        }
         this.item = item;
         this.menuEvent.node!.title = item.text;
         this.menuEvent.node!.origin = item;

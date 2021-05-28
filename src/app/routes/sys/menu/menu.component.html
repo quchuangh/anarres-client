@@ -32,7 +32,12 @@
           <sv label="隐藏"><span [innerHTML]="item.hide | yn"></span></sv>
           <sv label="隐藏导航"><span [innerHTML]="item.hideInBreadcrumb | yn"></span></sv>
           <sv label="允许快捷"><span [innerHTML]="item.canShortcut | yn"></span></sv>
-          <sv label="ACL">{{ item.acl }}</sv>
+          <sv label="ACL">
+            <ng-container *ngFor="let acl of item.acl | keyvalue">
+              {{ acl.key }}：
+              <nz-tag>{{ acl.value }}</nz-tag>
+            </ng-container>
+          </sv>
           <sv label="复用"><span [innerHTML]="item.reuse | yn"></span></sv>
           <sv label="启动"><span [innerHTML]="item.enabled | yn"></span></sv>
           <sv label="排序值">{{ item.sortRank }}</sv>
