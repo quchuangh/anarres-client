@@ -31,7 +31,7 @@ export class ObjectSelectWidget extends ControlUIWidget<ObjectSelectUISchema> im
   }
 
   change(value: any): void {
-    const result = JSON.stringify(value);
+    const result = Object.keys(value).length ? JSON.stringify(value) : '';
     if (this.ui.change) {
       this.ui.change(result);
     }

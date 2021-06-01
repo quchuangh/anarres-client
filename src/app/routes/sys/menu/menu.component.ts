@@ -141,8 +141,8 @@ export class SysMenuComponent implements OnInit {
           item.acl = JSON.parse(item.acl as string);
         } else {
           item.acl = {
-            role: [],
-            ability: [],
+            role: undefined,
+            ability: undefined,
           };
         }
         return item;
@@ -174,6 +174,9 @@ export class SysMenuComponent implements OnInit {
 
   save(item: any): void {
     item.externalLink = '';
+    if (typeof item.acl === 'object') {
+      item.acl = JSON.stringify(item.acl);
+    }
     this.http.post(`/api/sys/menu/${item.id ? 'update' : 'create'}`, item).subscribe(() => {
       if (item.id <= 0) {
         this.getData();

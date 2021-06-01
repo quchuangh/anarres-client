@@ -27,6 +27,7 @@ import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { LayoutPassportComponent } from './passport/passport.component';
 import { PRO_COMPONENTS, PRO_ENTRYCOMPONENTS } from './pro/index';
+import { ReuseTabModule } from '@delon/abc/reuse-tab';
 
 const PASSPORT = [LayoutPassportComponent];
 
@@ -36,6 +37,7 @@ const PASSPORT = [LayoutPassportComponent];
     RouterModule,
     FormsModule,
     AlainThemeModule,
+    ReuseTabModule,
     GlobalFooterModule,
     TranslateModule,
     CDKLayoutModule,
