@@ -55,7 +55,7 @@ export interface AclColDef extends ColDef {
 //   map: (data: any) => any;
 // }
 
-export type IGridDataSource<T> = <T>(rowQuery: IRowQuery) => Observable<IPage<T>>;
+export type IGridDataSource<T> = (rowQuery: IRowQuery) => Observable<IPage<T>>;
 
 export interface MenuItem {
   name: string;

@@ -1,10 +1,12 @@
 import { ColumnApi, GridApi, GridOptions, GridReadyEvent, IServerSideGetRowsParams, RowNode } from '@ag-grid-community/core';
 import { CellRange } from '@ag-grid-community/core/dist/cjs/interfaces/iRangeController';
-import { IServerSideDatasource } from '@ag-grid-community/core/dist/cjs/interfaces/iServerSideDatasource';
+import { IServerSideDatasource, IServerSideGetRowsRequest } from '@ag-grid-community/core/dist/cjs/interfaces/iServerSideDatasource';
 
 import { AllModules } from '@ag-grid-enterprise/all-modules';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 
+import { Column } from '@ag-grid-community/core/dist/cjs/entities/column';
+import { ColumnVO } from '@ag-grid-community/core/dist/cjs/interfaces/iColumnVO';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReuseTabService } from '@delon/abc/reuse-tab';
 import { ACLService } from '@delon/acl';
@@ -13,8 +15,9 @@ import { _HttpClient } from '@delon/theme';
 import { TranslateService } from '@ngx-translate/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { Observable, of, Subject } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { Observable, of, range, Subject } from 'rxjs';
+import { catchError, merge, mergeMap, pluck, reduce, takeUntil } from 'rxjs/operators';
+
 import { Console } from '../../../utils/console';
 import { IFilter } from '../../filter-input/filter.types';
 // 不要使用import {Console} from '@shared'，防止循环引用
@@ -330,7 +333,13 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
           Console.collapse('grid-table.component RefreshRowsData', 'redBg', 'ERROR', 'redOutline');
           console.log(err);
           console.groupEnd();
-          return of({ total: 0, records: [], size: rowQuery.pageSize, current: rowQuery.pageNum, statistics: [] } as IPage<any>);
+          return of({
+            total: 0,
+            records: [],
+            size: rowQuery.pageSize,
+            current: rowQuery.pageNum,
+            statistics: [],
+          } as IPage<any>);
         }),
       )
       .subscribe((resultPage) => {
@@ -356,7 +365,79 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
     this.query(idx, this.pageSize);
   }
 
-  exportAllPageData(): void {}
+  /**
+   *
+   * @param maxRequestCount 最大并发查询数
+   * @param pageSize 每次查询条数，默认采用当前分页大小
+   */
+  exportAllPageData(maxRequestCount: number = 3, pageSize?: number): void {
+    const initPageNum = 1;
+    pageSize = pageSize || this.pageSize;
+    let rowQuery: IRowQuery;
+    if (this.dataLoadModel !== 'pageable') {
+      rowQuery = clientSideAsRowQuery(this.api, this.columnApi, initPageNum, pageSize, this.filters());
+    } else {
+      rowQuery = serverSideAsRowQuery(
+        this.getServerSideGetRowsParams((initPageNum - 1) * pageSize, initPageNum * pageSize),
+        this.treeData,
+        this.filters(),
+      );
+    }
+    this.dataSource(rowQuery)
+      .pipe(
+        mergeMap((page: IPage<any>) => {
+          const { total, size, current, records } = page;
+          const totalPage = Math.ceil(total / size);
+          if (totalPage > current) {
+            return range(current + 1, totalPage).pipe(
+              mergeMap((index: number) => {
+                return this.dataSource(Object.assign({}, rowQuery, { pageNum: index }));
+              }),
+              pluck('records'),
+              reduce((acc, val) => acc.concat(val || []), records),
+            );
+          } else {
+            return of([]);
+          }
+        }, maxRequestCount),
+      )
+      .subscribe((next) => {
+        this.api.setRowData(next);
+        this.api.exportDataAsExcel();
+        this.refresh();
+      });
+  }
+
+  private getServerSideGetRowsParams(startRow: number, endRow: number): IServerSideGetRowsParams {
+    const columnToVO = (column: Column) =>
+      ({
+        id: column.getId(),
+        displayName: this.columnApi.getDisplayNameForCol(column),
+        field: column.getColDef().field,
+        aggFunc: column.getAggFunc(),
+      } as ColumnVO);
+    const rowGroupCols: ColumnVO[] = this.columnApi.getRowGroupColumns().map(columnToVO);
+    const valueCols = this.columnApi.getValueColumns().map(columnToVO);
+    const pivotCols = this.columnApi.getPivotColumns().map(columnToVO);
+    return {
+      request: {
+        startRow,
+        endRow,
+        rowGroupCols,
+        valueCols,
+        pivotCols,
+        pivotMode: this.columnApi.isPivotMode(),
+        groupKeys: this.columnApi.getColumnGroupState().map((state) => state.groupId),
+        filterModel: this.api.getFilterModel(),
+        sortModel: this.api.getSortModel(),
+      } as IServerSideGetRowsRequest,
+      parentNode: new RowNode(),
+      successCallback: (rowsThisPage: any[], lastRow: number) => {},
+      failCallback: () => {},
+      api: this.api,
+      columnApi: this.columnApi,
+    } as IServerSideGetRowsParams;
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -444,6 +525,7 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   toggleFullscreen(): void {
     this.setFullscreen(!this.fullscreen);
   }
+
   setFullscreen(fullscreen: boolean): void {
     this.fullscreen = fullscreen;
     this.fullscreenChange.emit(this.fullscreen);
