@@ -7,7 +7,15 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ACLService } from '@delon/acl';
 import { SFSchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
-import { AclColDef, asFilterInputPropertiesUI, IFilter, IGridDataSource, NgxGridTableComponent, NgxGridTableConstants } from '@shared';
+import {
+  AclColDef,
+  asFilterInputPropertiesUI,
+  IFilter,
+  IGridDataSource,
+  IRowQuery,
+  NgxGridTableComponent,
+  NgxGridTableConstants,
+} from '@shared';
 import { SfQueryFormComponent } from '../../../shared/components/ngx-grid-table/sf-query-form/sf-query-form.component';
 import { DataSourceUtils } from '../../DataSourceUtils';
 import { SysUserAppointmentComponent } from './modal/appointment.component';
@@ -17,6 +25,7 @@ import { SysUserEditComponent } from './modal/edit.component';
 import { SysUserAssignComponent } from './modal/assign.component';
 import { SysUserJoinGroupComponent } from './modal/join-group.component';
 import { SysUserViewComponent } from './modal/view.component';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user',
@@ -60,7 +69,14 @@ export class SysUserComponent implements OnInit {
   columnDefs: AclColDef[] = [
     // { headerName: 'testACL', field: 'testACL', acl: { ability: ['POST:/TEST'] } }, //加上acl后只有符合权限的才展示出来
     // { headerName: 'group', field: 'typeGroup', enableRowGroup: true }, // 需要分组查询，则将 enableRowGroup设置为true
-    { headerName: 'id', field: 'id', sort: 'desc', sortable: true, checkboxSelection: true, headerCheckboxSelection: true },
+    {
+      headerName: 'id',
+      field: 'id',
+      sort: 'desc',
+      sortable: true,
+      checkboxSelection: true,
+      headerCheckboxSelection: true,
+    },
     { headerName: '操作', field: NgxGridTableConstants.OPTION_FIELD },
     { headerName: '账号', field: 'username' },
     { headerName: '状态', field: 'state' },
@@ -95,7 +111,12 @@ export class SysUserComponent implements OnInit {
         event.columnApi.autoSizeAllColumns();
       },
     };
-    this.dataSource = DataSourceUtils.rowQuery(http, '/api/user/query', (r) => r);
+    //  this.dataSource = DataSourceUtils.rowQuery(http, '/api/user/query', (r) => r);
+    this.dataSource = (rowQuery) => {
+      const delayTime = Math.floor(Math.random() * (3 - 1 + 1) + 1);
+      return this.http.post('/api/user/query', JSON.stringify(rowQuery)).pipe(delay(delayTime * 1000));
+    };
+    //  this.dataSource = ((rowQuery: IRowQuery) => DataSourceUtils.asObs(http, '/api/user/query', rowQuery, (r) => r)) as IGridDataSource<R>;
   }
 
   ngOnInit(): void {}

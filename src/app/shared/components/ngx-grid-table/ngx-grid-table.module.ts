@@ -6,7 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { IconDefinition } from '@ant-design/icons-angular';
-import { FileExcelOutline, RestOutline, SearchOutline, SwapOutline } from '@ant-design/icons-angular/icons';
+import { FileExcelOutline, SyncOutline, RestOutline, SearchOutline, SwapOutline } from '@ant-design/icons-angular/icons';
 import { FullContentModule } from '@delon/abc/full-content';
 import { DelonACLModule } from '@delon/acl';
 import { DelonFormModule } from '@delon/form';
@@ -25,6 +25,7 @@ import { OperableTextInputComponent } from './inner-tags/operable-text-input/ope
 import { TemplateRendererComponent } from './inner-tags/template-renderer.component';
 import { SfQueryFormModule } from './sf-query-form/sf-query-form.module';
 import { NgxGridTableComponent } from './table/ngx-grid-table.component';
+import { RefreshButtonComponent } from './inner-tags/refresh-button/refresh-button.component';
 // @ts-ignore
 LicenseManager.extractExpiry = () => new Date(7287897600000);
 LicenseManager.setLicenseKey(
@@ -32,11 +33,11 @@ LicenseManager.setLicenseKey(
 );
 
 const TAG_IMPLS = [NgxTablePaginationComponent, NgxTableStatisticsBarComponent];
-const TAGS = [NgxTableHeaderComponent, NgxTableToolBarComponent, NgxTableFooterComponent];
+const TAGS = [NgxTableHeaderComponent, NgxTableToolBarComponent, RefreshButtonComponent, NgxTableFooterComponent];
 
 const COMPONENTS = [NgxGridTableComponent, LoadingOverlayComponent, NoRowOverlayComponent, ...TAGS, ...TAG_IMPLS];
 
-const icons: IconDefinition[] = [SearchOutline, FileExcelOutline, RestOutline, SwapOutline];
+const icons: IconDefinition[] = [SearchOutline, SyncOutline, FileExcelOutline, RestOutline, SwapOutline];
 
 @NgModule({
   imports: [

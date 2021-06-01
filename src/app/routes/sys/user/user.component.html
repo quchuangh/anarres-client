@@ -40,9 +40,10 @@
 <ng-template #bottomToolPanel let-table let-page="page">
   <ngx-table-tool-bar [left]="['full']" [right]="['page']" [page]="page" [table]="table">
     <div left>
-      <button nz-button acl [acl-ability]="'user:export'" nzSize="small" nzType="primary" (click)="this.table.exportAllPageData()">
+      <button nz-button nzSize="small" nzType="primary" (click)="this.table.exportAllPageData()">
         <i nz-icon nzType="file-excel" nzTheme="outline"></i>导出
       </button>
+      <app-refresh-button [time]="5" [refreshFunc]="table.refresh.bind(table)"></app-refresh-button>
     </div>
   </ngx-table-tool-bar>
 </ng-template>

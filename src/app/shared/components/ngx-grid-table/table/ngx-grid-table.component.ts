@@ -16,7 +16,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { Observable, of, range, Subject } from 'rxjs';
-import { catchError, merge, mergeMap, pluck, reduce, takeUntil, tap } from 'rxjs/operators';
+import { catchError, filter, merge, mergeMap, pluck, reduce, skip, take, takeUntil, tap } from 'rxjs/operators';
 
 import { Console } from '../../../utils/console';
 import { IFilter } from '../../filter-input/filter.types';
@@ -506,12 +506,16 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   /**
    * 刷新表格
    */
-  public refresh(): void {
+  public refresh(): Observable<boolean> {
     if (this.dataLoadModel === 'pageable') {
       this.query(this.pageIndex, this.pageSize);
     } else {
       this.api.purgeServerSideCache();
     }
+    return this.dataLoadingChange.asObservable().pipe(
+      filter((status) => !status),
+      take(1),
+    );
   }
 
   /**

@@ -29,6 +29,9 @@
       <i nz-icon [nzType]="full ? 'fullscreen-exit' : 'fullscreen'" nzTheme="outline"></i>全屏
     </button>
 
+    <!-- <lib-refresh-button *ngSwitchCase="'full'" [time]="refreshInterval"
+                        [refreshFunc]="autoRefresh"></lib-refresh-button>-->
+
     <button *ngSwitchCase="'export'" (click)="onExport()" acl nz-button nzSize="small" nzType="primary">
       <i nz-icon nzType="file-excel" nzTheme="outline"></i>导出
     </button>
