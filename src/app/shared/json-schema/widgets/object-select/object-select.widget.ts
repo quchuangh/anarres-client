@@ -4,7 +4,6 @@ import { SFUISchemaItem } from '@delon/form/src/schema/ui';
 import { ObjectSelectOption } from '../../../components/object-select';
 
 export interface ObjectSelectUISchema extends SFUISchemaItem {
-  /** 用户可选操作，如 >, >=, <, <= 等 */
   options: ObjectSelectOption[];
 }
 

@@ -2,7 +2,7 @@ import { ColumnApi, GridApi, GridOptions, GridReadyEvent, IServerSideGetRowsPara
 import { CellRange } from '@ag-grid-community/core/dist/cjs/interfaces/iRangeController';
 import { IServerSideDatasource, IServerSideGetRowsRequest } from '@ag-grid-community/core/dist/cjs/interfaces/iServerSideDatasource';
 
-import { AllModules } from '@ag-grid-enterprise/all-modules';
+import { AllModules, ExcelCell } from '@ag-grid-enterprise/all-modules';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 
 import { Column } from '@ag-grid-community/core/dist/cjs/entities/column';
@@ -16,7 +16,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { Observable, of, range, Subject } from 'rxjs';
-import { catchError, merge, mergeMap, pluck, reduce, takeUntil } from 'rxjs/operators';
+import { catchError, merge, mergeMap, pluck, reduce, takeUntil, tap } from 'rxjs/operators';
 
 import { Console } from '../../../utils/console';
 import { IFilter } from '../../filter-input/filter.types';
@@ -155,6 +155,7 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   // ============================= 组件 =======================
   @ViewChild(SfQueryFormComponent) form!: SfQueryFormComponent;
   @ViewChild('defaultPageTmpl') defaultPageTmpl!: TemplateRef<any>;
+  @ViewChild('progressTmpl') progressTmpl!: TemplateRef<any>;
 
   constructor(
     private translateService: TranslateService,
@@ -373,70 +374,112 @@ export class NgxGridTableComponent implements OnInit, OnDestroy {
   exportAllPageData(maxRequestCount: number = 3, pageSize?: number): void {
     const initPageNum = 1;
     pageSize = pageSize || this.pageSize;
-    let rowQuery: IRowQuery;
     if (this.dataLoadModel !== 'pageable') {
-      rowQuery = clientSideAsRowQuery(this.api, this.columnApi, initPageNum, pageSize, this.filters());
-    } else {
-      rowQuery = serverSideAsRowQuery(
-        this.getServerSideGetRowsParams((initPageNum - 1) * pageSize, initPageNum * pageSize),
-        this.treeData,
-        this.filters(),
-      );
+      // 暂时只支持客户端模式导出全部数据，因为服务端模式下由于缓存大小问题setRowData方法无效
+      console.warn('pageable 模式才能前端导出！');
+      // 导出当前缓存的数据
+      this.api.exportDataAsExcel({ customFooter: this.exportStatisticsFooter() });
+      return;
     }
-    this.dataSource(rowQuery)
-      .pipe(
-        mergeMap((page: IPage<any>) => {
-          const { total, size, current, records } = page;
-          const totalPage = Math.ceil(total / size);
-          if (totalPage > current) {
-            return range(current + 1, totalPage).pipe(
-              mergeMap((index: number) => {
-                return this.dataSource(Object.assign({}, rowQuery, { pageNum: index }));
-              }),
-              pluck('records'),
-              reduce((acc, val) => acc.concat(val || []), records),
-            );
-          } else {
-            return of([]);
-          }
-        }, maxRequestCount),
-      )
-      .subscribe((next) => {
-        this.api.setRowData(next);
-        this.api.exportDataAsExcel();
-        this.refresh();
-      });
+    const rowQuery: IRowQuery = clientSideAsRowQuery(this.api, this.columnApi, initPageNum, pageSize, this.filters());
+    const params = { percent: 0, status: 'active' };
+    const confirm = this.modal.confirm({
+      nzContent: this.progressTmpl,
+      nzTitle: this.translateService.instant('grid.export.confirm'),
+      nzComponentParams: params,
+      nzOkText: this.translateService.instant('grid.export.start'),
+      nzOnOk: () => {
+        params.percent = 0.01;
+        params.status = 'active';
+        confirm.updateConfig({
+          nzTitle: undefined,
+          nzContent: this.progressTmpl,
+          nzComponentParams: params,
+          nzOkText: null,
+          nzClosable: false,
+          nzCloseIcon: undefined,
+          nzIconType: undefined,
+          nzMaskClosable: false,
+          nzCancelText: null,
+        });
+        let statisticsFooter: Array<GridStatistics> = [];
+        return this.dataSource(rowQuery)
+          .pipe(
+            mergeMap((page: IPage<any>) => {
+              const { total, size, current, records, statistics } = page;
+              statisticsFooter = statistics || [];
+              const totalPage = Math.ceil(total / size);
+              if (totalPage > current) {
+                const step = parseFloat((100 / totalPage).toFixed(2));
+                params.percent = step;
+                return range(current + 1, totalPage).pipe(
+                  mergeMap((index: number) => {
+                    return this.dataSource(Object.assign({}, rowQuery, { pageNum: index }));
+                  }, maxRequestCount),
+                  pluck('records'),
+                  tap((next) => {
+                    params.percent = parseFloat((params.percent + step).toFixed(2));
+                  }),
+                  reduce((acc, val) => acc.concat(val || []), records),
+                );
+              } else {
+                return of([]);
+              }
+            }),
+          )
+          .toPromise()
+          .then((next) => {
+            params.status = '';
+            params.percent = 100;
+            this.api.setRowData(next);
+            this.api.exportDataAsExcel({ customFooter: this.exportStatisticsFooter(statisticsFooter) });
+            this.refresh();
+            return true;
+          })
+          .catch((err) => {
+            Console.collapse('grid-table.component ExportAllPageData', 'redBg', 'ERROR', 'redOutline');
+            console.error(err);
+            console.groupEnd();
+            params.status = 'exception';
+            confirm.updateConfig({
+              nzCancelText: undefined,
+              nzOkText: this.translateService.instant('grid.export.retry'),
+            });
+            return false;
+          });
+      },
+    });
   }
 
-  private getServerSideGetRowsParams(startRow: number, endRow: number): IServerSideGetRowsParams {
-    const columnToVO = (column: Column) =>
-      ({
-        id: column.getId(),
-        displayName: this.columnApi.getDisplayNameForCol(column),
-        field: column.getColDef().field,
-        aggFunc: column.getAggFunc(),
-      } as ColumnVO);
-    const rowGroupCols: ColumnVO[] = this.columnApi.getRowGroupColumns().map(columnToVO);
-    const valueCols = this.columnApi.getValueColumns().map(columnToVO);
-    const pivotCols = this.columnApi.getPivotColumns().map(columnToVO);
-    return {
-      request: {
-        startRow,
-        endRow,
-        rowGroupCols,
-        valueCols,
-        pivotCols,
-        pivotMode: this.columnApi.isPivotMode(),
-        groupKeys: this.columnApi.getColumnGroupState().map((state) => state.groupId),
-        filterModel: this.api.getFilterModel(),
-        sortModel: this.api.getSortModel(),
-      } as IServerSideGetRowsRequest,
-      parentNode: new RowNode(),
-      successCallback: (rowsThisPage: any[], lastRow: number) => {},
-      failCallback: () => {},
-      api: this.api,
-      columnApi: this.columnApi,
-    } as IServerSideGetRowsParams;
+  private exportStatisticsFooter(statistics?: Array<GridStatistics>): ExcelCell[][] {
+    const footers: Array<Array<ExcelCell>> = [[]];
+    statistics = statistics || this.statistics;
+    if (this.showStatistics && statistics && statistics.length) {
+      const footer = statistics
+        .filter((items) => items.skipExport !== true)
+        .map((items) => {
+          const rows: Array<ExcelCell> = [];
+          rows.push({
+            styleId: 'bigHeader',
+            data: {
+              type: 'String',
+              value: items.label || '',
+            },
+          });
+          items.fields.forEach((item) => {
+            rows.push({
+              styleId: 'bigHeader',
+              data: {
+                type: 'String',
+                value: `${item.label}:${item.value}`,
+              },
+            } as ExcelCell);
+          });
+          return rows;
+        });
+      footers.push(...footer);
+    }
+    return footers;
   }
 
   ngOnDestroy(): void {

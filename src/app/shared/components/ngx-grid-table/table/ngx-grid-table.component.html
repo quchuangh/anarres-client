@@ -56,3 +56,7 @@
   >
   </ngx-table-pagination>
 </ng-template>
+
+<ng-template #progressTmpl let-params>
+  <nz-progress *ngIf="params.percent" [nzPercent]="params.percent" [nzStatus]="params.status"></nz-progress>
+</ng-template>

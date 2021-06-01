@@ -119,4 +119,35 @@ export const USERS = {
   'POST /register': {
     msg: 'ok',
   },
+  'POST /api/user/query': (req: MockRequest) => {
+    const total = 8888;
+
+    const { pageNum, pageSize, filters }: { pageNum: number; pageSize: number; filters: any[] } = JSON.parse(req.body);
+    console.log(pageNum, pageSize);
+    const totalPage = Math.ceil(total / pageSize);
+    const len = Math.min(pageSize * pageNum, total);
+    let startNum = (pageNum - 1) * pageSize;
+    const data = [];
+    for (; startNum < len; startNum++) {
+      if (startNum > 200) {
+        throw new Error('500');
+      }
+      data.push({
+        id: startNum,
+        username: `username${startNum}`,
+        loginTimes: Math.floor(Math.random() * (666 - 1 + 1) + 1),
+      });
+    }
+
+    return {
+      current: pageNum,
+      hitCount: false,
+      orders: [],
+      records: data,
+      searchCount: true,
+      size: pageSize,
+      total,
+      pages: totalPage,
+    };
+  },
 };
