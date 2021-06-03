@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -33,7 +33,7 @@ import { takeUntil } from 'rxjs/operators';
     `,
   ],
 })
-export class RefreshButtonComponent implements OnInit {
+export class RefreshButtonComponent implements OnInit, OnDestroy {
   refresh = false;
 
   @Input()
@@ -74,5 +74,10 @@ export class RefreshButtonComponent implements OnInit {
           }
         });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.stop$.next();
+    this.stop$.complete();
   }
 }

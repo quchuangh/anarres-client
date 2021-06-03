@@ -28,6 +28,13 @@ import { ProSettingDrawerComponent } from './setting-drawer/setting-drawer.compo
   templateUrl: './pro.component.html',
   // NOTICE: If all pages using OnPush mode, you can turn it on and all `cdr.detectChanges()` codes
   // changeDetection: ChangeDetectionStrategy.OnPush
+  styles: [
+    `
+      :host ::ng-deep .reuse-tab__line .ant-tabs-nav .ant-tabs-tab .reuse-tab__op {
+        top: 15px;
+      }
+    `,
+  ],
 })
 export class LayoutProComponent implements OnInit, AfterViewInit, OnDestroy {
   private destroy$ = new Subject<void>();
