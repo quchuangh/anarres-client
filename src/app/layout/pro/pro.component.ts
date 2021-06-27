@@ -30,6 +30,9 @@ import { ProSettingDrawerComponent } from './setting-drawer/setting-drawer.compo
   // changeDetection: ChangeDetectionStrategy.OnPush
   styles: [
     `
+      .reuse-tab {
+        padding: 2px 2px 0 2px;
+      }
       :host ::ng-deep .reuse-tab__line .ant-tabs-nav .ant-tabs-tab .reuse-tab__op {
         top: 13px;
       }
