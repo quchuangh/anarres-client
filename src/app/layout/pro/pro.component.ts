@@ -41,6 +41,13 @@ import { ProSettingDrawerComponent } from './setting-drawer/setting-drawer.compo
       :host ::ng-deep .ant-tabs > div > .ant-tabs-nav .ant-tabs-nav-more {
         padding: 6px 16px;
       }
+      ::ng-deep .ant-dropdown-menu li > .reuse-tab__name {
+        display: inline-block;
+      }
+      ::ng-deep .ant-dropdown-menu li > .reuse-tab__name ~ i {
+        margin-top: 5px;
+        float: right;
+      }
     `,
   ],
 })
