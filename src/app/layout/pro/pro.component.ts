@@ -28,31 +28,6 @@ import { ProSettingDrawerComponent } from './setting-drawer/setting-drawer.compo
   templateUrl: './pro.component.html',
   // NOTICE: If all pages using OnPush mode, you can turn it on and all `cdr.detectChanges()` codes
   // changeDetection: ChangeDetectionStrategy.OnPush
-  styles: [
-    `
-      .reuse-tab {
-        padding: 2px 2px 0 2px;
-      }
-      :host ::ng-deep .reuse-tab__line .ant-tabs-nav .ant-tabs-tab .reuse-tab__op {
-        top: 13px;
-      }
-      :host ::ng-deep .reuse-tab__line .ant-tabs-nav .ant-tabs-tab .reuse-tab__name {
-        display: inline-block;
-        padding: 6px 15px 6px 5px;
-      }
-      :host ::ng-deep .ant-tabs > .ant-tabs-nav .ant-tabs-nav-more,
-      :host ::ng-deep .ant-tabs > div > .ant-tabs-nav .ant-tabs-nav-more {
-        padding: 6px 16px;
-      }
-      ::ng-deep .ant-dropdown-menu li > .reuse-tab__name {
-        display: inline-block;
-      }
-      ::ng-deep .ant-dropdown-menu li > .reuse-tab__name ~ i {
-        margin-top: 5px;
-        float: right;
-      }
-    `,
-  ],
 })
 export class LayoutProComponent implements OnInit, AfterViewInit, OnDestroy {
   private destroy$ = new Subject<void>();

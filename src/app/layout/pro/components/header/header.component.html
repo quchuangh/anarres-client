@@ -9,6 +9,7 @@
     <div class="alain-pro__top-nav-main-right" layout-pro-header-widget></div>
   </div>
 </div>
+
 <div *ngIf="!pro.isTopMenu" class="alain-pro__header">
   <div class="d-flex align-items-center">
     <ng-container *ngIf="pro.isMobile">
@@ -21,5 +22,6 @@
       <i nz-icon [nzType]="collapsedIcon" class="alain-pro__header-item-icon"></i>
     </div>
   </div>
+  <reuse-tab class="reuse-tab" #reuseTab [tabBarGutter]="1"></reuse-tab>
   <div layout-pro-header-widget></div>
 </div>

@@ -15,6 +15,7 @@ import { BrandService } from '../../pro.service';
     '[class.alain-pro__header-hide]': 'hideHeader',
     '[style.padding.px]': '0',
   },
+  styleUrls: ['./header.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LayoutProHeaderComponent implements OnInit, OnDestroy {

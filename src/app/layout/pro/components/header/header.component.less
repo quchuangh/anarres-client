@@ -1,0 +1,29 @@
+.reuse-tab {
+  width: 100px;
+  padding: 2px 2px 0 2px;
+  flex-grow: 1;
+  min-height: 36px;
+}
+
+:host ::ng-deep .reuse-tab__line .ant-tabs-nav .ant-tabs-tab .reuse-tab__op {
+  top: 13px;
+}
+
+:host ::ng-deep .reuse-tab__line .ant-tabs-nav .ant-tabs-tab .reuse-tab__name {
+  display: inline-block;
+  padding: 6px 15px 6px 5px;
+}
+
+:host ::ng-deep .ant-tabs > .ant-tabs-nav .ant-tabs-nav-more,
+:host ::ng-deep .ant-tabs > div > .ant-tabs-nav .ant-tabs-nav-more {
+  padding: 6px 16px;
+}
+
+::ng-deep .ant-dropdown-menu li > .reuse-tab__name {
+  display: inline-block;
+
+  ~ i {
+    float: right;
+    margin-top: 5px;
+  }
+}
