@@ -31,7 +31,15 @@ import { ProSettingDrawerComponent } from './setting-drawer/setting-drawer.compo
   styles: [
     `
       :host ::ng-deep .reuse-tab__line .ant-tabs-nav .ant-tabs-tab .reuse-tab__op {
-        top: 15px;
+        top: 13px;
+      }
+      :host ::ng-deep .reuse-tab__line .ant-tabs-nav .ant-tabs-tab .reuse-tab__name {
+        display: inline-block;
+        padding: 6px 15px 6px 5px;
+      }
+      :host ::ng-deep .ant-tabs > .ant-tabs-nav .ant-tabs-nav-more,
+      :host ::ng-deep .ant-tabs > div > .ant-tabs-nav .ant-tabs-nav-more {
+        padding: 6px 16px;
       }
     `,
   ],
